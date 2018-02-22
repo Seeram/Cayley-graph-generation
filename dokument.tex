@@ -9,8 +9,6 @@
 \author{Matus Behun}
 
 \maketitle
-\listofalgorithms
-
 \begin{algorithm}
 	\caption{Group elements generation}
 	\label{alg1}	
@@ -23,6 +21,7 @@
 			\FORALL{$generating\_element \leftarrow generation\_set[]$}
 				\STATE $multiplication\_result \leftarrow (stack\_element * generating\_element)$ mod $n$
 				\STATE $multiplication\_results[stack\_element]$ append $multiplication\_result$
+				\STATE $stack[]$ append $multiplication\_result$
 			\ENDFOR
 			\STATE shift to the left $stack[]$
 			\STATE $stack\_element \leftarrow stack[0]$
