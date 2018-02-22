@@ -1,0 +1,36 @@
+\documentclass{article}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{amsmath}
+
+\begin{document}
+
+\title{Generation of Cayley graphs}
+\author{Matus Behun}
+
+\maketitle
+\listofalgorithms
+
+\begin{algorithm}
+	\caption{Group elements generation}
+	\label{alg1}	
+	\algsetup{indent=1em}
+	\begin{algorithmic}[1]
+		\REQUIRE $generation\_set[], n$
+		\STATE $stack[] \leftarrow generation\_set[]$
+		\STATE $stack\_element \leftarrow stack[0]$
+		\WHILE{$stack[]$ \NOT empty}
+			\FORALL{$generating\_element \leftarrow generation\_set[]$}
+				\STATE $multiplication\_result \leftarrow (stack\_element * generating\_element)$ mod $n$
+				\STATE $multiplication\_results[stack\_element]$ append $multiplication\_result$
+			\ENDFOR
+			\STATE shift to the left $stack[]$
+			\STATE $stack\_element \leftarrow stack[0]$
+		\ENDWHILE
+		\RETURN $multiplication\_results$
+	\end{algorithmic}
+\end{algorithm}
+
+
+\end{document}
+
