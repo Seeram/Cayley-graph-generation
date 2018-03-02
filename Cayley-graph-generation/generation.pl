@@ -21,14 +21,23 @@ use Math::Primality qw( next_prime );
 
 # TODO
 # Make algorithm for arbitrary Zp with hash function - DONE
+# Use hash function for stack to avoid many 
 # Consider using database instead of alocated data
 # Consider paralelization in computing elements of group
 # Consider getting rid of PDL
-#  - make performance tests for computing multiplication of matrices
+#  - make performance tests for computing multiplication of matrices via perl structures
 # Hash table size computing
 #  - not really necessary
 # Representing matrices only by its keys
 # Consider making structured data for better readability
+# Subroutine for reading primes instead of computing them
+
+sub make_matrix_label
+{
+	my ($A, $zp) = @_;
+
+	return sprintf("%d", compute_hash($A, $zp));
+}
 
 sub determinant_Zp 
 {
@@ -59,13 +68,39 @@ sub generate_graph
 	my @t0 = gettimeofday();
 	#####
 
-	my ($keys_ref, $multiplication_results_ref) = @_;
+	my ($keys_ref, $multiplication_results_ref, $zp) = @_;
 	my $graph = Graph::Undirected->new; 
 
-	foreach my $start_node (@{ $keys_ref }) {
-		my @nodes = @{ $multiplication_results_ref->[$start_node->[0]] };
-		foreach my $end_node ( @nodes )  {
-			$graph->add_edge(make_matrix_label(${start_node}->[1]), make_matrix_label($end_node));
+	
+	# Data structure of multiplication_results
+	#
+	# $VAR621 = [
+	#        [
+	#          $VAR244->[0][1],
+	#          bless( do{\(my $o = 57162304)}, 'PDL::Matrix' ),
+	#          $VAR621->[0][1],
+	#          $VAR445->[0][0]
+	#        ],
+	#        [
+	#         $VAR244->[0][1],
+	#          $VAR621->[0][1],
+	#          $VAR445->[0][0]
+	#        ],
+	#        [
+	#          $VAR244->[0][1], 
+	#          $VAR445->[0][0]
+	#        ]
+	#      ];
+	# $VAR622 = undef;
+	# $VAR623 = undef;
+
+	foreach my $index ( @{ $keys_ref } ) {
+		foreach my $table_entry_ref ( @{ $multiplication_results_ref->[$index] } ) {
+			foreach my $edge ( @{ $table_entry_ref } ) {
+				unless (all $edge == $table_entry_ref->[0]) {
+					$graph->add_edge(make_matrix_label($table_entry_ref->[0], $zp), make_matrix_label($edge, $zp));
+				}
+			}
 		}
 	}
 
@@ -80,7 +115,6 @@ sub generate_graph
 	return $graph;
 }
 
-	# Probably not best way to test it
 sub find_result
 {
 	my ($multiplication_results_ref, $node_to_find, $zp, $hash_table_size) = @_;
@@ -142,7 +176,8 @@ sub generate_group
 	#####
 
 	my $current_node = $stack[0]; 
-	my @keys = [ compute_hash($current_node, $zp), $current_node ];
+	my @keys;
+	push @keys, compute_hash($current_node, $zp);
 
 	while(@stack) {
 		foreach my $generating_element (@generating_set) {
@@ -160,10 +195,9 @@ sub generate_group
 
 		if(@stack) {
 			$current_node = $stack[0];
-			push @keys, [ compute_hash($current_node, $zp), $current_node ];
+				# Depending on number of collisions there is a way to make it better
+			push @keys, compute_hash($current_node, $zp);
 		}
-		#		print "Stack size : $#stack\n";
-
 	}
 
 	#####	
@@ -172,8 +206,8 @@ sub generate_group
 	print "Number of nodes: " . ($#keys + 1) . "\n";
 	print "############################################\n";
 	#####
-
-	return ( \@keys, \@multiplication_results );
+	
+	return ( \@keys, \@multiplication_results, $zp );
 }
 
 sub get_index
@@ -237,8 +271,8 @@ sub compute_order_set
 		while(!(all $res == $eye)) {
 			$res = ($res x $generating_element) % $zp;
 			$order++;
-			print $res;
-			<STDIN>;
+			#		print $res;
+			#       <STDIN>;
 		}
 		print "-------\n";
 		print "Order of element: $order\n";
@@ -283,14 +317,13 @@ sub order_of_GL
 #4256233;
 #15485863;
 
-my $zp = give_nth_prime(25);
+my $zp = give_nth_prime(250);
 my $hash_table_size = 154485863;
-
 
 my @generating_set = 
 	( 
 		PDL::Matrix->pdl([[1,7],[7,3]]), 
-		PDL::Matrix->pdl([[2,1],[1,3]]), 
+		PDL::Matrix->pdl([[2,1],[0,2]]), 
 	);
 
 #compute_order_set(check_set(\@generating_set), $zp);
@@ -300,13 +333,9 @@ print "Zp: $zp\n";
 print "Hash table size: $hash_table_size\n";
 print "############################################\n";
 
-generate_group_alt(check_set(\@generating_set, $zp), $zp, $hash_table_size);
-#make_graphical_output(generate_graph(generate_group(check_set(\@generating_set, $zp), $zp, $hash_table_size)));
+
+#compute_order_set(\@generating_set, $zp);
+#generate_group(check_set(\@generating_set, $zp), $zp, $hash_table_size);
+make_graphical_output(generate_graph(generate_group(check_set(\@generating_set, $zp), $zp, $hash_table_size)));
 #generate_graph(generate_group(check_set(\@generating_set, $zp), $zp));
 
-sub make_matrix_label
-{
-	my ($A) = @_;
-
-	return sprintf("%d", compute_hash($A, $zp));
-}
