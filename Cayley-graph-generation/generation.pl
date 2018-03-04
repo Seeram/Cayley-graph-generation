@@ -21,10 +21,10 @@ use Math::Primality qw( next_prime );
 
 # TODO
 # Make algorithm for arbitrary Zp with hash function - DONE
+# Consider getting rid of PDL 
 # Use hash function for stack to avoid many 
 # Consider using database instead of alocated data
 # Consider paralelization in computing elements of group
-# Consider getting rid of PDL
 #  - make performance tests for computing multiplication of matrices via perl structures
 # Hash table size computing
 #  - not really necessary
@@ -164,50 +164,91 @@ sub insert_result
 	push @{ $multiplication_results_ref->[$index_no] }, [ $node_place, $node_to_insert ];
 }
 
+sub insert_hash
+{
+	my ($generating_nodes_ref, $node, $zp, $hash_table_size ) = @_;
+
+	my $hash_no = compute_hash($node, $zp);
+
+	unless(defined($generating_nodes_ref->{ $hash_no })) {
+		$generating_nodes_ref->{ $hash_no } = $hash_no;
+
+		return 1;
+	}
+
+	return 0;
+}
+
+sub find_hash
+{
+	my ($generating_nodes_ref, $node, $zp, $hash_table_size ) = @_;
+
+	my $hash_no = compute_hash($node, $zp);
+		
+	if(defined($generating_nodes_ref->{ $hash_no })) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
 sub generate_group
 {
 	my ($generating_set_ref, $zp, $hash_table_size) = @_;
 	my @generating_set = @{ $generating_set_ref };
 	my @stack = @generating_set;
-	my @multiplication_results;
+	my %generating_nodes;
+	my $graph = Graph::Undirected->new; 
+
 
 	#####
 	my @t0 = gettimeofday();
 	#####
 
 	my $current_node = $stack[0]; 
-	my @keys;
-	push @keys, compute_hash($current_node, $zp);
+	insert_hash(\%generating_nodes, $current_node, $zp, $hash_table_size );
 
+
+	my $counter = 0;
 	while(@stack) {
 		foreach my $generating_element (@generating_set) {
 			my $multiplication_result = ($current_node x $generating_element) % $zp;	
-			insert_result( \@keys, \@multiplication_results, $current_node, $multiplication_result, $zp, $hash_table_size );
-				# Possible performance improvment with checking @stack before putting in result
-			push @stack, $multiplication_result;
+
+			unless(find_hash(\%generating_nodes, $multiplication_result, $zp, $hash_table_size)) {
+				push @stack, $multiplication_result;
+			}
+
+			unless(all $generating_element == $multiplication_result) {
+				$graph->add_edge(make_matrix_label($current_node, $zp), make_matrix_label($multiplication_result, $zp));
+			}
 		}
 
 		shift @stack;
 
-		while(@stack && find_result(\@multiplication_results, $stack[0], $zp, $hash_table_size)) {
-			shift @stack;
-		}
-
 		if(@stack) {
 			$current_node = $stack[0];
-				# Depending on number of collisions there is a way to make it better
-			push @keys, compute_hash($current_node, $zp);
+			insert_hash(\%generating_nodes, $current_node, $zp, $hash_table_size );
+		}
+		
+
+		$counter++;
+		if(($counter % 10000) == 0) {
+			print "Velkost grafu: " . format_bytes(total_size(\$graph)) . "\n";
+			print "Pocet vrcholov: " . $graph->vertices . "\n";
+			print "Pocet matic v stacku: " . $#stack . "\n";
+			print "Velkost stacku: " . format_bytes(total_size(\@stack)) . "\n";
+			print "############################################\n";
 		}
 	}
 
-	#####	
+	exit;
+	#####
 	print "Generovanie prvkov: " . tv_interval( \@t0 ) . " sekund\n";
-	print "Size multiplication_results: " . format_bytes(total_size(\@multiplication_results)) . "\n";
-	print "Number of nodes: " . ($#keys + 1) . "\n";
-	print "############################################\n";
+	#	print "Velkost grafu: " . format_bytes(total_size(\$graph)) . "\n";
+	print "Priemer grafu: " . $graph->diameter   . "\n";
 	#####
 	
-	return ( \@keys, \@multiplication_results, $zp );
+	return $graph;
 }
 
 sub get_index
@@ -317,7 +358,7 @@ sub order_of_GL
 #4256233;
 #15485863;
 
-my $zp = give_nth_prime(250);
+my $zp = give_nth_prime(7);
 my $hash_table_size = 154485863;
 
 my @generating_set = 
@@ -326,6 +367,7 @@ my @generating_set =
 		PDL::Matrix->pdl([[2,1],[0,2]]), 
 	);
 
+PDL::Matrix->pdl([[2,1],[0,2]]), 
 #compute_order_set(check_set(\@generating_set), $zp);
 
 print "Order of GL(2,$zp): " . order_of_GL(2,$zp) . "\n";
@@ -336,6 +378,5 @@ print "############################################\n";
 
 #compute_order_set(\@generating_set, $zp);
 #generate_group(check_set(\@generating_set, $zp), $zp, $hash_table_size);
-make_graphical_output(generate_graph(generate_group(check_set(\@generating_set, $zp), $zp, $hash_table_size)));
+generate_group(check_set(\@generating_set, $zp), $zp, $hash_table_size);
 #generate_graph(generate_group(check_set(\@generating_set, $zp), $zp));
-
