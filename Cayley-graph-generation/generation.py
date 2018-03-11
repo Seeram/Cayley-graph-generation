@@ -49,10 +49,11 @@ def generate_subgroup(generating_set, zp):
     v = graph.add_vertex()
     vertex_list[hash_matrix(generating_matrix, zp)] = v
     vertex_label[v] = make_matrix_label(generating_matrix)
+    
 
     while stack:
         for generating_set_element in generating_set:
-            multiplication_result = (generating_set_element * generating_matrix) % zp
+            multiplication_result = (generating_matrix * generating_set_element) % zp
             if hash_matrix(multiplication_result, zp) not in generating_matrices:
                 stack.append(multiplication_result)
 
@@ -63,32 +64,38 @@ def generate_subgroup(generating_set, zp):
                     vertex_label[source_v] = make_matrix_label(generating_matrix)
                 else:
                     source_v = vertex_list[hash_matrix(generating_matrix, zp)]
+
                 if hash_matrix(multiplication_result, zp) not in vertex_list:
                     target_v = graph.add_vertex()
                     vertex_list[hash_matrix(multiplication_result, zp)] = target_v
                     vertex_label[target_v] = make_matrix_label(multiplication_result)
                 else:
                     target_v = vertex_list[hash_matrix(multiplication_result, zp)]
+
                 graph.add_edge(source_v, target_v)
 
         stack.pop(0)
 
         if stack:
-            generating_node = stack[0]
-            generating_matrices[hash_matrix(generating_node, zp)] = True
+            generating_matrix = stack[0]
+            generating_matrices[hash_matrix(generating_matrix, zp)] = True
     
-    graph.vertex_properties["name"] = vertex_label
-    graph_draw(
-                graph,
-                vertex_text=graph.vertex_properties["name"],
-                output="test.png"
-              )
+    print("Num vertices: " + str(graph.num_vertices()))
+    raw_input()
+    print("pocitam")
+    graph_tool.stats.distance_histogram(graph)
+
+#    graph.vertex_properties["name"] = vertex_label
+#    graph_tool.draw.graphviz_draw(
+#                graph,
+#                vertex_text=graph.vertex_properties["name"],
+#                layout="circo",
+#                output="test.png"
+#              )
 
 
 
 
 
-gen_set = [np.matrix('2 0;1 3'), np.matrix('2 0;1 2')]
-
-print_set(gen_set)
-generate_subgroup(gen_set, 5)
+gen_set = [np.matrix('2 0;1 3'), np.matrix('2 0;1 2'), np.matrix('2 4;2 3')]
+generate_subgroup(gen_set, 11)
