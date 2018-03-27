@@ -151,9 +151,6 @@ sub find_hash
 
 	my $hash_no = compute_hash($node, $zp);
 
-	my $mat = PDL::Matrix->pdl([[2,2],[1,0]]);
-
-
 	if( defined $generating_nodes_ref->{ $hash_no } ) {
 		return 0;
 	} else {
@@ -166,29 +163,29 @@ sub get_diameter
 	my ($keys_ref, $multiplication_results_ref, $generation_set_ref, $diameter, $zp) = @_;
 
 	my @generation_set = @{ $generation_set_ref }; 
-
-	my $variations = variations_with_repetition([0...$#generation_set], 2);
 	my @hash_storage;
 
-	while (my $variation = $variations->next) {
-		push @hash_storage, compute_hash((($generation_set[$variation->[0]] x $generation_set[$variation->[1]]) % $zp), $zp);
+	if($diameter == 1) {
+		return 1;
+	}
+
+	foreach my $i ( 2..$diameter ) {
+		my $variations = variations_with_repetition([0...$#generation_set], $i);
+		while (my $variation = $variations->next) {
+			my $m = $generation_set[$variation->[0]];
+			foreach my $j ( 1..($i-1) ) {
+				$m = ($m x $generation_set[$variation->[$j]]) % $zp;
+			}
+			push @hash_storage, compute_hash($m, $zp);
+		}
 	}
 
 	foreach my $m ( @{ $generation_set_ref } ) {
 		push @hash_storage, compute_hash($m, $zp);
 	}
-	
+
 	foreach my $key ( @{ $keys_ref } ) {
-			# Not found not given 
-		unless(List::Util::any {$_ eq $key} @hash_storage) {
-			if($diameter == 2) {
-				print "Diameter 2\n";
-				print "Couldn't find $key\n";
-				print join(", ", @hash_storage) . "\n";
-				<STDIN>;
-			}
-			return 0;
-		}
+		return 0 unless(List::Util::any {$_ eq $key} @hash_storage) 
 	}
 
 	return 1;
@@ -255,14 +252,11 @@ sub generate_graph_from_table
 
 	my $diameter = $graph->diameter;
 
-	if($diameter == 2) {
-		if(get_diameter( $keys_ref, $multiplication_results_ref, $generating_set_ref, $diameter, $zp)) {
-			print "Sedi\n";
-		} else {
-			print "Nesedi\n";
-		}
-		#make_graphical_output($graph, $generating_set_ref, $diameter, $zp, "graf_diameter_2.svg");
-	} 	
+	if(get_diameter( $keys_ref, $multiplication_results_ref, $generating_set_ref, $diameter, $zp)) {
+		print "Ok\n";
+	} else {
+		print "Not Ok\n";
+	}
 
 	return ( $graph, $generating_set_ref, $diameter, $zp );
 }
