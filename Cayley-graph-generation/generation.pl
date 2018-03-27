@@ -11,6 +11,8 @@ use Graph::Directed;
 use Graph::Writer::Dot;
 
 use Data::Dumper;
+use List::MoreUtils qw( );
+use List::Util qw( );
 
 use Devel::Size qw( size total_size );
 use Number::Format qw( format_bytes );
@@ -19,11 +21,7 @@ use Time::HiRes qw( gettimeofday tv_interval);
 use Math::GMPz qw( Rmpz_get_ui );
 use Math::Primality qw( next_prime );
 
-# TODO
-# Consider paralelization in computing elements of group
-#  - make performance tests for computing multiplication of matrices via perl structures
-# Hash table size computing
-#  - not really necessary
+use Algorithm::Combinatorics qw( combinations variations_with_repetition );
 
 sub make_matrix_label
 {
@@ -67,7 +65,8 @@ sub insert_result
 	my ($multiplication_results_ref, $node_place, $node_to_insert, $zp, $hash_table_size ) = @_;
 
 	my $hash_no = compute_hash($node_place, $zp);
-	my $index_no = $hash_no % $hash_table_size;
+	#	my $index_no = $hash_no % $hash_table_size;
+	my $index_no = $hash_no;
 
 		# First parent node on index
 	if(not defined($multiplication_results_ref->[$index_no])) {
@@ -115,6 +114,22 @@ sub find_result
 	exit;
 }
 
+sub print_hash_table 
+{
+	print "Printing hash table\n";
+	my ($generating_nodes_ref) = @_;
+
+	my %ht = %{ $generating_nodes_ref };
+
+	foreach my $key ( keys %ht ) {
+		print "$key\n";
+	}
+
+	my @keys = keys %ht;
+
+}
+
+
 sub insert_hash
 {
 	my ($generating_nodes_ref, $node, $zp) = @_;
@@ -135,38 +150,79 @@ sub find_hash
 	my ($generating_nodes_ref, $node, $zp) = @_;
 
 	my $hash_no = compute_hash($node, $zp);
-		
-	if(defined($generating_nodes_ref->{ $hash_no })) {
-		return 1;
-	} else {
+
+	my $mat = PDL::Matrix->pdl([[2,2],[1,0]]);
+
+
+	if( defined $generating_nodes_ref->{ $hash_no } ) {
 		return 0;
+	} else {
+		return 1;
 	}
+}
+
+sub get_diameter
+{
+	my ($keys_ref, $multiplication_results_ref, $generation_set_ref, $diameter, $zp) = @_;
+
+	my @generation_set = @{ $generation_set_ref }; 
+
+	my $variations = variations_with_repetition([0...$#generation_set], 2);
+	my @hash_storage;
+
+	while (my $variation = $variations->next) {
+		push @hash_storage, compute_hash((($generation_set[$variation->[0]] x $generation_set[$variation->[1]]) % $zp), $zp);
+	}
+
+	foreach my $m ( @{ $generation_set_ref } ) {
+		push @hash_storage, compute_hash($m, $zp);
+	}
+	
+	foreach my $key ( @{ $keys_ref } ) {
+			# Not found not given 
+		unless(List::Util::any {$_ eq $key} @hash_storage) {
+			if($diameter == 2) {
+				print "Diameter 2\n";
+				print "Couldn't find $key\n";
+				print join(", ", @hash_storage) . "\n";
+				<STDIN>;
+			}
+			return 0;
+		}
+	}
+
+	return 1;
 }
 
 sub generate_group
 {
-	print "Generation of group\n";
-	my ($generating_set_ref, $zp, $hash_table_size) = @_;
-	my @generating_set = @{ $generating_set_ref };
-	my @stack = @generating_set;
-	my @multiplication_results;
-	my %generating_nodes;
-
-
 	#####
 	my @t0 = gettimeofday();
 	#####
+	
+	my ($generating_set_ref, $zp, $hash_table_size) = @_;
+	my @multiplication_results;
+	my %generating_nodes;
+	
+	my @generating_set = @{ $generating_set_ref };
+	my @keys;
+	my @stack;
+
+	foreach my $gs_element ( @generating_set ) {
+		insert_hash(\%generating_nodes, $gs_element, $zp, $hash_table_size );
+		push @keys, compute_hash($gs_element, $zp);
+		push @stack, $gs_element;
+	}
 
 	my $current_node = $stack[0]; 
-	my @keys;
-	push @keys, compute_hash($current_node, $zp);
 
 	while(@stack) {
 		foreach my $generating_element (@generating_set) {
 			my $multiplication_result = ($current_node x $generating_element) % $zp;	
 			insert_result(\@multiplication_results, $current_node,  $multiplication_result, $zp, $hash_table_size);
-			print find_hash(\%generating_nodes, $multiplication_result, $zp, $hash_table_size);
-			unless(find_hash(\%generating_nodes, $multiplication_result, $zp, $hash_table_size)) {
+			if(find_hash(\%generating_nodes, $multiplication_result, $zp)) {
+				insert_hash(\%generating_nodes, $multiplication_result, $zp, $hash_table_size );
+				push @keys, compute_hash($multiplication_result, $zp);
 				push @stack, $multiplication_result;
 			}
 		}
@@ -175,25 +231,18 @@ sub generate_group
 
 		if(@stack) {
 			$current_node = $stack[0];
-			insert_hash(\%generating_nodes, $current_node, $zp, $hash_table_size );
-			push @keys, compute_hash($current_node, $zp);
 		}
 	}
-	
-	return ( \@keys, \@multiplication_results, $zp );
+
+	return ( \@keys, \@multiplication_results, $generating_set_ref, $zp);
 }
 
 sub generate_graph_from_table
 {
-	print "Generating graph from table\n";
-	#####
-	my @t0 = gettimeofday();
-	#####
-
-	my ($keys_ref, $multiplication_results_ref, $zp) = @_;
+	my ($keys_ref, $multiplication_results_ref, $generating_set_ref, $zp) = @_;
 	my $graph = Graph::Undirected->new; 
 
-	print "Number of keys: " . $#{ $keys_ref } . "\n";
+	#print "Number of keys: " . $#{ $keys_ref } . "\n";
 	foreach my $index ( @{ $keys_ref } ) {
 		foreach my $table_entry_ref ( @{ $multiplication_results_ref->[$index] } ) {
 			foreach my $edge ( @{ $table_entry_ref } ) {
@@ -204,14 +253,18 @@ sub generate_graph_from_table
 		}
 	}
 
-	#####	
-	print "Generovanie grafu: " . tv_interval( \@t0 ) . " sekund\n";
-	print "Velkost graf: " . format_bytes(total_size(\$graph)) . "\n";
-	print "############################################\n";
-	#####
-	print "Diameter: " . $graph->diameter. "\n";
-	
-	return $graph;
+	my $diameter = $graph->diameter;
+
+	if($diameter == 2) {
+		if(get_diameter( $keys_ref, $multiplication_results_ref, $generating_set_ref, $diameter, $zp)) {
+			print "Sedi\n";
+		} else {
+			print "Nesedi\n";
+		}
+		#make_graphical_output($graph, $generating_set_ref, $diameter, $zp, "graf_diameter_2.svg");
+	} 	
+
+	return ( $graph, $generating_set_ref, $diameter, $zp );
 }
 
 sub generate_graph
@@ -251,14 +304,9 @@ sub generate_graph
 		}
 	}
 
-	#my $writer = Graph::Writer::Dot->new();
-	#$writer->write_graph($graph, 'graph.dot');
-
-	#	system "circo", "-Tsvg", "graf.dot", "-o", "outfile.svg";
-	
-	print "Number of vertices: " . $graph->vertices;
-	<STDIN>;
-	print "pocitam\n";
+	# print "Number of vertices: " . $graph->vertices;
+	# <STDIN>;
+	# print "pocitam\n";
 	return $graph->diameter;
 }
 
@@ -298,6 +346,7 @@ sub generate_SL_group
 
 	my @generating_set ;
 	my $zpg = $zp - 1;
+	my $neutral_element = PDL::Matrix->pdl([[1, 0],[0, 1]]);
 
 	foreach my $i (0..$zpg){
 		foreach my $j (0..$zpg) {
@@ -305,7 +354,9 @@ sub generate_SL_group
 				foreach my $l (0..$zpg) {
 					my $m = PDL::Matrix->pdl([[$i, $j],[$k, $l]]);
 					if(determinant_Zp($m, $zp) == 1) {
-						push @generating_set, $m;
+						unless(all $m == $neutral_element) {
+							push @generating_set, $m;
+						}
 					}
 				}
 			}
@@ -424,13 +475,21 @@ sub compute_order_set
 
 sub make_graphical_output
 {
-	my ($graph) = @_;
+	my ($graph, $generating_set_ref, $diameter, $zp, $filename) = @_;
 	my $writer = Graph::Writer::Dot->new();
 	$writer->write_graph($graph, 'graf.dot');
 
-	print "Making graphical output on" .  $graph->vertices . "vertices\n";
+	my $hash = "";
+	foreach my $mat ( @{ $generating_set_ref } ) {
+		$hash = $hash . compute_hash($mat, $zp) . ".";
+	}
 
-	system "circo", "-Tsvg", "graf.dot", "-o", "outfile.svg";
+	if( not defined  $filename ) {
+		$filename = "GeneratingSetSize_" . ($#{ $generating_set_ref } + 1) . "_Diameter_" . $diameter . "_Zp_" . $zp . "_$hash" . "svg";
+	} 
+
+	my $folder = "graphs/";
+	system "circo", "-Tsvg", "graf.dot", "-o", $folder . $filename;
 }
 
 sub give_nth_prime 
@@ -469,23 +528,32 @@ sub order_of_SL
 	return ($order / ($q - 1));
 }
 
-my $zp = give_nth_prime(4);
-print "Zp: $zp\n";
-print "Order of GL(2,$zp): " . order_of_GL(2,$zp) . "\n";	
-my $hash_table_size = 154485863;
+sub generate_degree_diameter_solution
+{
+	my $zp = give_nth_prime(2);
+	my @group = @{ generate_SL_group($zp) };
+	my $hash_table_size = 154485863;
 
-my @generating_set = 
-	(
-		#				PDL::Matrix->pdl([[2,0],[1,3]]), 
-				PDL::Matrix->pdl([[2,0],[1,2]]), 
-				PDL::Matrix->pdl([[2,1],[1,1]]), 
-				PDL::Matrix->pdl([[2,1],[1,0]]), 
-				PDL::Matrix->pdl([[2,2],[1,0]]), 
-	);
+	print "Zp: $zp\n";
+	print "Order of SL(2,$zp): " . order_of_SL(2,$zp) . "\n";	
 
-push @generating_set, find_group_inverse(PDL::Matrix->pdl([[2,0],[1,2]]), $zp); 
-push @generating_set, find_group_inverse(PDL::Matrix->pdl([[2,1],[1,1]]), $zp);
-push @generating_set, find_group_inverse(PDL::Matrix->pdl([[2,1],[1,0]]), $zp);
-push @generating_set, find_group_inverse(PDL::Matrix->pdl([[2,2],[1,0]]), $zp);
+	my $moor_boundary = int(sqrt($#group)) + 1;
+	foreach my $num_of_elements ( (($moor_boundary/2))..($moor_boundary*2) ) {
+		my $combinations = combinations([0..$#group], $num_of_elements);
+		while(my $combination = $combinations->next) {
+			my @chosen_set;
 
-generate_graph_from_table(generate_group(check_GL_set(\@generating_set, $zp), $zp, $hash_table_size));
+			foreach my $group_index ( @{ $combination } ) {
+				push @chosen_set, $group[$group_index];
+				push @chosen_set, find_group_inverse($group[$group_index], $zp);
+			}
+
+				# Remove same matrices if in chosen set was inverse of some other element
+			my @generating_set = List::MoreUtils::uniq @chosen_set;
+
+			make_graphical_output(generate_graph_from_table(generate_group(check_GL_set(\@generating_set, $zp), $zp, $hash_table_size)));
+		}
+	}
+}
+
+generate_degree_diameter_solution();
