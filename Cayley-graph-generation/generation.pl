@@ -158,15 +158,30 @@ sub find_hash
 	}
 }
 
-sub get_diameter
+sub find_diameter
 {
-	my ($keys_ref, $multiplication_results_ref, $generation_set_ref, $diameter, $zp) = @_;
+
+}
+
+sub check_diameter
+{
+	my ($keys_ref, $multiplication_results_ref, $generation_set_ref, $zp, $diameter) = @_;
 
 	my @generation_set = @{ $generation_set_ref }; 
 	my @hash_storage;
 
 	if($diameter == 1) {
-		return 1;
+		my @graph = generate_graph_from_table($keys_ref, $multiplication_results_ref, $generation_set_ref, $zp);
+		if($graph[0]->diameter == 1) {
+			my $order = $graph[0]->vertices;	
+			
+			foreach my $vertex ( $graph[0]->vertices ) {
+				if(($graph[0]->vertex_degree($vertex) + 1) != $order) {
+					return 0;
+				}
+			}
+			return 1;
+		}
 	}
 
 	foreach my $i ( 2..$diameter ) {
@@ -185,7 +200,7 @@ sub get_diameter
 	}
 
 	foreach my $key ( @{ $keys_ref } ) {
-		return 0 unless(List::Util::any {$_ eq $key} @hash_storage) 
+		return 0 unless(List::Util::any {$_ eq $key} @hash_storage);
 	}
 
 	return 1;
@@ -250,15 +265,7 @@ sub generate_graph_from_table
 		}
 	}
 
-	my $diameter = $graph->diameter;
-
-	if(get_diameter( $keys_ref, $multiplication_results_ref, $generating_set_ref, $diameter, $zp)) {
-		print "Ok\n";
-	} else {
-		print "Not Ok\n";
-	}
-
-	return ( $graph, $generating_set_ref, $diameter, $zp );
+	return ( $graph, $generating_set_ref, $zp );
 }
 
 sub generate_graph
@@ -469,7 +476,8 @@ sub compute_order_set
 
 sub make_graphical_output
 {
-	my ($graph, $generating_set_ref, $diameter, $zp, $filename) = @_;
+	my ($graph, $generating_set_ref, $zp, $diameter, $filename) = @_;
+	print "Graf " . $graph->diameter . "\n";
 	my $writer = Graph::Writer::Dot->new();
 	$writer->write_graph($graph, 'graf.dot');
 
@@ -522,7 +530,7 @@ sub order_of_SL
 	return ($order / ($q - 1));
 }
 
-sub generate_degree_diameter_solution
+sub generate_all_degree_diameter_solution_graphs
 {
 	my $zp = give_nth_prime(2);
 	my @group = @{ generate_SL_group($zp) };
@@ -532,7 +540,7 @@ sub generate_degree_diameter_solution
 	print "Order of SL(2,$zp): " . order_of_SL(2,$zp) . "\n";	
 
 	my $moor_boundary = int(sqrt($#group)) + 1;
-	foreach my $num_of_elements ( (($moor_boundary/2))..($moor_boundary*2) ) {
+	foreach my $num_of_elements ( (($moor_boundary/2))..($#group) ) {
 		my $combinations = combinations([0..$#group], $num_of_elements);
 		while(my $combination = $combinations->next) {
 			my @chosen_set;
@@ -541,11 +549,59 @@ sub generate_degree_diameter_solution
 				push @chosen_set, $group[$group_index];
 				push @chosen_set, find_group_inverse($group[$group_index], $zp);
 			}
-
+			
 				# Remove same matrices if in chosen set was inverse of some other element
 			my @generating_set = List::MoreUtils::uniq @chosen_set;
+				#Change according to new arguments
+			#make_graphical_output(generate_graph_from_table(generate_group(check_GL_set(\@generating_set, $zp), $zp, $hash_table_size)));
+		}
+	}
+}
 
-			make_graphical_output(generate_graph_from_table(generate_group(check_GL_set(\@generating_set, $zp), $zp, $hash_table_size)));
+sub generate_degree_diameter_solution
+{
+	my $zp = give_nth_prime(3);
+	my @group = @{ generate_SL_group($zp) };
+	my $hash_table_size = 154485863;
+
+	print "Zp: $zp\n";
+	print "Order of SL(2,$zp): " . order_of_SL(2,$zp) . "\n";	
+
+	my $moor_boundary = int(sqrt($#group)) + 1;
+	foreach my $num_of_elements ( (($moor_boundary/2))..($#group) ) {
+		my $combinations = combinations([0..$#group], $num_of_elements);
+		while(my $combination = $combinations->next) {
+			my @chosen_set;
+			foreach my $group_index ( @{ $combination } ) {
+				push @chosen_set, $group[$group_index];
+				push @chosen_set, find_group_inverse($group[$group_index], $zp);
+			}
+			
+				# Remove same matrices if in chosen set was inverse of some other element
+			my @generating_set = List::MoreUtils::uniq @chosen_set;
+			my @group = generate_group(check_GL_set(\@generating_set, $zp), $zp, $hash_table_size);
+
+			print "Graf na $#generating_set\n";
+			if(check_diameter(@group, 2)) {
+				print "Nasiel som\n";
+				print @generating_set;
+				exit;
+			}
+
+			my $diameter;
+
+				# Random testing of graphs
+			if(rand() > 1) {
+				my @graph = generate_graph_from_table(@group);
+				my $graph_diameter = $graph[0]->diameter;
+				print "Testing random graph for diameter $graph_diameter: ";
+				if($diameter != $graph_diameter) {
+					print "diameter $diameter not equal to computed graph diameter $graph_diameter\n";
+					exit;
+				} else {
+					print "Ok!\n";
+				}
+			}
 		}
 	}
 }
