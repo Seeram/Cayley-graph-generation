@@ -17,6 +17,7 @@ use List::Util qw( );
 use Devel::Size qw( size total_size );
 use Number::Format qw( format_bytes );
 use Time::HiRes qw( gettimeofday tv_interval);
+use Parallel::ForkManager;
 
 use Math::GMPz qw( Rmpz_get_ui );
 use Math::Primality qw( next_prime );
@@ -560,9 +561,10 @@ sub generate_all_degree_diameter_solution_graphs
 
 sub generate_degree_diameter_solution
 {
-	my $zp = give_nth_prime(3);
+	my $zp = give_nth_prime(2);
 	my @group = @{ generate_SL_group($zp) };
 	my $hash_table_size = 154485863;
+	my $pm = new Parallel::ForkManager( 4 );
 
 	print "Zp: $zp\n";
 	print "Order of SL(2,$zp): " . order_of_SL(2,$zp) . "\n";	
@@ -571,6 +573,8 @@ sub generate_degree_diameter_solution
 	foreach my $num_of_elements ( (($moor_boundary/2))..($#group) ) {
 		my $combinations = combinations([0..$#group], $num_of_elements);
 		while(my $combination = $combinations->next) {
+			$pm->start and next;
+			print join(" ," , @{ $combination }) . "\n";
 			my @chosen_set;
 			foreach my $group_index ( @{ $combination } ) {
 				push @chosen_set, $group[$group_index];
@@ -579,29 +583,29 @@ sub generate_degree_diameter_solution
 			
 				# Remove same matrices if in chosen set was inverse of some other element
 			my @generating_set = List::MoreUtils::uniq @chosen_set;
+
+
 			my @group = generate_group(check_GL_set(\@generating_set, $zp), $zp, $hash_table_size);
 
-			print "Graf na $#generating_set\n";
 			if(check_diameter(@group, 2)) {
 				print "Nasiel som\n";
-				print @generating_set;
-				exit;
+				#				print @generating_set;
+				#exit;
 			}
 
-			my $diameter;
+			my $diameter = 2;
 
 				# Random testing of graphs
-			if(rand() > 1) {
+			if(rand() > 0.95) {
 				my @graph = generate_graph_from_table(@group);
 				my $graph_diameter = $graph[0]->diameter;
 				print "Testing random graph for diameter $graph_diameter: ";
-				if($diameter != $graph_diameter) {
+				if($diameter == $graph_diameter) {
 					print "diameter $diameter not equal to computed graph diameter $graph_diameter\n";
-					exit;
-				} else {
-					print "Ok!\n";
-				}
+				} 			
 			}
+
+			$pm->finish;
 		}
 	}
 }
