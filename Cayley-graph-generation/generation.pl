@@ -599,7 +599,7 @@ sub generate_degree_diameter_solution
 			if(rand() > 0.95) {
 				my @graph = generate_graph_from_table(@group);
 				my $graph_diameter = $graph[0]->diameter;
-				print "Testing random graph for diameter $graph_diameter: ";
+				print "Testing random graph for diameter $graph_diameter: \n";
 				if($diameter == $graph_diameter) {
 					print "diameter $diameter not equal to computed graph diameter $graph_diameter\n";
 				} 			
