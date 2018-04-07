@@ -561,6 +561,10 @@ sub generate_all_degree_diameter_solution_graphs
 
 sub generate_degree_diameter_solution
 {
+	####
+	my @t0 = gettimeofday();
+	####
+	
 	my $zp = give_nth_prime(2);
 	my @group = @{ generate_SL_group($zp) };
 	my $hash_table_size = 154485863;
@@ -572,7 +576,14 @@ sub generate_degree_diameter_solution
 	my $moor_boundary = int(sqrt($#group)) + 1;
 	foreach my $num_of_elements ( (($moor_boundary/2))..($#group) ) {
 		my $combinations = combinations([0..$#group], $num_of_elements);
+		my $counter = 0;
 		while(my $combination = $combinations->next) {
+			$counter++;
+			if($counter == 200) {
+				print "Cas vygenerovania 100 grafov" . tv_interval( \@t0 ) ."sekund\n";
+				exit;
+			}
+			print $counter . "\n";
 			$pm->start and next;
 			print join(" ," , @{ $combination }) . "\n";
 			my @chosen_set;
