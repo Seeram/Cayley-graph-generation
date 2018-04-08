@@ -514,21 +514,21 @@ sub make_group_output
 
 	if( not defined  $filename ) {
 		$filename = "GeneratingSetSize_" . ($#{ $generating_set_ref } + 1) . "_Diameter_" . $diameter . "_Zp_" . $zp . "_$hash";
-
-		open(my $file, ">", $folder . $filename . "gs")
-			or die "cannot open > " . $folder .  $filename . "gs" . ": $!";
-
-		print $file "Group: SL(2,$zp)\n";
-		print $file "Diameter of Cayley graph: $diameter\n";
-		print $file "Generating set size: $#{ $generating_set_ref }\n";
-		print $file "Generating set:\n";
-
-		foreach my $matrix ( @{ $generating_set_ref } ) {
-			print $file $matrix;
-		}
-
-		close $file;
 	} 
+
+	open(my $file, ">", $folder . $filename . "gs")
+		or die "cannot open > " . $folder .  $filename . "gs" . ": $!";
+
+	print $file "Group: SL(2,$zp)\n";
+	print $file "Diameter of Cayley graph: $diameter\n";
+	print $file "Generating set size: $#{ $generating_set_ref }\n";
+	print $file "Generating set:\n";
+
+	foreach my $matrix ( @{ $generating_set_ref } ) {
+		print $file $matrix;
+	}
+
+	close $file;
 }
 
 sub give_nth_prime 
@@ -624,21 +624,23 @@ sub generate_degree_diameter_solution
 			my @generating_set = List::MoreUtils::uniq @chosen_set;
 			my @group = generate_group(check_GL_set(\@generating_set, $zp), $zp, $hash_table_size);
 			my $diameter = find_diameter(@group);
-			make_group_output(@group, $diameter);
 
 				# Random testing of graphs
 			if(rand() > 0.95) {
 				my @graph = generate_graph_from_table(@group);
 				my $graph_diameter = $graph[0]->diameter;
 				if($diameter != $graph_diameter) {
-					print join(", " , @{ $combination }) . "\t\t\t\t\t\tDiameter: $diameter\t\t\tDiameter check: [FAIL]\n";
-					#					check_diameter(@group, $);
+					print join(", " , @{ $combination }) . "\t\t\t\t\t\t\t\tDiameter: $diameter\t\t\tDiameter check: [FAIL]\n";
+					make_group_output(@group, $diameter, "Wrong_diameter." . join(".", @{ $combination }) . ".");
+					$pm->finish;
 				} else {
-					print join(", " , @{ $combination }) . "\t\t\t\t\t\tDiameter: $diameter\t\t\tDiameter check: [OK]\n";
+					print join(", " , @{ $combination }) . "\t\t\t\t\t\t\t\tDiameter: $diameter\t\t\tDiameter check: [OK]\n";
 				}
 			} else {
-				print join(", " , @{ $combination }) . "\t\t\t\t\t\tDiameter: $diameter\n";
+				print join(", " , @{ $combination }) . "\t\t\t\t\t\t\t\tDiameter: $diameter\n";
 			}
+
+			make_group_output(@group, $diameter);
 			$pm->finish;
 		}
 	}
