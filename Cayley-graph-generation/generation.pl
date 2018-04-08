@@ -161,7 +161,16 @@ sub find_hash
 
 sub find_diameter
 {
+	my ($keys_ref, $multiplication_results_ref, $generation_set_ref, $zp) = @_;
+	my @checked_diameters = qw(1 2 3 4 5 6 7 8 9 10 );
 
+	foreach my $diameter ( @checked_diameters ) {
+		if(check_diameter($keys_ref, $multiplication_results_ref, $generation_set_ref, $zp, $diameter)) {
+			return $diameter;
+		}
+	}
+
+	return undef;
 }
 
 sub check_diameter
@@ -170,17 +179,6 @@ sub check_diameter
 
 	my @generation_set = @{ $generation_set_ref }; 
 	my @hash_storage;
-
-	if($diameter == 1) {
-		foreach my $index_no ( @{ $keys_ref } ) {
-			foreach my $table_entry_ref ( @{ $multiplication_results_ref->[$index_no] } ) {
-				if( $#{ $keys_ref } != $#{ $table_entry_ref } ) {
-					return 0;
-				}
-			}
-		}
-		return 1;
-	}
 
 	foreach my $i ( 2..$diameter ) {
 		my $variations = variations_with_repetition([0...$#generation_set], $i);
@@ -504,6 +502,35 @@ sub make_graphical_output
 	system "circo", "-Tsvg", "graf.dot", "-o", $folder . $filename . ".svg";
 }
 
+sub make_group_output
+{
+	my ($keys_ref, $multiplication_results_ref, $generating_set_ref, $zp, $diameter, $filename) = @_;
+
+	my $folder = "graphs/";
+	my $hash = "";
+	foreach my $mat ( @{ $generating_set_ref } ) {
+		$hash = $hash . compute_hash($mat, $zp) . ".";
+	}
+
+	if( not defined  $filename ) {
+		$filename = "GeneratingSetSize_" . ($#{ $generating_set_ref } + 1) . "_Diameter_" . $diameter . "_Zp_" . $zp . "_$hash";
+
+		open(my $file, ">", $folder . $filename . "gs")
+			or die "cannot open > " . $folder .  $filename . "gs" . ": $!";
+
+		print $file "Group: SL(2,$zp)\n";
+		print $file "Diameter of Cayley graph: $diameter\n";
+		print $file "Generating set size: $#{ $generating_set_ref }\n";
+		print $file "Generating set:\n";
+
+		foreach my $matrix ( @{ $generating_set_ref } ) {
+			print $file $matrix;
+		}
+
+		close $file;
+	} 
+}
+
 sub give_nth_prime 
 {
 	my ($n) = @_;
@@ -574,10 +601,10 @@ sub generate_degree_diameter_solution
 	my @t0 = gettimeofday();
 	####
 	
-	my $zp = give_nth_prime(2);
+	my $zp = give_nth_prime(3);
 	my @group = @{ generate_SL_group($zp) };
 	my $hash_table_size = 154485863;
-	my $pm = new Parallel::ForkManager( 0 );
+	my $pm = new Parallel::ForkManager( 4 );
 
 	print "Zp: $zp\n";
 	print "Order of SL(2,$zp): " . order_of_SL(2,$zp) . "\n";	
@@ -586,8 +613,8 @@ sub generate_degree_diameter_solution
 	foreach my $num_of_elements ( (($moor_bound/2))..($#group + 1) ) {
 		my $combinations = combinations([0..$#group], $num_of_elements);
 		while(my $combination = $combinations->next) {
+			srand time;
 			$pm->start and next;
-			print join(", " , @{ $combination }) . "\n";
 			my @chosen_set;
 			foreach my $group_index ( @{ $combination } ) {
 				push @chosen_set, $group[$group_index];
@@ -595,16 +622,22 @@ sub generate_degree_diameter_solution
 			}
 				# Remove same matrices if in chosen set was inverse of some other element
 			my @generating_set = List::MoreUtils::uniq @chosen_set;
-			make_graphical_output(generate_graph_from_table(generate_group(check_GL_set(\@generating_set, $zp), $zp, $hash_table_size)));
+			my @group = generate_group(check_GL_set(\@generating_set, $zp), $zp, $hash_table_size);
+			my $diameter = find_diameter(@group);
+			make_group_output(@group, $diameter);
 
 				# Random testing of graphs
-			if(0 && rand() > 0.95) {
+			if(rand() > 0.95) {
 				my @graph = generate_graph_from_table(@group);
 				my $graph_diameter = $graph[0]->diameter;
-				print "Testing random graph for diameter $graph_diameter: \n";
-				if(my $diameter == $graph_diameter) {
-					print "diameter $diameter not equal to computed graph diameter $graph_diameter\n";
-				} 			
+				if($diameter != $graph_diameter) {
+					print join(", " , @{ $combination }) . "\t\t\t\t\t\tDiameter: $diameter\t\t\tDiameter check: [FAIL]\n";
+					#					check_diameter(@group, $);
+				} else {
+					print join(", " , @{ $combination }) . "\t\t\t\t\t\tDiameter: $diameter\t\t\tDiameter check: [OK]\n";
+				}
+			} else {
+				print join(", " , @{ $combination }) . "\t\t\t\t\t\tDiameter: $diameter\n";
 			}
 			$pm->finish;
 		}
