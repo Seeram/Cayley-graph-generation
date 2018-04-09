@@ -58,26 +58,26 @@
 \pagebreak
 \tableofcontents
 \newpage
+
 %====================================================================================================================================================
 % END OF FIRST PAGE  
 %====================================================================================================================================================
 
 \section{Introduction}
 
+Construction of network consisting of `nodes` as vertices and `links` between them as edges under certain graph topology properties can be difficult if possible. Restrictions for graph such as number of edges outgoing from node or \textit{degree} of vertices, length of path between any of them or \textit{diameter} or possibility to return by unwalked edges with certain path length or \textit{girth} of graph are examples. 
 
+Making graph with biggest possible number of vertices while keeping degree and diameter is known as \textit{degree/diameter} problem and has been studied by many~\cite{Degree-diameter-survey}.
+
+\newpage
 %====================================================================================================================================================
 % INTRODUCTION TO DEGREE DIAMETER PROBLEM ON UNDIRECTED GRAPHS strana 8, 9
 %====================================================================================================================================================
 
-%%% Pridat ako sa modeluju grafy podla prednasky? %% Opytat sa
-%%% Pridat o akych grafoch uvazujeme len pre SVOC %% Opytat sa
-
 \section{Degree/diameter problem}
-\subsection{Moore's boundary}
-%% Uvod do problemu 
-Degree/Diameter problem's concerning construction of graphs with biggest possible order $n_{d,k}$ with given diameter $k$ and maximal degree $d$. There exists theoretical upper boundary named after Moore for such graphs. 
+\subsection{Moore bound}
 
-Boundary is easily derived from construction of graph with node connected to $d$ nodes. Next step consists of making every of new $d$ nodes making adjacent to $d-1$ nodes making them of degree $d$. There have to $n$ such steps including step for first one to satisfy diameter restriction.
+There is theoretical upper bound named after Moore for order of graphs with given diameter $k$ and degree $d$. Bound is easily derived from construction of graph. Start with single vertex connected to $d$ vertices. Next step consists of making every of new $d$ vertices making adjacent to $d-1$ new vertices making them of degree $d$. There have to be $n$ such steps including first one to satisfy diameter restriction. 
 
 \begin{equation}
 	\begin{split}
@@ -91,42 +91,15 @@ Boundary is easily derived from construction of graph with node connected to $d$
 \end{equation}
 
 %% About upper boundary
-\subsection{Moore's graphs}
-	 Graphs which's order is equal to Moore's boundary are called Moore's graphs. 
-Such graph is necessary regular of degree $d$. Research of Moore's graph was initiated by Hoffman and Singleton in paper with focus on diameter 2 and 3. ~\cite{Hoffman-Singleton}
-They proved there are Moore's graphs for $k=2, d=2,3,7$ wich are unique and possibly $57$ which hasn't been found yet. They also proved that heptagon is unique Moore's graph of degree 3 and diameter 2. 
+\subsection{Moore graphs}
+In general $n_{d,k}$ in (1) equals to $M_{d,k}$ in few cases. Graphs with order equal $M_{d,k}$ are called by \textit{Moore} who first proposed problem of classifying there graphs~\cite{ Hoffman-Singleton }. Moore graphs are  necessary regular of degree $d$. Research of Moore graph was initiated by Hoffman and Singleton in paper~\cite{Hoffman-Singleton} with focus on diameter $2$ and $3$.They found Moore graphs with $k=2$ and $d=2,3,7$ which are unique and there is possibly graph with $d=57$ which hasn't been found yet. They also proved that for $k=3$ and $d=2$ heptagon is unique Moore graph. The proofs exploit eigenvalues and eigenvectors of the adjacency matrix (and its principal submatrices) of graphs. \\
 
-The proofs exploit eigenvalues and eigenvectors of the adjacency matrix (and its principal submatrices) of graphs. \\ \\
-Let A be the adjacency matrix of a graph of degree d $\geq$ 2, k = 2 and order
-\begin{align*}
-	n = M_{d,2} = 1 + d + d(d - 1) = d^2 + 1
-\end{align*}
-Diameter 2 of graph makes matrix A satisfy equation with I being identity and J being all-ones matrix.
-\begin{equation*}
-	A^2 + A - (d - 1)I = J
-\end{equation*}
-Since eigenvalues of A and J must satisfy the same polynomial equation and the spectrum of J is $n^{1}0^{n-1}$, it follows that A has just two eigenvalues r, s distinct from d and these satisfy the equation
-\begin{equation*}
-	x^2 + x - (d - 1) = 0 
-\end{equation*}
-that is 
-\begin{equation*}
-	r,s = (-1 \pm \sqrt{4d - 3})/2  
-\end{equation*}
-For multiplicities a,b of r,s one obiously has a+b= $d^2$ and the trace of A gives  
-
-\begin{equation*}
-	trace(A) = 1 \ast d + a \ast r + b \ast s = 0 
-\end{equation*}
-If r and s are irrational, then a = b and d = 2. If r,s are rational, then they must be integral; also, then 4d - 3 = $m^{2}$, for some positive integer m. Letting b = $d^{2}$ - a and then substituting d = ($m^2$ + 3)/4 into the trace equation yields, after simplification, a polynomial equation for m of the fifth degree (with parameter a) with leading coefficient 1 and absolute term equal to 15. Then m must be a divisor of 15 and hence m $\in$ \{1,3,5,15\}, that is, d $\in$ \{1, 3, 7, 57\}.
-$\blacksquare$
-
-Easily found Moore graphs for parameters $d=2$ and k $\geq$ 2 are circle graphs $C_{2k+1}$, Moore graphs with diameter k=1 and degree d $\geq$ 1 are complete graphs $K_{d+1}$. Unique Moore's graph for $n_{3,2}$ is Petersen graph and for $n_{7,2}$ Hoffman-Singleton graph.
+Easily found Moore graphs for parameters $d=2$ and $k \geq 2$ are circle graphs $C_{2k+1}$, Moore graphs with diameter $k = 1$ and degree $d \geq 1$ are complete graphs $K_{d+1}$. Unique Moore graph for $n_{3,2}$ is Petersen graph and for $n_{7,2}$ Hoffman-Singleton graph.
 
 \begin{figure}[!ht]
 	\centering
 	\includegraphics[scale=0.33]{Hoffman-Singleton_graph.png}
-	\caption{Hoffman-singleton graph is Moore's graph with $d=7$ and $k=2$ }
+	\caption{Hoffman-singleton graph is Moore graph with $d=7$ and $k=2$ }
 \end{figure}
 
 %====================================================================================================================================================
@@ -138,20 +111,22 @@ Easily found Moore graphs for parameters $d=2$ and k $\geq$ 2 are circle graphs 
 %====================================================================================================================================================
 
 \subsection{Graphs close to Moore boundary}
-Because there are only few graphs mentiond earlier that satisfy theoretical Moore's boundary there has been effort making graphs as close as possible. Graph with defect is denoted by (d,k,$-\delta$) equal to graph of order $M_{d,k}-\delta$. Conventionally $\delta$ refers to small defect $\delta$ $\leq$ d. 
+Because there are only few graphs that satisfy theoretical Moore boundary there has been effort making graphs as close to it as possible. Graph with defect is denoted by $(d,k,-\delta)$ equal to graph of order $M_{d,k}-\delta$. Conventionally $\delta$ refers to small defect $\delta \leq d$ . 
 
-Research yields many results concerning graph with defects. Erdős, Fajtlowitcz and Hoffman proved~\cite{Erdos-Fajtlowicz-Hoffman} that there is no graph of degree d and diameter 2 and $\delta$ = 1 apart from cycle $C_{4}$.  
-Concerning $\delta = 2$ in case of $d = 2 (d,k,-2)$ graphs are cycles $C_{2k-1}$. For $d \geq 3$, only five graphs are known at present two $(3,2,-2)$ of order 8, $(4,2,-2)$ of order 15, a $(5,2,-2)$ of order 24 and $(3,3,-2)$ of order 20.
-
+Research yields many results concerning graph with defects. Erdős, Fajtlowitcz and Hoffman proved~\cite{Erdos-Fajtlowicz-Hoffman} that there is no graph of degree $d$ and diameter $2$ and $\delta = 1$ apart from cycle $C_{4}$.  
+In case of  $\delta = 2$ with $d = 2$ are all $(d,k,-2)$ graphs cycles $C_{2k-1}$. For $d \geq 3$, only five graphs are known at present two $(3,2,-2)$ of order $8$, $(4,2,-2)$ of order $15$, a $(5,2,-2)$ of order $24$ and $(3,3,-2)$ of order $20$.
 %% Doplnit citacie
+
 \subsection{Constructions of large graphs}
-Different aproach to finding graphs close to Moore bound is by constructing large graphs to find lower bound on the maximum possible order of graphs. There were various ways to consider these techniques such as vertex-transitive and Cayley graphs. For finding such graphs there are many techniques have been used such as star product, the voltage assignment technique, graph compounding and computer search. \\
+Different aproach for finding graphs close to Moore bound is by constructing large graphs to find lower bound of the maximum possible order of graphs. There are various graphs to considering for example \textit{vertex-transitive} and \textit{Cayley graphs}. For finding such graphs there are many techniques that have been used such as star product, the voltage assignment technique, graph compounding and computer search. \\
 
-\subsection{Cayley graph definition}
-Let $\Gamma$ be a group and let S be a symmetric S = $S^{-1}$ generating set without identity element  $e\not\in$ S. The $\textit{Cayley graph}$ $C(\Gamma,S)$ is the graph with vertex set $\Gamma$, with vertices a,b being adjacent if $a^{-1}b$ $\in$ S.
+\subsection{Cayley graphs}
+Let $\Gamma$ be a group and let S be a symmetric S = $S^{-1}$ generating set without identity $e\not\in S$. The $\textit{Cayley graph}$ $C(\Gamma,S)$ is the graph with vertex set $\Gamma$, with vertices $a,b$ being adjacent if $a^{-1}b$ $\in$ S. \\
 
-Let Cayley graph graphs with degree d and diameter k denote by $C_{d,k}$. Proved in ~\cite{Jajcay-Macaj-Siran} there exists $d \geq 3$ and $c \geq 2$ there exists a set S of natural numbers of positive density s.t. $C_{d,k} \leq M_{d,k}-c$ for all D $\in$ S. There is no better upper bound on $C_{d,k}$ than $M_{d,k} - 2$. For other pairs there is no upper bound on $C_{d,k}$ than $M_{d,k} - 2$.
+%% 3.4.2 1§ 
+Let Cayley graph with degree $d$ and diameter $k$ we denote by $C_{d,k}$. Proved in ~\cite{Jacay-Macaj-Siran} that for fixed $d \geq 3$ and $c \geq 2$ there is a set $S$ of natural numbers with positive density s.t. $C_{d,k} \leq M_{d,k}-c$ for all $D$ in $S$. 
  
+%% 3.4.2 2§
 Best available lower bound on $C_{d,2}$ was obtained by Šiagiová and Širáň. Let $D = \{ 2^{2m+\mu}+(2+\delta)2^{m+1}-6,m \geq 1, \mu \in \{0,1\} \}$ and $d$ be from set D then bound is $C_{d,k} > d^{2} - 6\sqrt{2}d^{3/2}$.
 
 \subsection{Graph lifting}
@@ -173,9 +148,6 @@ will be called voltage assignment if $\alpha(e^{-1})$ = $(\alpha(e))^{-1}$, for 
 %% Example of Hoffman-Singleton lift.
 
 Bigger graph $G$ is a lift if and only if the automorphism group of $G$ contains a non-trivial subgroup acting freely on the vertex set of $G$.~\cite{Gross-Tucker} Many current biggest $n_{d,k}$ graphs can be described as lifts. For example $n_{3,7}$, $n_{3,8}$, $n_{4,4}$, $n_{5,3}$, $n_{5,5}$, $n_{6,3}$, $n_{6,4}$, $n_{7,3}$, $n_{14, 3}$ and $n_{16,2}$ were obatained by computer search.~\cite{Exoo} Lifting of graph consiting of one vertex with are Cayley graphs. 
-
-\subsection{Table of large graphs}
-\subsection{Table of large Cayley's graphs}
 
 \bibliography{degree-diameter}{}
 \bibliographystyle{plain}
