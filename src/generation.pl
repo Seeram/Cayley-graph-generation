@@ -702,7 +702,7 @@ sub generate_sets_incrementally
 				if($graph[$#graph] == 2) {
 					save_generating_set_and_diameter(@cayley_graph, 2, "results/");
 				} else {
-					save_generating_set_and_diameter(@cayley_graph, 2, "wrong_computed_diameter/");
+					save_generating_set_and_diameter(@cayley_graph, 2, "diameter_error/");
 				}
 			} 		
 		$pm->finish;
