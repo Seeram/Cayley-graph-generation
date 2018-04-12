@@ -267,10 +267,6 @@ sub check_one_diameter
 
 sub generate_cayley_graph
 {
-	#####
-	my @t0 = gettimeofday();
-	#####
-	
 	my ($generating_set_ref, $zp, $hash_table_size) = @_;
 	my @multiplication_results;
 	my %generating_nodes;
@@ -336,11 +332,6 @@ sub generate_graph
 	my @stack = @generating_set;
 	my %generating_nodes;
 	my $graph = Graph::Undirected->new(); 
-
-
-	#####
-	my @t0 = gettimeofday();
-	#####
 
 	my $current_node = $stack[0]; 
 	insert_hash(\%generating_nodes, $current_node, $zp, $hash_table_size );
@@ -449,6 +440,7 @@ sub generate_arbitrary_group
 sub find_group_inverse
 {
 	my ($m, $zp) = @_;
+
 	my $det_inverse = $multiplication_inverse_finite_field[determinant_Zp($m, $zp)];
 
 	my $a = $multiplication_finite_field[index2d($m, 1,1)][$det_inverse];
@@ -463,27 +455,6 @@ sub find_group_inverse
 							]
 						   );
 }
-
-sub find_group_inverse_index
-{
-	my ($group_ref, $zp, $m) = @_;
-	my $det_inverse = $multiplication_inverse_finite_field[determinant_Zp($m, $zp)];
-
-	my $eye_matrix = PDL::Matrix->pdl([[1, 0],[0, 1]]);
-
-	my $a = $multiplication_finite_field[index2d($m, 1,1)][$det_inverse];
-	my $b = $multiplication_finite_field[$addition_inverse_finite_field[index2d($m, 1,0)]][$det_inverse];
-	my $c = $multiplication_finite_field[$addition_inverse_finite_field[index2d($m, 0,1)]][$det_inverse];
-	my $d = $multiplication_finite_field[index2d($m, 0,0)][$det_inverse];
-
-	return PDL::Matrix->pdl(
-							[
-							   	[ $a, $c ],
-								[ $b, $d ] 
-							]
-						   );
-}
-
 
 sub check_GL_set
 {
@@ -675,40 +646,42 @@ sub get_random_generating_set
 {
 	my ($group_ref, $zp, $required_size_of_set) = @_;
 	my @generating_set;
-	my $chosen_one;
 
-	srand time;
 	while(($#generating_set + 1) != $required_size_of_set) {
-		$chosen_one = int(rand($#{ $group_ref->[0] } + 1 ));
-		push @generating_set, $group_ref->[0]->[$chosen_one];
+		my $chosen_index = int(rand($#{ $group_ref->[0] } + 1 ));
+		my $chosen_matrix = $group_ref->[0]->[$chosen_index];
+		push @generating_set, $chosen_matrix;
 
 			# Unless I have choosed index with involution add inverse
-		unless(List::Util::any {$_ eq $chosen_one} $group_ref->[1]) {
-			push @generating_set, find_group_inverse_index($group_ref, $zp, $group_ref->[0]->[$chosen_one], $zp)
+		unless(List::Util::any {$_ eq $chosen_index} @{ $group_ref->[1] }) {
+			push @generating_set, find_group_inverse($chosen_matrix, $zp); 
 		}
 
 			# Only one element left to add, it has to be involution
 		if($#generating_set == $required_size_of_set) {
 				# Try just number of involutions in group to add random one 
 			foreach ( 0..$#{ $group_ref->[1] } ) {
-				$chosen_one = int(rand($#{ $group_ref->[1] } + 1 ));
-				unless(List::Util::any {all $_ == $group_ref->[0]->[$chosen_one]} @generating_set) {
-					push @generating_set, $group_ref->[0]->[$chosen_one];
+				$chosen_index = int(rand($#{ $group_ref->[1] } + 1 ));
+				my $involution = $group_ref->[0]->[$group_ref->[1]->[$chosen_index]];
+				unless(List::Util::any { all $_ == $involution } @generating_set) {
+					push @generating_set, $involution;
 					return \@generating_set;
 				}
 			}
 
 				# Then try any of them
-			foreach my $involution ( @{ $group_ref->[1] } ) {
-				unless(List::Util::any {all $_ == $group_ref->[0]->[$involution]} @generating_set) {
+			foreach my $chosen_index ( @{ $group_ref->[1] } ) {
+				my $involution = $group_ref->[0]->[$chosen_index];
+				unless(List::Util::any {all $_ == $involution} @generating_set) {
 					push @generating_set, $group_ref->[0]->[$involution];
 					return \@generating_set;
 				}
 			}
-
 				# Hopeless try new combination
 			return get_random_generating_set($group_ref, $zp, $required_size_of_set);
 		}
+
+		@generating_set = List::MoreUtils::uniq @generating_set;
 	}
 
 	return \@generating_set;
@@ -770,14 +743,21 @@ sub generate_sets_randomly
 
 	my $pm = new Parallel::ForkManager( $number_of_forks );
 	my $counter = 1;
+	srand time;
 
 	while($counter != 10000) {
-		print "[$counter]\n"; $counter++;
-		my @generating_set = @{ get_random_generating_set($group_ref, $zp, $size_of_generating_set) };
+		# print "[$counter]\n"; $counter++;
+		my $generating_set_ref = get_random_generating_set($group_ref, $zp, $size_of_generating_set);
+
+
 
 		$pm->start and next;
-			my @cayley_graph = generate_cayley_graph(\@generating_set, $zp, $hash_table_size);
-		
+			unless(check_symmetric_set($generating_set_ref, $zp)) {
+				print "Check of symmetric set failed\n";
+				exit;
+			}
+			my @cayley_graph = generate_cayley_graph($generating_set_ref, $zp, $hash_table_size);
+			
 			if(check_diameter(@cayley_graph, 2)) {
 				my @graph = generate_graph_from_table(@cayley_graph);
 				if($graph[$#graph] == 2) {
@@ -791,9 +771,47 @@ sub generate_sets_randomly
 	}
 }
 
-sub check_generation_set
+sub check_symmetric_set
 {
+	my ($generating_set_ref, $zp) = @_;
+	my @checked_matrices;	
+	my $eye = PDL::Matrix->pdl([[1,0],[0,1]]);
+	my $set_size = $#{ $generating_set_ref };
+		
+	foreach my $i ( 1..$set_size ) {
+		unless(List::Util::any {$_ eq $i} @checked_matrices) {
+			push @checked_matrices, $i;
+			my $m = $generating_set_ref->[$i];
+			my $m_squared = ($m x $m) % $zp;
+			unless(all $m_squared == $eye) {
+				my $flag = 0;
+				foreach my $inv ( @{ $generating_set_ref } ) {
+					my $res = ( $inv x $m ) % $zp;
+					if(all $res == $eye) {
+						$flag = 1;
+					}
+				}
+				unless($flag) {
+					print "Haven't found inverse of element in set!\n"; 
+					exit;
+					return 0;
+				} 
+			}
+		}
+	}
 
+	check_SL_set($generating_set_ref, $zp);
+
+	my @generating_set = List::MoreUtils::uniq @{ $generating_set_ref };
+	if($#generating_set != $#{ $generating_set_ref }) {
+		print "Uniq made generating set smaller!\n";
+		<STDIN>;
+		print @{ $generating_set_ref };
+		<STDIN>;
+		exit;
+	}
+
+	return 1;
 }
 
 sub graph_hunting
@@ -818,10 +836,14 @@ print "\t\t\t\t\t\t\t\t[OK]\n";
 print "Looking for involutions: ";
 push @group, find_involutions($group[0], $zp);
 print "\t\t\t\t\t\t\t\t[OK]\n";
-print "####################################################################################################################################\n";
+print "############################################################################################\n";
+
 
 #my $moore_degree_for_diameter_two = int(sqrt($#{ $group[0] }));
-my $moore_degree_for_diameter_two = 10;
+my $moore_degree_for_diameter_two = 11;
 
 #generate_sets_incrementally(\@group, $zp, $moore_degree_for_diameter_two, $number_of_forks, $hash_table_size);
-generate_sets_randomly(\@group, $zp, $moore_degree_for_diameter_two, $number_of_forks, $hash_table_size);
+
+foreach my $deg ( $moore_degree_for_diameter_two..( $moore_degree_for_diameter_two + 10 ) ) {
+	generate_sets_randomly(\@group, $zp, $deg, $number_of_forks, $hash_table_size);
+}
