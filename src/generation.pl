@@ -656,6 +656,7 @@ sub get_random_generating_set
 		unless(List::Util::any {$_ eq $chosen_index} @{ $group_ref->[1] }) {
 			push @generating_set, find_group_inverse($chosen_matrix, $zp); 
 		}
+		@generating_set = List::MoreUtils::uniq @generating_set;
 
 			# Only one element left to add, it has to be involution
 		if($#generating_set == $required_size_of_set) {
@@ -673,7 +674,7 @@ sub get_random_generating_set
 			foreach my $chosen_index ( @{ $group_ref->[1] } ) {
 				my $involution = $group_ref->[0]->[$chosen_index];
 				unless(List::Util::any {all $_ == $involution} @generating_set) {
-					push @generating_set, $group_ref->[0]->[$involution];
+					push @generating_set, $involution;
 					return \@generating_set;
 				}
 			}
@@ -681,7 +682,6 @@ sub get_random_generating_set
 			return get_random_generating_set($group_ref, $zp, $required_size_of_set);
 		}
 
-		@generating_set = List::MoreUtils::uniq @generating_set;
 	}
 
 	return \@generating_set;
@@ -746,10 +746,8 @@ sub generate_sets_randomly
 	srand time;
 
 	while($counter != 10000) {
-		# print "[$counter]\n"; $counter++;
+		print "[$counter]\n"; $counter++;
 		my $generating_set_ref = get_random_generating_set($group_ref, $zp, $size_of_generating_set);
-
-
 
 		$pm->start and next;
 			unless(check_symmetric_set($generating_set_ref, $zp)) {
