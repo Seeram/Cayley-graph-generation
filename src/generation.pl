@@ -646,20 +646,10 @@ sub get_random_generating_set
 {
 	my ($group_ref, $zp, $required_size_of_set) = @_;
 	my @generating_set;
+	my $chosen_index;
 
-	while(($#generating_set + 1) != $required_size_of_set) {
-		my $chosen_index = int(rand($#{ $group_ref->[0] } + 1 ));
-		my $chosen_matrix = $group_ref->[0]->[$chosen_index];
-		push @generating_set, $chosen_matrix;
-
-			# Unless I have choosed index with involution add inverse
-		unless(List::Util::any {$_ eq $chosen_index} @{ $group_ref->[1] }) {
-			push @generating_set, find_group_inverse($chosen_matrix, $zp); 
-		}
-		@generating_set = List::MoreUtils::uniq @generating_set;
-
-			# Only one element left to add, it has to be involution
-		if($#generating_set == $required_size_of_set) {
+	while(($#generating_set + 1) < $required_size_of_set) {
+		if(($#generating_set + 1) == ($required_size_of_set - 1)) {
 				# Try just number of involutions in group to add random one 
 			foreach ( 0..$#{ $group_ref->[1] } ) {
 				$chosen_index = int(rand($#{ $group_ref->[1] } + 1 ));
@@ -679,9 +669,22 @@ sub get_random_generating_set
 				}
 			}
 				# Hopeless try new combination
+			print "Hopeless\n";
 			return get_random_generating_set($group_ref, $zp, $required_size_of_set);
 		}
 
+		$chosen_index = int(rand($#{ $group_ref->[0] } + 1 ));
+		my $chosen_matrix = $group_ref->[0]->[$chosen_index];
+		push @generating_set, $chosen_matrix;
+
+			# Unless I have choosed index with involution add inverse
+		unless(List::Util::any {$_ eq $chosen_index} @{ $group_ref->[1] }) {
+			push @generating_set, find_group_inverse($chosen_matrix, $zp); 
+		}
+
+		@generating_set = List::MoreUtils::uniq @generating_set;
+
+			# Only one element left to add, it has to be involution
 	}
 
 	return \@generating_set;
@@ -741,19 +744,17 @@ sub generate_sets_randomly
 {
 	my ($group_ref, $zp, $size_of_generating_set, $number_of_forks, $hash_table_size) = @_;
 
-	my $pm = new Parallel::ForkManager( $number_of_forks );
-	my $counter = 1;
 	srand time;
+	my $pm = new Parallel::ForkManager( $number_of_forks );
+
+	my $counter = 1;
 
 	while($counter != 10000) {
 		print "[$counter]\n"; $counter++;
+
 		my $generating_set_ref = get_random_generating_set($group_ref, $zp, $size_of_generating_set);
 
 		$pm->start and next;
-			unless(check_symmetric_set($generating_set_ref, $zp)) {
-				print "Check of symmetric set failed\n";
-				exit;
-			}
 			my @cayley_graph = generate_cayley_graph($generating_set_ref, $zp, $hash_table_size);
 			
 			if(check_diameter(@cayley_graph, 2)) {
@@ -771,10 +772,17 @@ sub generate_sets_randomly
 
 sub check_symmetric_set
 {
-	my ($generating_set_ref, $zp) = @_;
+	my ($generating_set_ref, $zp, $size) = @_;
 	my @checked_matrices;	
 	my $eye = PDL::Matrix->pdl([[1,0],[0,1]]);
 	my $set_size = $#{ $generating_set_ref };
+
+	if(($set_size + 1) != $size) {
+		print "Size not right " . ($set_size + 1) . " not " . "$size\n";
+		exit;
+	} else {
+		print "Set size: " . ($set_size + 1) . "\n";
+	}
 		
 	foreach my $i ( 1..$set_size ) {
 		unless(List::Util::any {$_ eq $i} @checked_matrices) {
@@ -783,17 +791,22 @@ sub check_symmetric_set
 			my $m_squared = ($m x $m) % $zp;
 			unless(all $m_squared == $eye) {
 				my $flag = 0;
-				foreach my $inv ( @{ $generating_set_ref } ) {
-					my $res = ( $inv x $m ) % $zp;
+				foreach my $j ( 0..$#{ $generating_set_ref } ) {
+					my $res = ( $generating_set_ref->[$j] x $m ) % $zp;
 					if(all $res == $eye) {
+						print "Found inverse\n";
+						push @checked_matrices, $j;
 						$flag = 1;
 					}
 				}
+
 				unless($flag) {
 					print "Haven't found inverse of element in set!\n"; 
 					exit;
 					return 0;
 				} 
+			} else {
+				print "Involution\n";
 			}
 		}
 	}
@@ -803,9 +816,7 @@ sub check_symmetric_set
 	my @generating_set = List::MoreUtils::uniq @{ $generating_set_ref };
 	if($#generating_set != $#{ $generating_set_ref }) {
 		print "Uniq made generating set smaller!\n";
-		<STDIN>;
 		print @{ $generating_set_ref };
-		<STDIN>;
 		exit;
 	}
 
@@ -835,7 +846,6 @@ print "Looking for involutions: ";
 push @group, find_involutions($group[0], $zp);
 print "\t\t\t\t\t\t\t\t[OK]\n";
 print "############################################################################################\n";
-
 
 #my $moore_degree_for_diameter_two = int(sqrt($#{ $group[0] }));
 my $moore_degree_for_diameter_two = 11;
