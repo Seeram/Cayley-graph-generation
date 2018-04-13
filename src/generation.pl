@@ -669,7 +669,6 @@ sub get_random_generating_set
 				}
 			}
 				# Hopeless try new combination
-			print "Hopeless\n";
 			return get_random_generating_set($group_ref, $zp, $required_size_of_set);
 		}
 
@@ -749,7 +748,7 @@ sub generate_sets_randomly
 
 	my $counter = 1;
 
-	while($counter != 10000) {
+	while($counter != 1000000) {
 		print "[$counter]\n"; $counter++;
 
 		my $generating_set_ref = get_random_generating_set($group_ref, $zp, $size_of_generating_set);
@@ -760,12 +759,14 @@ sub generate_sets_randomly
 			if(check_diameter(@cayley_graph, 2)) {
 				my @graph = generate_graph_from_table(@cayley_graph);
 				if($graph[$#graph] == 2) {
+					print "Found it\n";
 					save_generating_set_and_diameter(@cayley_graph, 2, "results/");
-					return;
+	
+				} else {
+					print "Error\n";
+					save_generating_set_and_diameter(@cayley_graph, 2, "diameter_error/");
 				}
-			} else {
-				save_generating_set_and_diameter(@cayley_graph, 2, "diameter_error/");
-			}
+			} 		
 		$pm->finish;
 	}
 }
@@ -830,9 +831,9 @@ sub graph_hunting
 
 my $hash_table_size = 154485863;
 my $diameter = 2;
-my $number_of_forks = 0;
+my $number_of_forks = 4;
 my @group;
-my $zp = get_nth_prime(3);
+my $zp = get_nth_prime(4);
 print "Zp: $zp\n";
 print "Order of SL(2,$zp): " . get_order_of_SL(2,$zp) . "\n";	
 
@@ -848,10 +849,6 @@ print "\t\t\t\t\t\t\t\t[OK]\n";
 print "############################################################################################\n";
 
 #my $moore_degree_for_diameter_two = int(sqrt($#{ $group[0] }));
-my $moore_degree_for_diameter_two = 11;
+my $moore_degree_for_diameter_two = 10;
 
-#generate_sets_incrementally(\@group, $zp, $moore_degree_for_diameter_two, $number_of_forks, $hash_table_size);
-
-foreach my $deg ( $moore_degree_for_diameter_two..( $moore_degree_for_diameter_two + 10 ) ) {
-	generate_sets_randomly(\@group, $zp, $deg, $number_of_forks, $hash_table_size);
-}
+generate_sets_randomly(\@group, $zp, $moore_degree_for_diameter_two, $number_of_forks, $hash_table_size);
