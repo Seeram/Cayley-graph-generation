@@ -7,6 +7,7 @@
 \usepackage{algorithmic}
 \usepackage{algorithm}
 \usepackage{amsmath}
+\usepackage{mathtools}
 \usepackage{amssymb}
 \usepackage{graphicx}
 \usepackage{graphics}
@@ -70,6 +71,7 @@ Construction of network consisting of `nodes` as vertices and `links` between th
 Making graph with biggest possible number of vertices while keeping degree and diameter is known as \textit{degree/diameter} problem and has been studied by many~\cite{Degree-diameter-survey}.
 
 \newpage
+
 %====================================================================================================================================================
 % INTRODUCTION TO DEGREE DIAMETER PROBLEM ON UNDIRECTED GRAPHS strana 8, 9
 %====================================================================================================================================================
@@ -120,14 +122,43 @@ In case of  $\delta = 2$ with $d = 2$ are all $(d,k,-2)$ graphs cycles $C_{2k-1}
 \subsection{Constructions of large graphs}
 Different aproach for finding graphs close to Moore bound is by constructing large graphs to find lower bound of the maximum possible order of graphs. There are various graphs to considering for example \textit{vertex-transitive} and \textit{Cayley graphs}. For finding such graphs there are many techniques that have been used such as star product, the voltage assignment technique, graph compounding and computer search. \\
 
+General large graph construction of \textit{undirected de Brujin graph} type $(t,k)$ has degree $d = 2t$ and diameter $k$ give lower bound
+\begin{equation*}
+	n_{d,k} \geq \left( \frac{d}{2} \right)^{k}.
+\end{equation*}
+
+Lower bound can be improved by derived \textit{Kautz graphs} on $(2)$ and digraph construction of Baskoro and Miller with order equal to right side of $(2)$.% [32]
+\begin{equation}
+	N_{d,k} \geq \left( \frac{d}{2} \right)^{k} +  \left( \frac{d}{2} \right)^{k-1}
+\end{equation}	
+
+Modified Brown graphs can give for sufficiently large $d$ bound % [318]
+\begin{equation*}
+	n_{d,2} \geq d^{2} - 2d^{1.525}.
+\end{equation*}	
+
+\subsubsection{Star product and compounding}
+
+Star product and compounding are techniques for producing large graphs with given degree and diameter. \\
+
+Star product of two graphs $H$ and $K$. Fix orientation of $H$ and let $E$ be set of oriented edges of $H$. For each dart $uv \in E$, let $\phi_{uv}$ be a bijection on the set $V(K)$. Vertex set of star product $H \star K$ is $V(H) \times V(K)$, and a vertex $(u,k)$ is joined to $(v,l)$ in new graph if and only if either $u = v$ and $kl$ is an edge of $K$, or if $uv \in E$ and $l = \phi_{uv}(k)$. 
+
+Compounding of two graphs $G$ and $H$ is made by taking $|V(H)|$ copies of $G$, indexed by vertices of $H$, and joining of two copies $G_{u}$, $G_{v}$ of $G$ by edge whenever $uv$ is an edge of $H$.
+
 \subsection{Cayley graphs}
 Let $\Gamma$ be a group and let S be a symmetric S = $S^{-1}$ generating set without identity $e\not\in S$. The $\textit{Cayley graph}$ $C(\Gamma,S)$ is the graph with vertex set $\Gamma$, with vertices $a,b$ being adjacent if $a^{-1}b$ $\in$ S. \\
 
 %% 3.4.2 1§ 
-Let Cayley graph with degree $d$ and diameter $k$ we denote by $C_{d,k}$. Proved in ~\cite{Jacay-Macaj-Siran} that for fixed $d \geq 3$ and $c \geq 2$ there is a set $S$ of natural numbers with positive density s.t. $C_{d,k} \leq M_{d,k}-c$ for all $D$ in $S$. 
+Let Cayley graph with degree $d$ and diameter $k$ we denote by $C_{d,k}$. Proved in ~\cite{Jajcay-Macaj-Siran} that for fixed $d \geq 3$ and $c \geq 2$ there is a set $S$ of natural numbers with positive density s.t. $C_{d,k} \leq M_{d,k}-c$ for all $D$ in $S$. 
  
 %% 3.4.2 2§
 Best available lower bound on $C_{d,2}$ was obtained by Šiagiová and Širáň. Let $D = \{ 2^{2m+\mu}+(2+\delta)2^{m+1}-6,m \geq 1, \mu \in \{0,1\} \}$ and $d$ be from set D then bound is $C_{d,k} > d^{2} - 6\sqrt{2}d^{3/2}$.
+
+Cayley graphs on abelian groups with diameter two can be bounded from above by 
+\begin{equation*}
+	n_{d,2} \geq \lfloor \frac{d+2}{2} \rfloor \lceil \frac{d + 2}{2} \rceil
+\end{equation*}	
+with product of cyclic groups $Z_{ \lfloor (d+2)/2  \rfloor) } \times Z_{ \lceil (d+2)/2 \rceil }$, with generating set consisting of all pairs $(x_1,x_2)$, with one of them equal to 0.
 
 \subsection{Graph lifting}
 Graph lifting is technique producing large graphs and is well known in topological and algebraic graph theory.~\cite{Gross-Tucker} 
@@ -148,6 +179,18 @@ will be called voltage assignment if $\alpha(e^{-1})$ = $(\alpha(e))^{-1}$, for 
 %% Example of Hoffman-Singleton lift.
 
 Bigger graph $G$ is a lift if and only if the automorphism group of $G$ contains a non-trivial subgroup acting freely on the vertex set of $G$.~\cite{Gross-Tucker} Many current biggest $n_{d,k}$ graphs can be described as lifts. For example $n_{3,7}$, $n_{3,8}$, $n_{4,4}$, $n_{5,3}$, $n_{5,5}$, $n_{6,3}$, $n_{6,4}$, $n_{7,3}$, $n_{14, 3}$ and $n_{16,2}$ were obatained by computer search.~\cite{Exoo} Lifting of graph consiting of one vertex with are Cayley graphs. 
+
+\subsection{General linear and special linear groups}
+
+\textbf{Definition.} If $V$ is an $n$-dimensional vector space over field $K$ then the \textbf{general linear group} $GL(V)$ is the group of all linear transformations on $V$ with matrix multiplication as binary operation.\\ \\
+$GL(V)$ over finite field $m$ with $n=dim(V)$ will be denoted as $GL(n,m)$ \\ \\
+\textbf{Theorem.} Order of $GL(m,q)$ is:
+\begin{equation*}
+	| GL(m,q) | = (q^{m} - 1)(q^{m} - q) \dots (q^{m} - q^{m-1}) 
+\end{equation*}	\\
+\textbf{Definition.} If $V$ is an $n$-dimensional vector space over finite field $Z_{p}$, then the \textbf{special linear group} $GL(n,p)$ is the group of all linear transformations on $V$ with determinant equal to 1.\\
+
+\subsection{Results}
 
 \bibliography{degree-diameter}{}
 \bibliographystyle{plain}
