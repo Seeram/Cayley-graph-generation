@@ -11,6 +11,9 @@
 \usepackage{amssymb}
 \usepackage{graphicx}
 \usepackage{graphics}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{listings}
 %\usepackage{cite}
 
 \graphicspath{ {pictures/} }
@@ -102,11 +105,11 @@ It is well known that equality in (\ref{eq:Moore}) holds only if $d=2$ (for any 
 Research into the degree/diameter problem and into Moore graphs in particular was initiated by Hoffman and Singleton in \cite{Hof-Sin} who proved that Moore graphs of diameter $k=2$ can exist only for $d\in \{2,3,7\}$ and possibly $57$, proving also their uniqueness except for the last case, and establishing also that the unique Moore graph of diameter $3$ is the cycle of length $7$. Their proofs exploit eigenvalues and eigenvectors of adjacency matrices (and the corresponding principal submatrices) of graphs.
 \medskip
 
-%\begin{figure}[!ht]
-%	\centering
-%	\includegraphics[scale=0.33]{Hoffman-Singleton_graph.png}
-%	\caption{Hoffman-singleton graph is Moore graph with $d=7$ and $k=2$ }
-%\end{figure}
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[scale=0.33]{Hoffman-Singleton_graph.png}
+	\caption{Hoffman-singleton graph is Moore graph with $d=7$ and $k=2$ }
+\end{figure}
 
 %====================================================================================================================================================
 % END OF INTRODUCTION TO DEGREE DIAMETER PROBLEM
@@ -200,8 +203,176 @@ Linear groups are usually described in terms of linear transformations of vector
 
 We will be particularly interested in the case $m=2$ and $q=p$ for some prime numbers $p$, and in Cayley graphs of diameter $2$ arising from the groups $SL(2,p)$. To the best of our knowledge such a study has not appeared in the available literature.
 
-\subsection{Results}
+\newpage
+\section{Results}
 
+\subsection{Example of Cayley graph}
+
+For example we generate Cayley graph on group $SL(2,3)$ with order $|SL(2,3)| = 24$ consiting of \\ \\
+$
+SL(2,3) = 
+\bigg\{ 
+\begin{bmatrix}
+	1 & 0 \\
+	0 & 1
+\end{bmatrix},
+\begin{bmatrix}
+	0 & 1 \\
+	2 & 0
+\end{bmatrix},
+\begin{bmatrix}
+	0 & 1 \\
+	2 & 1
+\end{bmatrix},
+\begin{bmatrix}
+	0 & 1 \\
+	2 & 2
+\end{bmatrix},
+\begin{bmatrix}
+	0 & 2 \\
+	1 & 0
+\end{bmatrix},
+\begin{bmatrix}
+	0 & 2 \\
+	1 & 1
+\end{bmatrix},
+\begin{bmatrix}
+	0 & 2 \\
+	1 & 2
+\end{bmatrix},
+\begin{bmatrix}
+	1 & 0 \\
+	1 & 1
+\end{bmatrix},
+\begin{bmatrix}
+	1 & 0 \\
+	2 & 1
+\end{bmatrix},
+\begin{bmatrix}
+	1 & 1 \\
+	0 & 1
+\end{bmatrix}, \\
+\begin{bmatrix}
+	1 & 1 \\
+	1 & 2
+\end{bmatrix},
+\begin{bmatrix}
+	1 & 1 \\
+	2 & 0
+\end{bmatrix},
+\begin{bmatrix}
+	1 & 2 \\
+	0 & 1
+\end{bmatrix},
+\begin{bmatrix}
+	1 & 2 \\
+	1 & 0
+\end{bmatrix},
+\begin{bmatrix}
+	1 & 2 \\
+	2 & 2
+\end{bmatrix},
+\begin{bmatrix}
+	2 & 0 \\
+	0 & 2
+\end{bmatrix},
+\begin{bmatrix}
+	2 & 0 \\
+	1 & 2
+\end{bmatrix},
+\begin{bmatrix}
+	2 & 0 \\
+	2 & 2
+\end{bmatrix},
+\begin{bmatrix}
+	2 & 1 \\
+	0 & 2
+\end{bmatrix},
+\begin{bmatrix}
+	2 & 1 \\
+	1 & 1
+\end{bmatrix},
+\begin{bmatrix}
+	2 & 1 \\
+	2 & 0
+\end{bmatrix},
+\begin{bmatrix}
+	2 & 2 \\
+	0 & 2
+\end{bmatrix}, \\
+\begin{bmatrix}
+	2 & 2 \\
+	1 & 0
+\end{bmatrix},
+\begin{bmatrix}
+	2 & 2 \\
+	2 & 1
+\end{bmatrix} 
+\bigg\}
+$. \\ \\ 
+For generating set $S$ with three pairs of elements and its inverses \\ \\ 
+$
+S = 
+\bigg\{ 
+\begin{bmatrix}
+	1 & 1 \\
+	1 & 2
+\end{bmatrix},
+\begin{bmatrix}
+	2 & 2 \\
+	2 & 1
+\end{bmatrix},
+\begin{bmatrix}
+	2 & 2 \\
+	0 & 2
+\end{bmatrix},
+\begin{bmatrix}
+	2 & 1 \\
+	0 & 2
+\end{bmatrix},
+\begin{bmatrix}
+	0 & 2 \\
+	1 & 1
+\end{bmatrix},
+\begin{bmatrix}
+	1 & 1 \\
+	2 & 0
+\end{bmatrix}
+\bigg\} 
+$ \\ \\
+Cayley graph $C(SL(2,3),S)$ has order 24, $d=6$ and $k=2$.  
+
+\lstset{
+	basicstyle=\footnotesize,
+	tabsize=2
+}
+\lstinputlisting[language=Perl, frame=sinlge]{perl.pl}
+\begin{algorithm}
+        \caption{Cayley graph generation}
+        \label{alg1}    
+        \algsetup{indent=1em}
+        \begin{algorithmic}[1]
+                \REQUIRE $generation\_set[], n$
+                \STATE $stack[] \leftarrow generation\_set[]$
+                \STATE $stack\_element \leftarrow stack[0]$
+                \WHILE{$stack[]$ \NOT empty}
+                        \FORALL{$generating\_element \leftarrow generation\_set[]$}
+                                \STATE $multiplication\_result \leftarrow (stack\_element * generating\_element)$ mod $n$
+                                \STATE $multiplication\_results[stack\_element]$ append $multiplication\_result$
+                                \STATE $stack[]$ append $multiplication\_result$
+                        \ENDFOR
+                        \STATE shift to the left $stack[]$
+                        \STATE $stack\_element \leftarrow stack[0]$
+                \ENDWHILE
+                \RETURN $multiplication\_results$
+        \end{algorithmic}
+\end{algorithm}
+
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[scale=0.2]{example.png}
+	\caption{ Output of ~\cite{Circos} of $C(SL(2,3), S)$, direction of edges is insignificant }
+\end{figure}
 
 
 
@@ -228,6 +399,8 @@ Maximum degree in graphs of diameter 2, Networks 10
 
 \bibitem{Sia-Sir} J. \v{S}iagiov\'a and J. \v{S}ir\'a\v{n}, Approaching the Moore bound for diameter two by Cayley graphs, J. Combin. Theory Ser. B 102 (2012) 470--473.
 
+\bibitem{Circos} Circo, http://circos.ca
+
 \end{thebibliography}
 
 
@@ -235,8 +408,6 @@ Maximum degree in graphs of diameter 2, Networks 10
 %\bibliographystyle{plain}
 
 \end{document}
-
-
 
 \subsubsection{Star product and compounding}
 
