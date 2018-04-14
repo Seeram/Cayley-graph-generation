@@ -565,7 +565,7 @@ sub make_graphical_output
 
 sub save_generating_set_and_diameter
 {
-	my ($keys_ref, $multiplication_results_ref, $generating_set_ref, $zp, $diameter, $folder, $filename) = @_;
+	my ($keys_ref, $multiplication_results_ref, $generating_set_ref, $zp, $diameter, $order_of_graph, $folder, $filename) = @_;
 
 	my $hash = "";
 	foreach my $mat ( @{ $generating_set_ref } ) {
@@ -577,7 +577,7 @@ sub save_generating_set_and_diameter
 	}
 
 	if( not defined  $filename ) {
-		$filename = "GeneratingSetSize_" . ($#{ $generating_set_ref } + 1) . "_Diameter_" . $diameter . "_Zp_" . $zp . "_$hash";
+		$filename = "GeneratingSetSize_" . ($#{ $generating_set_ref } + 1) . "_Diameter_" . $diameter . "_OrderOfGraph_" . $order_of_graph . "_Zp_" . $zp . "_$hash";
 	} 
 
 	open(my $file, ">", $folder . $filename . "gs")
@@ -585,7 +585,8 @@ sub save_generating_set_and_diameter
 
 	print $file "Group: SL(2,$zp)\n";
 	print $file "Diameter of Cayley graph: $diameter\n";
-	print $file "Generating set size: $#{ $generating_set_ref }\n";
+	print $file "Generating set size: " . ($#{ $generating_set_ref } + 1) . "\n";
+	print $file "Order of graph: " . $order_of_graph . "\n";
 	print $file "Generating set:\n";
 
 	foreach my $matrix ( @{ $generating_set_ref } ) {
@@ -730,7 +731,7 @@ sub generate_sets_incrementally
 			if(check_diameter(@cayley_graph, 2)) {
 				my @graph = generate_graph_from_table(@cayley_graph);
 				if($graph[$#graph] == 2) {
-					save_generating_set_and_diameter(@cayley_graph, 2, "results/");
+					save_generating_set_and_diametr(@cayley_graph, 2, "results/");
 				} else {
 					save_generating_set_and_diameter(@cayley_graph, 2, "diameter_error/");
 				}
@@ -741,14 +742,14 @@ sub generate_sets_incrementally
 
 sub generate_sets_randomly
 {
-	my ($group_ref, $zp, $size_of_generating_set, $number_of_forks, $hash_table_size) = @_;
+	my ($group_ref, $zp, $size_of_generating_set, $number_of_forks, $hash_table_size, $number_of_graphs) = @_;
 
 	srand time;
 	my $pm = new Parallel::ForkManager( $number_of_forks );
 
 	my $counter = 1;
 
-	while($counter != 1000000) {
+	while($counter != $number_of_graphs) {
 		print "[$counter]\n"; $counter++;
 
 		my $generating_set_ref = get_random_generating_set($group_ref, $zp, $size_of_generating_set);
@@ -758,13 +759,18 @@ sub generate_sets_randomly
 			
 			if(check_diameter(@cayley_graph, 2)) {
 				my @graph = generate_graph_from_table(@cayley_graph);
+				my $order_of_graph = $graph[0]->vertices;
 				if($graph[$#graph] == 2) {
-					print "Found it\n";
-					save_generating_set_and_diameter(@cayley_graph, 2, "results/");
-	
+					if(check_symmetric_set($generating_set_ref, $zp, $size_of_generating_set)) {
+						print "Found it\n";
+						save_generating_set_and_diameter(@cayley_graph, 2, $order_of_graph, "results/");
+					} else {
+						print "Error\n";
+						save_generating_set_and_diameter(@cayley_graph, 2, $order_of_graph, "set_error/");
+					}
 				} else {
 					print "Error\n";
-					save_generating_set_and_diameter(@cayley_graph, 2, "diameter_error/");
+					save_generating_set_and_diameter(@cayley_graph, 2, $order_of_graph, "diameter_error/");
 				}
 			} 		
 		$pm->finish;
@@ -779,12 +785,10 @@ sub check_symmetric_set
 	my $set_size = $#{ $generating_set_ref };
 
 	if(($set_size + 1) != $size) {
-		print "Size not right " . ($set_size + 1) . " not " . "$size\n";
-		exit;
-	} else {
-		print "Set size: " . ($set_size + 1) . "\n";
-	}
-		
+		print "Set size error\n";
+		return 0;
+	} 		
+
 	foreach my $i ( 1..$set_size ) {
 		unless(List::Util::any {$_ eq $i} @checked_matrices) {
 			push @checked_matrices, $i;
@@ -795,30 +799,22 @@ sub check_symmetric_set
 				foreach my $j ( 0..$#{ $generating_set_ref } ) {
 					my $res = ( $generating_set_ref->[$j] x $m ) % $zp;
 					if(all $res == $eye) {
-						print "Found inverse\n";
 						push @checked_matrices, $j;
 						$flag = 1;
 					}
 				}
-
 				unless($flag) {
-					print "Haven't found inverse of element in set!\n"; 
-					exit;
+					print "Inverse element not found\n";
 					return 0;
 				} 
-			} else {
-				print "Involution\n";
-			}
+			} 		
 		}
 	}
 
-	check_SL_set($generating_set_ref, $zp);
-
 	my @generating_set = List::MoreUtils::uniq @{ $generating_set_ref };
 	if($#generating_set != $#{ $generating_set_ref }) {
-		print "Uniq made generating set smaller!\n";
-		print @{ $generating_set_ref };
-		exit;
+		print "Uniq made generation set smaller!\n";
+		return 0;
 	}
 
 	return 1;
@@ -848,7 +844,8 @@ push @group, find_involutions($group[0], $zp);
 print "\t\t\t\t\t\t\t\t[OK]\n";
 print "############################################################################################\n";
 
-#my $moore_degree_for_diameter_two = int(sqrt($#{ $group[0] }));
-my $moore_degree_for_diameter_two = 10;
+my $moore_degree_for_diameter_two = ;
 
-generate_sets_randomly(\@group, $zp, $moore_degree_for_diameter_two, $number_of_forks, $hash_table_size);
+my @t0 = gettimeofday();
+generate_sets_randomly(\@group, $zp, $moore_degree_for_diameter_two, $number_of_forks, $hash_table_size, 100);
+print "Generovanie prvkov: " . tv_interval( \@t0 ) . " sekund\n"; 
