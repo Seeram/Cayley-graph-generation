@@ -342,6 +342,14 @@ S =
 $ \\ \\
 Cayley graph $C(SL(2,3),S)$ has order 24, $d=6$ and $k=2$.  
 
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[scale=0.2]{example.png}
+	\caption{ Output of circos ~\cite{Circos} of $C(SL(2,3), S)$ }
+\end{figure}
+
+The generating set S of the group $G=SL(2,3)$ in this example has the form $\{ x_1,x_1^{-1},x_2,x_2^{-1},x_3,x_3^{-1}\}$. To verify that the Cayley graph $C(G,S)$ has diameter $2$ one would have to show that the set $S$ together with the identity and with all products $x_i^{\pm 1}y_j^{\pm 1}$ gives the entire group $G$. Although this could be done by hand in this example, we deferred this task to a code that we designed for a more general purpose and which we list below.
+
 \lstset{
 	basicstyle=\footnotesize,
 	tabsize=2
@@ -368,13 +376,6 @@ Cayley graph $C(SL(2,3),S)$ has order 24, $d=6$ and $k=2$.
         \end{algorithmic}
 \end{algorithm}
 
-\begin{figure}[!ht]
-	\centering
-	\includegraphics[scale=0.2]{example.png}
-	\caption{ Output of circos ~\cite{Circos} of $C(SL(2,3), S)$ }
-\end{figure}
-
-The generating set S of the group $G=SL(2,3)$ in this example has the form $\{ x_1,x_1^{-1},x_2,x_2^{-1},x_3,x_3^{-1}\}$. To verify that the Cayley graph $C(G,S)$ has diameter $2$ one would have to show that the set $S$ together with the identity and with all products $x_i^{\pm 1}y_j^{\pm 1}$ gives the entire group $G$. Although this could be done by hand in this example, we deferred this task to a code that we designed for a more general purpose and which we list below.
 
 \begin{thebibliography}{xx}
 
