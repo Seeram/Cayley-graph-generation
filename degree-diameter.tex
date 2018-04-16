@@ -2,10 +2,7 @@
     \pagestyle{headings}
     \usepackage[top=2.5cm, bottom=2.5cm, left=3.5cm, right=2cm]{geometry} %odporucane okraje
 
-%\usepackage[utf8x]{inputenc}
 \usepackage[T1]{fontenc} %pekne makcene
-%\usepackage{algorithmic}
-%\usepackage{algorithm}
 \usepackage{amsmath}
 \usepackage{mathtools}
 \usepackage{amssymb}
@@ -32,36 +29,28 @@
 %====================================================================================================================================================
 % FIRST PAGE
 %====================================================================================================================================================
-\thispagestyle{empty}
-{
-	\topmargin=0pt
-	\centerline {\large \bf{SLOVAK UNIVERSITY OF TECHNOLOGY}}
-	\vskip 0.2cm
-	\centerline{\large \bf{FACULTY OF CIVIL ENGINEERING}}
-	\vskip 5cm
-	\centerline{\Large \bf{Cayley graphs of given degree and diameter on linear groups}}
-	\vskip 0.2cm
-	%\centerline{\Large \bf{Hï¿½ JEHO DRUHï¿½ RIADOK}}
-	%\centerline{ \bf{(verzia z~\today) }}   %vypisovanie dnesneho datumu
-	\vskip 0.5cm
-	\centerline{\large \bf{Bachelor Thesis}}
-	\vskip 5cm          %\vskip 2cm             %zmena kvoli zobrazovaniu dnesneho datumu
-	\normalsize
-		\begin{tabular}[l]{p{0.27\textwidth}p{0.73\textwidth}}
-		ï¿½tudijny program: & Matematicko-pocï¿½tacovï¿½ modelovanie\\
-		ï¿½tudijny odbor: & Aplikovanï¿½ matematika\\
-		ï¿½koliace pracovisko: & dopln ma\\
-		Vedï¿½ci diplomovej prï¿½ce: & dopln ma \\
-		\end{tabular}
-	\vskip 3cm
-	\centerline{\large \bf{BRATISLAVA 2018}}
-	\vskip 0.2cm
-	\centerline{\large \bf{Matï¿½ï¿½ Behun}}
-}
-
-\pagebreak
-\tableofcontents
-\newpage
+\begin{titlepage}
+     \centering
+     \begin{figure}[ht!]
+     \centering
+     \includegraphics[width=90mm]{logo.png}
+     \end{figure}
+     {\scshape\LARGE Slovak University of Technology in Bratislava \par}
+     \vspace{1cm}
+     {\scshape\Large Student scientific conference\par}
+     \vspace{1.5cm}
+     {\huge\bfseries Cayley graphs of given degree and diameter on linear groups\par}
+     \vspace{2cm}
+	 {\Large\itshape Matú\v{s} Behun, 3.ro\v{c}ník, MPM\par}
+     \vfill
+	 Supervisor\par
+	 doc. RNDr. Jana \v{S}iagiová, PhD. 
+     \vfill
+ 
+ % Bottom of the page
+     {\large Bratislava 14th of April 2018}
+ \end{titlepage}
+ \newpage
 
 %====================================================================================================================================================
 % END OF FIRST PAGE
@@ -376,6 +365,19 @@ The generating set S of the group $G=SL(2,3)$ in this example has the form $\{ x
         \end{algorithmic}
 \end{algorithm}
 
+\subsection{Computer search of graphs}
+
+Here we present results of computer search of graphs in $SL(2,5)$ group. Order for $SL(2,5) = 120$ and it's assumed that Cayley graph will yield all elements of group. In search we were looking for graphs with diameter two. Moore bound for given parameter is $d=11$ therefore search was done on degree $12$ and up to 21. 
+
+Generation sets were random and we generated and tested diameter two for 50000 graphs for all degrees. \\ \\
+
+\begin{tabular}[htbp]{l*{10}{c}r}
+	$d$	& $12$ & $13$ & $14$ & $15$ & $16$ & $17$ & $18$ & $19$ & $20$ & $21$ \\
+\hline
+	Found graphs & $0$ & $0$  & $0$ & $1$ & $107$ & $345$ & $2451$  & $4120$ & $11669$ & $14926$ \\
+\end{tabular} \\ \\ 
+
+Search for graphs in $SL(2,7)$ with order $336$ has failed to find any graph for $d=20$ up to $25$.
 
 \begin{thebibliography}{xx}
 
@@ -403,10 +405,6 @@ Maximum degree in graphs of diameter 2, Networks 10
 \bibitem{Circos} Circo, http://circos.ca
 
 \end{thebibliography}
-
-
-%\bibliography{degree-diameter}{}
-%\bibliographystyle{plain}
 
 \end{document}
 
