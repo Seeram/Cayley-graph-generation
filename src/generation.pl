@@ -301,7 +301,7 @@ sub generate_cayley_graph
 		}
 	}
 
-	return ( \@keys, \@multiplication_results, $generating_set_ref, $zp);
+	return ( \@keys, \@multiplication_results, $generating_set_ref, $zp );
 }
 
 sub generate_graph_from_table
@@ -565,8 +565,9 @@ sub make_graphical_output
 
 sub save_generating_set_and_diameter
 {
-	my ($keys_ref, $multiplication_results_ref, $generating_set_ref, $zp, $diameter, $order_of_graph, $folder, $filename) = @_;
+	my ($keys_ref, $multiplication_results_ref, $generating_set_ref, $zp, $diameter, $folder, $filename) = @_;
 
+	my $order_of_graph = $#{ $keys_ref };
 	my $hash = "";
 	foreach my $mat ( @{ $generating_set_ref } ) {
 		$hash = $hash . compute_hash($mat, $zp) . ".";
@@ -759,20 +760,49 @@ sub generate_sets_randomly
 			
 			if(check_diameter(@cayley_graph, 2)) {
 				my @graph = generate_graph_from_table(@cayley_graph);
-				my $order_of_graph = $graph[0]->vertices;
 				if($graph[$#graph] == 2) {
 					if(check_symmetric_set($generating_set_ref, $zp, $size_of_generating_set)) {
 						print "Found it\n";
-						save_generating_set_and_diameter(@cayley_graph, 2, $order_of_graph, "results/");
+						save_generating_set_and_diameter(@cayley_graph, 2, "results/");
 					} else {
 						print "Error\n";
-						save_generating_set_and_diameter(@cayley_graph, 2, $order_of_graph, "set_error/");
+						save_generating_set_and_diameter(@cayley_graph, 2, "set_error/");
 					}
 				} else {
 					print "Error\n";
-					save_generating_set_and_diameter(@cayley_graph, 2, $order_of_graph, "diameter_error/");
+					save_generating_set_and_diameter(@cayley_graph, 2, "diameter_error/");
 				}
 			} 		
+		$pm->finish;
+	}
+}
+
+sub check_random_graphs
+{
+	my ($group_ref, $zp, $size_of_generating_set, $number_of_forks, $hash_table_size, $number_of_graphs, $diameter) = @_;
+
+	my $counter = 1;
+	my $pm = new Parallel::ForkManager( $number_of_forks );
+
+	while($counter != $number_of_graphs) {
+		print "[$counter]\n"; $counter++;
+
+		my $generating_set_ref = get_random_generating_set($group_ref, $zp, $size_of_generating_set);
+
+		$pm->start and next;
+			my @cayley_graph = generate_cayley_graph($generating_set_ref, $zp, $hash_table_size);
+			if(check_diameter(@cayley_graph, $diameter)) {
+				#			my @graph = generate_graph_from_table(@cayley_graph);
+				if(check_symmetric_set($generating_set_ref, $zp, $size_of_generating_set)) {
+					print "Found it\n";
+					save_generating_set_and_diameter(@cayley_graph, $diameter, "results/");
+					return 0;
+				} else {
+					print "Error\n";
+					save_generating_set_and_diameter(@cayley_graph, $diameter, "set_error/");
+					return 0;
+				}
+			} 			
 		$pm->finish;
 	}
 }
@@ -825,27 +855,39 @@ sub graph_hunting
 
 }
 
+srand time;
+my $number_of_forks = 4;
 my $hash_table_size = 154485863;
 my $diameter = 2;
-my $number_of_forks = 4;
-my @group;
-my $zp = get_nth_prime(4);
-print "Zp: $zp\n";
-print "Order of SL(2,$zp): " . get_order_of_SL(2,$zp) . "\n";	
 
-print "Filling up arithmetic tables of finite field: ";
-fill_finite_field_arithmetic_tables($zp);
-print "\t\t\t\t\t\t[OK]\n";
-print "Generating group elements: ";
-push @group, generate_SL_group($zp);
-print "\t\t\t\t\t\t\t\t[OK]\n";
-print "Looking for involutions: ";
-push @group, find_involutions($group[0], $zp);
-print "\t\t\t\t\t\t\t\t[OK]\n";
-print "############################################################################################\n";
+foreach my $p ( 2..10 ) {
+	my $zp = get_nth_prime($p);
+	my @group;
+	my $number_of_generated_graphs = 100;
+	print "Zp: $zp\n";
+	print "Order of SL(2,$zp): " . get_order_of_SL(2,$zp) . "\n";	
+	print "Filling up arithmetic tables of finite field: ";
+	fill_finite_field_arithmetic_tables($zp);
+	print "\t\t\t\t\t\t[OK]\n";
+	print "Generating group elements: ";
+	push @group, generate_SL_group($zp);
+	print "\t\t\t\t\t\t\t\t[OK]\n";
+	print "Looking for involutions: ";
+	push @group, find_involutions($group[0], $zp);
+	print "\t\t\t\t\t\t\t\t[OK]\n";
+	print "############################################################################################\n";
 
-my $moore_degree_for_diameter_two = ;
-
-my @t0 = gettimeofday();
-generate_sets_randomly(\@group, $zp, $moore_degree_for_diameter_two, $number_of_forks, $hash_table_size, 100);
-print "Generovanie prvkov: " . tv_interval( \@t0 ) . " sekund\n"; 
+	my $degree = int(sqrt(get_order_of_SL(2,$zp))) + 1; # moore degree
+	
+	my $graph_not_found = 1;
+	while($graph_not_found) {
+		print "Looking for graphs with k=$diameter in SL(2,$zp) with d=$degree\n";
+		my @t0 = gettimeofday();
+		if(check_random_graphs(\@group, $zp, $degree, $number_of_forks, $hash_table_size, $number_of_generated_graphs, $diameter)) { 
+			print "Graph found with degree $degree\n";
+			$graph_not_found = 0;
+		}
+		print "Generovanie grafov trvalo: " . tv_interval( \@t0 ) . " sekund\n"; 
+		$degree++;
+	}
+}
