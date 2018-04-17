@@ -38,6 +38,10 @@
 \usepackage{listings}
 \graphicspath{ {pictures/} } 
 
+\lstset{ 
+	basicstyle=\footnotesize, 
+	tabsize=2 
+} 
 %----------------------------------------------------------------------------------------
 %	TITLE PAGE
 %----------------------------------------------------------------------------------------
@@ -185,16 +189,50 @@ There is theoretical upper bound for largest order of graph with $d$-degree and 
 		\item Generating sets yield all elements of $|SL(2,5)| = 120$
 		\item Cayley graphs are regular with with $d=|S|$
 	\end{itemize}
-	we know by Moore bound that size of $S$ must be at least $12$ and all we have to check is diameter of graph. \\ 
+	we know by Moore bound that size of $S$ must be at least $12$ and all we have to check is diameter of graph. 
 \end{frame}
 %------------------------------------------------
 \begin{frame}
 	\frametitle{Computer search of Cayley graphs}
+	With one involution in $SL(2,5)$ and with unit-free property of symmetry we have $59$ pairs of elements with its inverses. To check all graphs for $d=12$ we have to generate and check diameter on ${59 \choose 6} = 45057474$ graphs. \\
+	In our computation we generated 150000 graphs for all listed degrees. \\
+	\begin{tabular}[htbp]{l*{10}{c}r}
+		$d$ & $13$ & $14$ & $15$ & $16$ & $17$ & $18$ & $19$ & $20$ & $21$ \\
+		\hline
+ 		Found graphs & $0$  & $0$ & $1$ & $107$ & $345$ & $2451$  & $4120$ & $11669$ & $14926$ \\
+	\end{tabular} 
+\end{frame}
+%------------------------------------------------
+\begin{frame}
+	\frametitle{Algorithm for generation of cayley graph}
+	Algoritmus na generovanie grafu
+\end{frame}
+%------------------------------------------------
+\begin{frame}
+	\frametitle{Algorithm for diameter}
+	Algoritmus na kontrolu priemeru grafu
+\end{frame}
+%------------------------------------------------
+\begin{frame}
+	\frametitle{Output of program}
+	\begin{figure}[!ht]
+ 		\centering
+ 		\includegraphics[scale=0.12]{example.png}
+		\caption{One of the generated graphs from $SL(2,3)$ }
+	\end{figure}
 \end{frame}
 %------------------------------------------------
 \begin{frame}
 \Huge{\centerline{The End}}
 \end{frame}
 %----------------------------------------------------------------------------------------
-
 \end{document} 
+
+\begin{frame}
+	\frametitle{Computer search of Cayley graphs}
+	We know that Cayley graph is lift of one vertex with $|S|$ edges. We exploit that property by computation of diameter on smaller graph to determine it.
+	\begin{theorem}[Diameter of Cayley graph]
+		Cayley graph $(\Gamma, S)$ has diameter $k$ if and only if \\
+		$ \forall x \in Cay(\Gamma, S) there \exists x_{1}, x_{2}, \dots ,x_{i} \in S$
+	\end{theorem}
+\end{frame}
