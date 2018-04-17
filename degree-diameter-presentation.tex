@@ -92,9 +92,6 @@ Slovak University of Technology in Bratislava \\ % Your institution for the titl
 	\begin{block}{Degree/diameter problem}
 		Find graph with biggest possible number of vertices with given degree and diameter.
 	\end{block}
-	\begin{block}{Degree/girth problem}
-		Find graph with smallest possible number of vertices with given degree and diameter.
-	\end{block}
 \end{frame}
 %------------------------------------------------
 \begin{frame}
@@ -168,7 +165,7 @@ There is theoretical upper bound for largest order of graph with $d$-degree and 
 %------------------------------------------------
 \begin{frame}
 	\frametitle{General linear and Special linear groups}
-		\begin{definition}[General linear group] Let $q$ be a     power of a prime and let $GF(q)$ be the Galois field of order $q$. The {\em general linear group} $GL(m,q)$ consists of all non-singular $m\times m$ matrices over $GF(q)$ under multiplication of matrices.
+		\begin{definition}[General linear group] Let $q$ be a power of a prime and let $GF(q)$ be the Galois field of order $q$. The {\em general linear group} $GL(m,q)$ consists of all non-singular $m\times m$ matrices over $GF(q)$ under multiplication of matrices.
 		Special linear group is subgroup of $GL(m,q)$ consiting of matrices with determinant equal to 1.
 		\end{definition}
 		\begin{theorem}[Order of $GL(m,q)$]
@@ -180,12 +177,19 @@ There is theoretical upper bound for largest order of graph with $d$-degree and 
 \end{frame}
 %------------------------------------------------
 \begin{frame}
-	\frametitle{Computer search of cayley graphs}
-
+	\frametitle{Computer search of Cayley graphs}
+	In order to find graphs with given $d$ and $k$ we generted Cayley graphs from random symmetric unit-free sets $S$ of $SL(2,5)$. 
+	\medskip
+	With assumptions that: 
+	\begin{itemize}
+		\item Generating sets yield all elements of $|SL(2,5)| = 120$
+		\item Cayley graphs are regular with with $d=|S|$
+	\end{itemize}
+	we know by Moore bound that size of $S$ must be at least $12$ and all we have to check is diameter of graph. \\ 
 \end{frame}
 %------------------------------------------------
 \begin{frame}
-	\frametitle{Generation of cayley graphs}
+	\frametitle{Computer search of Cayley graphs}
 \end{frame}
 %------------------------------------------------
 \begin{frame}
