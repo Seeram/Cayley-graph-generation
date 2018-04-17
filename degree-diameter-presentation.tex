@@ -160,10 +160,23 @@ There is theoretical upper bound for largest order of graph with $d$-degree and 
 %------------------------------------------------
 \begin{frame}
 	\frametitle{Cayley graphs}
+	Let $\Gamma$ be a group and let $S\subset \Gamma$ be a symmetric unit-free generating set for $\Gamma$; that is, we require that $S=S^{-1}$ and $1\notin S$. 
+	\begin{definition}[Cayley graphs]
+		The $\textit{Cayley graph}$ $C(\Gamma,S)$ is the graph with vertex set $\Gamma$ in which vertices $a,b$ are adjacent if $a^{-1}b\in S$. 		
+	\end{definition}
 \end{frame}
 %------------------------------------------------
 \begin{frame}
 	\frametitle{General linear and Special linear groups}
+		\begin{definition}[General linear group] Let $q$ be a     power of a prime and let $GF(q)$ be the Galois field of order $q$. The {\em general linear group} $GL(m,q)$ consists of all non-singular $m\times m$ matrices over $GF(q)$ under multiplication of matrices.
+		Special linear group is subgroup of $GL(m,q)$ consiting of matrices with determinant equal to 1.
+		\end{definition}
+		\begin{theorem}[Order of $GL(m,q)$]
+			$|GL(m,q)| = (q^m - 1)(q^m - q) \cdots (q^m - q^{n-1})$
+		\end{theorem}
+		\begin{theorem}[Order of $SL(m,q)$]
+			$|SL(m,q)| = |GL(m,q)|/(q-1)$
+		\end{theorem}
 \end{frame}
 %------------------------------------------------
 \begin{frame}
