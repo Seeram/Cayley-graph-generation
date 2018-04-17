@@ -61,27 +61,19 @@ Slovak University of Technology in Bratislava \\ % Your institution for the titl
 \begin{document}
 
 \begin{frame}
-\titlepage % Print the title page as the first slide
+\titlepage 
 \end{frame}
 
 \begin{frame}
-\frametitle{Overview} % Table of contents slide, comment this block out to remove it
-\tableofcontents % Throughout your presentation, if you choose to use \section{} and \subsection{} commands, these will automatically be printed on this slide as an overview of your presentation
+\frametitle{Overview}
+\tableofcontents
 \end{frame}
-
-%----------------------------------------------------------------------------------------
-%	PRESENTATION SLIDES
-%----------------------------------------------------------------------------------------
-
-%------------------------------------------------
-\section{First Section} % Sections can be created in order to organize your presentation into discrete blocks, all sections and subsections are automatically printed in the table of contents as an overview of the talk
-%------------------------------------------------
-
-\subsection{Subsection Example} % A subsection can be created just before a set of slides with a common theme to further break down your presentation into chunks
 
 %------------------------------------------------
 % DEGREE DIAMETER
+\section{Degree/diameter} 
 %------------------------------------------------
+
 \begin{frame}
 	\frametitle{Motivation}
 \begin{itemize}
@@ -142,6 +134,9 @@ There is theoretical upper bound for largest order of graph with $d$-degree and 
 	\end{figure}
 \end{frame}
 %------------------------------------------------
+% DEGREE DIAMETER
+\section{Graph lifting and Cayley graphs} 
+%------------------------------------------------
 \begin{frame}
 	\frametitle{Graph lifting}
 	Let $G$ be an undirected graph. We will assign direction to every edge of graph and making them {\em arcs}. {\em Arc} with {\em reversed} direction of $e$ is denoted by $e^{-1}$. 
@@ -179,6 +174,9 @@ There is theoretical upper bound for largest order of graph with $d$-degree and 
 			$|SL(m,q)| = |GL(m,q)|/(q-1)$
 		\end{theorem}
 \end{frame}
+%------------------------------------------------
+% DEGREE DIAMETER
+\section{Computer search of graphs} 
 %------------------------------------------------
 \begin{frame}
 	\frametitle{Computer search of Cayley graphs}
@@ -220,6 +218,14 @@ There is theoretical upper bound for largest order of graph with $d$-degree and 
  		\includegraphics[scale=0.12]{example.png}
 		\caption{One of the generated graphs from $SL(2,3)$ }
 	\end{figure}
+\end{frame}
+%------------------------------------------------
+\begin{frame}
+	\frametitle{Further research}
+	\begin{itemize}
+		\item Finding smallest graph with given girth and degree is konwn as Degree/girth problem. With small changes to program we can systematically or randomly look for Cayley graphs and check its girth.
+		\item Computations to find smallest graphs with $k=2$ in bigger Galois fields .
+	\end{itemize}
 \end{frame}
 %------------------------------------------------
 \begin{frame}
