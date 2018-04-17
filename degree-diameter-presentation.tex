@@ -78,7 +78,7 @@ Slovak University of Technology in Bratislava \\ % Your institution for the titl
 	\frametitle{Motivation}
 \begin{itemize}
     \item In it's simplest form, networks can be modeled by graphs with nodes as vertices and links between them as edges.
-	\item In design of graphs we can take many restrictions into acount such degree, grith, diameter.
+	\item In design of graphs we can take many restrictions into acount such as degree, grith, diameter.
 	\item Two important problems concerning degree and diameter and degree and grith of graph
 \end{itemize}
 \end{frame}
@@ -151,7 +151,11 @@ There is theoretical upper bound for largest order of graph with $d$-degree and 
 %------------------------------------------------
 \begin{frame}
 	\frametitle{Graph lifting example}
-	Obrazok zdvihu na petersenov graf.
+		\begin{itemize}
+			\item A {\em walk} of length $\ell$ in $G$ is any sequence $W=e_1e_2\ldots e_{\ell}$ of consecutive arcs of $G$, and the voltage $\alpha(W)$ of the walk is simply the product $\alpha(W)=\alpha(e_1)\alpha(e_2)\cdots \alpha(e_{\ell})$. \\
+			\item Lift $G^{\alpha}$ has diameter at most $k$ if for any two vertices $u,v$ of $G$ and for any element $g\in \Gamma$ there is a walk $W$ of length at most $k$ emanating from $u$ and terminating at $v$ such that $\alpha(W)=g$; in the case when $u=v$ we also require that $g\ne 1$.
+		\end{itemize}
+ 					Obrazok zdvihu na petersenov graf.
 \end{frame}
 %------------------------------------------------
 \begin{frame}
