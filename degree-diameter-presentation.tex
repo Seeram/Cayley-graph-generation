@@ -1,0 +1,162 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Beamer Presentation
+% LaTeX Template
+% Version 1.0 (10/11/12)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND THEMES
+%----------------------------------------------------------------------------------------
+
+
+\documentclass{beamer}
+
+\mode<presentation> {
+\usetheme{Madrid}
+
+\setbeamertemplate{footline}[page number] % To replace the footer line in all slides with a simple slide count uncomment this line
+\setbeamertemplate{navigation symbols}{} % To remove the navigation symbols from the bottom of all slides uncomment this line
+}
+
+\usepackage{graphicx} 
+\usepackage{booktabs}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{graphics}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{listings}
+\graphicspath{ {pictures/} } 
+
+%----------------------------------------------------------------------------------------
+%	TITLE PAGE
+%----------------------------------------------------------------------------------------
+
+%\title[Short title]{Full Title of the Talk} % The short title appears at the bottom of every slide, the full title is only on the title page
+\title[]{Cayley graphs of given degree and diameter on linear groups} % The short title appears at the bottom of every slide, the full title is only on the title page
+
+\author{Mat\'u\v{s} Behun} % Your name
+\institute[UCLA] % Your institution as it will appear on the bottom of every slide, may be shorthand to save space
+{
+Slovak University of Technology in Bratislava \\ % Your institution for the title page
+\medskip
+%\textit{john@smith.com} % Your email address
+}
+\date{\today} % Date, can be changed to a custom date
+
+\begin{document}
+
+\begin{frame}
+\titlepage % Print the title page as the first slide
+\end{frame}
+
+\begin{frame}
+\frametitle{Overview} % Table of contents slide, comment this block out to remove it
+\tableofcontents % Throughout your presentation, if you choose to use \section{} and \subsection{} commands, these will automatically be printed on this slide as an overview of your presentation
+\end{frame}
+
+%----------------------------------------------------------------------------------------
+%	PRESENTATION SLIDES
+%----------------------------------------------------------------------------------------
+
+%------------------------------------------------
+\section{First Section} % Sections can be created in order to organize your presentation into discrete blocks, all sections and subsections are automatically printed in the table of contents as an overview of the talk
+%------------------------------------------------
+
+\subsection{Subsection Example} % A subsection can be created just before a set of slides with a common theme to further break down your presentation into chunks
+
+%------------------------------------------------
+% DEGREE DIAMETER
+%------------------------------------------------
+\begin{frame}
+	\frametitle{Motivation}
+\begin{itemize}
+    \item In it's simplest form, networks can be modeled by graphs with nodes as vertices and links between them as edges.
+	\item In design of graphs we can take many restrictions into acount such degree, grith, diameter.
+	\item Two important problems concerning degree and diameter and degree and grith of graph
+\end{itemize}
+\end{frame}
+%------------------------------------------------
+\begin{frame}
+\frametitle{The degree/diameter problem}
+\begin{block}{Degree/diameter problem}
+Find graph with biggest possible number of vertices with given degree and diameter.
+\end{block}
+\begin{block}{Degree/girth problem}
+Find graph with smallest possible number of vertices with given degree and diameter.
+\end{block}
+\end{frame}
+%------------------------------------------------
+\begin{frame}
+	\frametitle{Moore bound}
+There is theoretical upper bound for largest order of graph with $d$-degree and $k$-diameter.
+\begin{equation}\label{eq:Moore}
+	\begin{split}
+		n_{d,k} \leq M_{d,k}    & = 1 + d + d(d - 1) + \dots + d(d - 1)^{k-1}  \\
+								& = 1 + d(1 + (d - 1) + \dots + (d - 1)^{k-1}) \\
+                                & = \begin{cases}
+                                        1+d\frac{(d-1)^{k}-1}{d-2}, & \text{if}\ d > 2 \\
+                                    	2k+1, & \text{if}\ d=2
+    								\end{cases}
+    \end{split}
+\end{equation}
+\end{frame}
+%------------------------------------------------
+\begin{frame}
+	\frametitle{Moore bound}
+		\begin{figure}[!ht]
+    		\centering
+    		\includegraphics[scale=0.6]{petersen-moore.png}
+    		\caption{Peterssen graph is Moore graph with $d=3$ and $k=2$ }
+		\end{figure}
+
+\end{frame}
+%------------------------------------------------
+\begin{frame}
+	\frametitle{Moore graphs}
+	Graphs with order equal Moore bound are called Moore graphs and are reached only in few cases.	
+\begin{itemize}
+    \item.
+\end{itemize}
+\end{frame}
+%------------------------------------------------
+\begin{frame}
+	\frametitle{Graph lifting}
+\end{frame}
+%------------------------------------------------
+\begin{frame}
+	\frametitle{Graph lifting example}
+\end{frame}
+%------------------------------------------------
+\begin{frame}
+	\frametitle{Cayley graphs}
+\end{frame}
+%------------------------------------------------
+\begin{frame}
+	\frametitle{General linear and Special linear groups}
+\end{frame}
+%------------------------------------------------
+\begin{frame}
+	\frametitle{Generation of cayley graphs}
+\end{frame}
+%------------------------------------------------
+\begin{frame}
+	\frametitle{Computer search of cayley graphs}
+\end{frame}
+\begin{frame}
+\Huge{\centerline{The End}}
+\end{frame}
+
+%----------------------------------------------------------------------------------------
+
+\end{document} 
