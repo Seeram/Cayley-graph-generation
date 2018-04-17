@@ -89,12 +89,12 @@ Slovak University of Technology in Bratislava \\ % Your institution for the titl
 %------------------------------------------------
 \begin{frame}
 \frametitle{The degree/diameter problem}
-\begin{block}{Degree/diameter problem}
-Find graph with biggest possible number of vertices with given degree and diameter.
-\end{block}
-\begin{block}{Degree/girth problem}
-Find graph with smallest possible number of vertices with given degree and diameter.
-\end{block}
+	\begin{block}{Degree/diameter problem}
+		Find graph with biggest possible number of vertices with given degree and diameter.
+	\end{block}
+	\begin{block}{Degree/girth problem}
+		Find graph with smallest possible number of vertices with given degree and diameter.
+	\end{block}
 \end{frame}
 %------------------------------------------------
 \begin{frame}
@@ -119,23 +119,43 @@ There is theoretical upper bound for largest order of graph with $d$-degree and 
     		\includegraphics[scale=0.6]{petersen-moore.png}
     		\caption{Peterssen graph is Moore graph with $d=3$ and $k=2$ }
 		\end{figure}
-
 \end{frame}
 %------------------------------------------------
 \begin{frame}
 	\frametitle{Moore graphs}
 	Graphs with order equal Moore bound are called Moore graphs and are reached only in few cases.	
-\begin{itemize}
-    \item.
-\end{itemize}
+	\begin{itemize}
+		\item If $d = 2$ for any $k \geq 1$
+		\item If $k = 1$ for any $d \geq 2$
+		\item For $k = 2$ for $d \in \{3, 7 \}$, and possibly $57$
+	\end{itemize}
+	For other cases we try to construct graphs with order as close to Moore bound as possible.
+\end{frame}
+%------------------------------------------------
+\begin{frame}
+	\frametitle{Moore graphs}
+	\begin{figure}[!ht]
+ 		\centering
+ 		\includegraphics[scale=0.25]{Hoffman-Singleton_graph.png}
+		\caption{Hoffman-singleton graph is Moore graph with $d=7$ and $k=2$ }
+	\end{figure}
 \end{frame}
 %------------------------------------------------
 \begin{frame}
 	\frametitle{Graph lifting}
+	Let $G$ be an undirected graph. We will assign direction to every edge of graph and making them {\em arcs}. {\em Arc} with {\em reversed} direction of $e$ is denoted by $e^{-1}$. 
+	\begin{definition}[Graph lifting]
+		Let $G$ be a graph as above and let $\Gamma$ be a finite group. The mapping
+		\begin{align*}
+			\alpha: D(G) \rightarrow \Gamma
+		\end{align*}
+		will be called a {\em voltage assignment} if $\alpha(e^{-1})$ = $(\alpha(e))^{-1}$, for any arc $e \in D(G)$.
+	\end{definition}
 \end{frame}
 %------------------------------------------------
 \begin{frame}
 	\frametitle{Graph lifting example}
+	Obrazok zdvihu na petersenov graf.
 \end{frame}
 %------------------------------------------------
 \begin{frame}
@@ -156,6 +176,7 @@ There is theoretical upper bound for largest order of graph with $d$-degree and 
 \begin{frame}
 \Huge{\centerline{The End}}
 \end{frame}
+ 16 \graphicspath{ {pictures/} } 
 
 %----------------------------------------------------------------------------------------
 
