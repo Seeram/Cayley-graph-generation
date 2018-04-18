@@ -40,7 +40,7 @@
 
 \lstset{ 
 	basicstyle=\footnotesize, 
-	tabsize=3 
+	tabsize=1 
 } 
 %----------------------------------------------------------------------------------------
 %	TITLE PAGE
@@ -77,7 +77,6 @@ Slovak University of Technology in Bratislava \\ % Your institution for the titl
 \begin{itemize}
     \item In it's simplest form, networks can be modeled by graphs with nodes as vertices and links between them as edges.
 	\item In design of graphs we can take many restrictions into acount such as degree, grith, diameter.
-	\item Two important problems concerning degree and diameter and degree and grith of graph
 \end{itemize}
 \end{frame}
 %------------------------------------------------
@@ -117,12 +116,12 @@ Slovak University of Technology in Bratislava \\ % Your institution for the titl
 %------------------------------------------------
 \begin{frame}
 	\frametitle{Moore graphs}
-	Graphs with order equal Moore bound are called Moore graphs and are reached only in few cases.	
+	Graphs with order equal Moore bound are called Moore graphs and are reached only in few cases: ~\\
 	\begin{itemize}
 		\item If $d = 2$ for any $k \geq 1$
 		\item If $k = 1$ for any $d \geq 2$
 		\item For $k = 2$ for $d \in \{3, 7 \}$, and possibly $57$
-	\end{itemize}
+	\end{itemize} ~\\~\\
 	For other cases we try to construct graphs with order as close to Moore bound as possible.
 \end{frame}
 %------------------------------------------------
@@ -139,15 +138,14 @@ Slovak University of Technology in Bratislava \\ % Your institution for the titl
 \section{Graph lifting and Cayley graphs} 
 %------------------------------------------------
 \begin{frame}
-	\frametitle{Construction of large graphs - dokoncit text}
-	\begin{equation*}
-		n_{d,k} \geq \left( \frac{d}{2} \right)^{k}.
+	\frametitle{Construction of large graphs}
+
+	Finding large graphs close to Moore bound is approached by many techniques in most cases by combinatorics on words algebraic structures. \\~\\ 
+	
+    Here we present two best bounds on large graphs: 
+    \begin{equation*}
+        n_{d,k} \geq \left( \frac{d}{2} \right)^{k} +  \left( \frac{d}{2} \right)^{k-1} \cite{Bas-Mil} 
     \end{equation*}
-    This bound was improved by Baskoro and Miller \cite{Bas-Mil} to
-    \begin{equation}
-        n_{d,k} \geq \left( \frac{d}{2} \right)^{k} +  \left( \frac{d}{2} \right)^{k-1}
-    \end{equation}
-    
     In the special case of diameter $k=2$, modified Brown graphs can give for sufficiently large $d$ the bound
     \begin{equation*}
         n_{d,2} \geq d^{2} - 2d^{1+\varepsilon}
@@ -179,10 +177,14 @@ Slovak University of Technology in Bratislava \\ % Your institution for the titl
 %------------------------------------------------
 \begin{frame}
 	\frametitle{Cayley graphs}
-	Let $\Gamma$ be a group and let $S\subset \Gamma$ be a symmetric unit-free generating set for $\Gamma$; that is, we require that $S=S^{-1}$ and $1\notin S$. 
+	Let $\Gamma$ be a group and let $S\subset \Gamma$ be a symmetric unit-free generating set for $\Gamma$; that is, we require that $S=S^{-1}$ and $1\notin S$.\\~\\
 	\begin{definition}[Cayley graphs]
-		The $\textit{Cayley graph}$ $C(\Gamma,S)$ is the graph with vertex set $\Gamma$ in which vertices $a,b$ are adjacent if $a^{-1}b\in S$. 		
-	\end{definition}
+		The $\textit{Cayley graph}$ $C(\Gamma,S)$ is the graph with vertex set $\Gamma$ in which vertices $a,b$ are adjacent if $a^{-1}b\in S$.	
+	\end{definition} ~\\~\\
+	Best lower bound on Cayley graphs obtained by \v{S}iagiov\'a and \v{S}ir\'a\v{n} \cite{Sia-Sir}: 
+	\begin{theorem}
+	Let $D = \{ 2^{2m+\mu}+    (2+\delta)2^{m+1}-6,m \geq 1, \mu \in \{0,1\} \}$. Then, for every $d\in D$ one has $C_{d,2} > d^{2} - 6\sqrt{2}d^{3/2}$.
+	\end{theorem}
 \end{frame}
 %------------------------------------------------
 \begin{frame}
@@ -209,14 +211,14 @@ Slovak University of Technology in Bratislava \\ % Your institution for the titl
 	\begin{itemize}
 		\item Generating sets yield all elements of $|SL(2,5)| = 120$
 		\item Cayley graphs are regular with with $d=|S|$
-	\end{itemize}
+	\end{itemize} ~\\
 	we know by Moore bound that size of $S$ must be at least $12$ and all we have to check is diameter of graph. 
 \end{frame}
 %------------------------------------------------
 \begin{frame}
 	\frametitle{Computer search of Cayley graphs}
-	With one involution in $SL(2,5)$ and with unit-free property of symmetry we have $59$ pairs of elements with its inverses. To check all graphs for $d=12$ we have to generate and check diameter on ${59 \choose 6} = 45057474$ graphs. \\
-	In our computation we generated 150000 graphs for all listed degrees. \\
+	With one involution in $SL(2,5)$ and with unit-free property of symmetry we have $59$ pairs of elements with its inverses. To check all graphs for $d=12$ we have to generate and check diameter on ${59 \choose 6} = 45057474$ graphs. \\~\\
+	In our search we generated 150000 graphs for all listed degrees. \\~\\
 	\begin{tabular}[htbp]{l*{10}{c}r}
 		$d$ & $13$ & $14$ & $15$ & $16$ & $17$ & $18$ & $19$ & $20$ & $21$ \\
 		\hline
