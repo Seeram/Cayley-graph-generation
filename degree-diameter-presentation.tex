@@ -59,21 +59,19 @@ Slovak University of Technology in Bratislava \\ % Your institution for the titl
 \date{\today} % Date, can be changed to a custom date
 
 \begin{document}
-
+%------------------------------------------------
 \begin{frame}
 \titlepage 
 \end{frame}
-
+%------------------------------------------------
 \begin{frame}
 \frametitle{Overview}
 \tableofcontents
 \end{frame}
-
 %------------------------------------------------
 % DEGREE DIAMETER
 \section{Degree/diameter} 
 %------------------------------------------------
-
 \begin{frame}
 	\frametitle{Motivation}
 \begin{itemize}
@@ -88,21 +86,24 @@ Slovak University of Technology in Bratislava \\ % Your institution for the titl
 	\begin{block}{Degree/diameter problem}
 		Find graph with biggest possible number of vertices with given degree and diameter.
 	\end{block}
+	\begin{block}{Edward Forrest Moore}
+		Edward Forrest Moore was first who proposed problem of describing and classifying these graphs.
+	\end{block}
 \end{frame}
 %------------------------------------------------
 \begin{frame}
 	\frametitle{Moore bound}
-There is theoretical upper bound for largest order of graph with $d$-degree and $k$-diameter.
-\begin{equation}\label{eq:Moore}
-	\begin{split}
-		n_{d,k} \leq M_{d,k}    & = 1 + d + d(d - 1) + \dots + d(d - 1)^{k-1}  \\
-								& = 1 + d(1 + (d - 1) + \dots + (d - 1)^{k-1}) \\
-                                & = \begin{cases}
-                                        1+d\frac{(d-1)^{k}-1}{d-2}, & \text{if}\ d > 2 \\
-                                    	2k+1, & \text{if}\ d=2
-    								\end{cases}
-    \end{split}
-\end{equation}
+	There is theoretical upper bound for largest order of graph with $d$-degree and $k$-diameter.
+	\begin{equation}\label{eq:Moore}
+		\begin{split}
+			n_{d,k} \leq M_{d,k}    & = 1 + d + d(d - 1) + \dots + d(d - 1)^{k-1}  \\
+									& = 1 + d(1 + (d - 1) + \dots + (d - 1)^{k-1}) \\
+									& = \begin{cases}
+											1+d\frac{(d-1)^{k}-1}{d-2}, & \text{if}\ d > 2 \\
+											2k+1, & \text{if}\ d=2
+										\end{cases}
+		\end{split}
+	\end{equation}
 \end{frame}
 %------------------------------------------------
 \begin{frame}
@@ -134,8 +135,25 @@ There is theoretical upper bound for largest order of graph with $d$-degree and 
 	\end{figure}
 \end{frame}
 %------------------------------------------------
-% DEGREE DIAMETER
+% Graph lifting and Cayley graphs
 \section{Graph lifting and Cayley graphs} 
+%------------------------------------------------
+\begin{frame}
+	\frametitle{Construction of large graphs - dokoncit text}
+	\begin{equation*}
+		n_{d,k} \geq \left( \frac{d}{2} \right)^{k}.
+    \end{equation*}
+    This bound was improved by Baskoro and Miller \cite{Bas-Mil} to
+    \begin{equation}
+        n_{d,k} \geq \left( \frac{d}{2} \right)^{k} +  \left( \frac{d}{2} \right)^{k-1}
+    \end{equation}
+    
+    In the special case of diameter $k=2$, modified Brown graphs can give for sufficiently large $d$ the bound
+    \begin{equation*}
+        n_{d,2} \geq d^{2} - 2d^{1+\varepsilon}
+    \end{equation*}
+
+\end{frame}
 %------------------------------------------------
 \begin{frame}
 	\frametitle{Graph lifting}
@@ -155,7 +173,8 @@ There is theoretical upper bound for largest order of graph with $d$-degree and 
 			\item A {\em walk} of length $\ell$ in $G$ is any sequence $W=e_1e_2\ldots e_{\ell}$ of consecutive arcs of $G$, and the voltage $\alpha(W)$ of the walk is simply the product $\alpha(W)=\alpha(e_1)\alpha(e_2)\cdots \alpha(e_{\ell})$. \\
 			\item Lift $G^{\alpha}$ has diameter at most $k$ if for any two vertices $u,v$ of $G$ and for any element $g\in \Gamma$ there is a walk $W$ of length at most $k$ emanating from $u$ and terminating at $v$ such that $\alpha(W)=g$; in the case when $u=v$ we also require that $g\ne 1$.
 		\end{itemize}
- 					Obrazok zdvihu na petersenov graf.
+ 		Obrazok zdvihu na petersenov graf.
+
 \end{frame}
 %------------------------------------------------
 \begin{frame}
