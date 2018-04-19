@@ -40,7 +40,7 @@
 
 \lstset{ 
 	basicstyle=\footnotesize, 
-	tabsize=1 
+	tabsize=3,
 } 
 %----------------------------------------------------------------------------------------
 %	TITLE PAGE
@@ -70,29 +70,34 @@ Slovak University of Technology in Bratislava \\ % Your institution for the titl
 \end{frame}
 %------------------------------------------------
 % DEGREE DIAMETER
-\section{Degree/diameter} 
+\section{Degree/diameter problem} 
 %------------------------------------------------
 \begin{frame}
 	\frametitle{Motivation}
 \begin{itemize}
-    \item In it's simplest form, networks can be modeled by graphs with nodes as vertices and links between them as edges.
-	\item In design of graphs we can take many restrictions into acount such as degree, grith, diameter.
+    \item In its simplest form, networks can be modeled by graphs with nodes as vertices and links between them as edges.
+	\item In modeling interconnection networks by graphs one often considers two restrictions: 
+		\begin{itemize}
+			\item limitation on the number of physical links leaving a node
+			\item limitation on accessibility, that is, any two nodes should be accessible using at most a certain number of physical links. 
+		\end{itemize}
+		In terms of a graph model this translates into restriction on the maximum degree and on the diameter.
 \end{itemize}
 \end{frame}
 %------------------------------------------------
 \begin{frame}
 \frametitle{The degree/diameter problem}
 	\begin{block}{Degree/diameter problem}
-		Find graph with biggest possible number of vertices with given degree and diameter.
+		Find graphs with the largest possible number of vertices, with given degree and diameter.
 	\end{block}
 	\begin{block}{Edward Forrest Moore}
-		Edward Forrest Moore was first who proposed problem of describing and classifying these graphs.
+		Edward Forrest Moore was first who proposed problem of describing and classifying such graphs.
 	\end{block}
 \end{frame}
 %------------------------------------------------
 \begin{frame}
 	\frametitle{Moore bound}
-	There is theoretical upper bound for largest order of graph with $d$-degree and $k$-diameter.
+	There is a theoretical upper bound on the largest order of a graph of maximum degree $d\ge 2$ and diameter $k\ge 1$.
 	\begin{equation}\label{eq:Moore}
 		\begin{split}
 			n_{d,k} \leq M_{d,k}    & = 1 + d + d(d - 1) + \dots + d(d - 1)^{k-1}  \\
@@ -102,27 +107,29 @@ Slovak University of Technology in Bratislava \\ % Your institution for the titl
 											2k+1, & \text{if}\ d=2
 										\end{cases}
 		\end{split}
-	\end{equation}
+	\end{equation} ~\\~\\
+	Graphs of maximum degree $d$ and diameter $k$ with $M_{d,k}$ vertices are called {\em Moore graphs}. \\~\\
+	Moore graphs are necessarily regular.
 \end{frame}
 %------------------------------------------------
 \begin{frame}
-	\frametitle{Moore bound}
+	\frametitle{An example of Moore graph}
 		\begin{figure}[!ht]
     		\centering
-    		\includegraphics[scale=0.6]{petersen-moore.png}
-    		\caption{Peterssen graph is Moore graph with $d=3$ and $k=2$ }
+    		\includegraphics[scale=0.8]{petersen-moore.png}
+    		\caption{The Petersen graph is a Moore graph with $d=3$ and $k=2$ }
 		\end{figure}
 \end{frame}
 %------------------------------------------------
 \begin{frame}
 	\frametitle{Moore graphs}
-	Graphs with order equal Moore bound are called Moore graphs and are reached only in few cases: ~\\
+	Moore graphs are rare; they exist only for the following degrees and diameters: ~\\
 	\begin{itemize}
 		\item If $d = 2$ for any $k \geq 1$
 		\item If $k = 1$ for any $d \geq 2$
-		\item For $k = 2$ for $d \in \{3, 7 \}$, and possibly $57$
+		\item If $k = 2$ and $d \in \{3, 7 \}$, and possibly $57$
 	\end{itemize} ~\\~\\
-	For other cases we try to construct graphs with order as close to Moore bound as possible.
+	In the remaining cases one tries to construct graphs of maximum degree $d$ and diameter $k$ of order as close to the Moore bound $M_{d,k}$ as possible.
 \end{frame}
 %------------------------------------------------
 \begin{frame}
@@ -130,27 +137,130 @@ Slovak University of Technology in Bratislava \\ % Your institution for the titl
 	\begin{figure}[!ht]
  		\centering
  		\includegraphics[scale=0.25]{Hoffman-Singleton_graph.png}
-		\caption{Hoffman-singleton graph is Moore graph with $d=7$ and $k=2$ }
+		\caption{The Hoffman-singleton graph is Moore graph with $(d,k)=(7,2)$}
 	\end{figure}
 \end{frame}
 %------------------------------------------------
 % Graph lifting and Cayley graphs
-\section{Graph lifting and Cayley graphs} 
+\section{Cayley graphs} 
 %------------------------------------------------
 \begin{frame}
-	\frametitle{Construction of large graphs}
-
-	Finding large graphs close to Moore bound is approached by many techniques in most cases by combinatorics on words algebraic structures. \\~\\ 
-	
-    Here we present two best bounds on large graphs: 
+	\frametitle{Construction of large $(d,k)$-graphs}
+	Finding $(d,k)$-graph of large order is approached by many techniques, mostly using combinatorics on words or various algebraic structures. \\~\\
+    We present two examples of bounds arising from such constructions: ~\\
+	Using combinatorics on words, Baskoro and Miller(1993) \cite{Bas-Mil} proved that 
     \begin{equation*}
-        n_{d,k} \geq \left( \frac{d}{2} \right)^{k} +  \left( \frac{d}{2} \right)^{k-1} \cite{Bas-Mil} 
-    \end{equation*}
-    In the special case of diameter $k=2$, modified Brown graphs can give for sufficiently large $d$ the bound
+        n_{d,k} \geq \left( \frac{d}{2} \right)^{k} +  \left( \frac{d}{2} \right)^{k-1}     
+	\end{equation*}
+	With the help of finite fields Bevan, Erskine and Lewis(2017) \cite{Bev-Ers} observed that modified Brown graphs give the bound
     \begin{equation*}
-        n_{d,2} \geq d^{2} - 2d^{1+\varepsilon}
-    \end{equation*}
+		n_{d,2} \geq d^{2} - 2d^{1+\varepsilon}     
+	\end{equation*}
+	where $\varepsilon$ depends on results about graphs between consecutive primes.	
+\end{frame}
+%------------------------------------------------
+\begin{frame}
+	\frametitle{Cayley graphs}
+	Let $\Gamma$ be a group and let $S\subset \Gamma$ be a symmetric unit-free generating set for $\Gamma$; that is, we require that $S=S^{-1}$ and $1\notin S$.\\~\\
+	\begin{definition}[Cayley graphs]
+		The $\textit{Cayley graph}$ $C(\Gamma,S)$ is the graph with vertex set $\Gamma$ in which vertices $a,b$ are adjacent if $a^{-1}b\in S$.	
+	\end{definition} ~\\~\\
+	By $C_{d,k}$ we denote the largest order of Cayley graph of degree $d$ and diameter $k$.
+	The best currently known lower bound on diameter $2$ for an infinite family of degrees is due to \v{S}iagiov\'a and \v{S}ir\'a\v{n}(2012) \cite{Sia-Sir}: 
+	\begin{theorem}
+	Let $D = \{ 2^{2m+\mu}+    (2+\delta)2^{m+1}-6,m \geq 1, \mu \in \{0,1\} \}$. Then, for every $d\in D$ one has $C_{d,2} > d^{2} - 6\sqrt{2}d^{3/2}$.
+	\end{theorem}
+\end{frame}
+%------------------------------------------------
+\begin{frame}
+	\frametitle{General and special linear groups}
+		\begin{definition}[General and special linear group] Let $q$ be a power of a prime and let $GF(q)$ be the Galois field of order $q$. The {\em general linear group} $GL(m,q)$ consists of all non-singular $m\times m$ matrices over $GF(q)$ under multiplication. \\~\\
+		The special linear group is the subgroup of $GL(m,q)$ consiting of matrices with determinant $1$.
+		\end{definition}
+		\begin{theorem}[Order of $GL(m,q)$]
+			$|GL(m,q)| = (q^m - 1)(q^m - q) \cdots (q^m - q^{m-1})$
+		\end{theorem}
+		\begin{theorem}[Order of $SL(m,q)$]
+			$|SL(m,q)| = |GL(m,q)|/(q-1)$
+		\end{theorem}
+\end{frame}
+%------------------------------------------------
+% DEGREE DIAMETER
+\section{Computer search} 
+%------------------------------------------------
+\begin{frame}
+	\frametitle{Computer search}
+	We created a program generating Cayley graphs of given degree and diameter based on $SL(2,q)$. \\~\\
+	As an example, consider the problem of generating a Cayley graph for the group $SL(2,5)$ of diameter $2$ and minimum possible degree: \\~\\
 
+	In order to find graphs with given $d$ and $k$ we generted Cayley graphs from random symmetric unit-free sets $S$ of $SL(2,5)$.
+	The order of $SL(2,5)$ is $120$, so that by the Moore bound the first feasible degree (equal to sthe size of a generating set) would be $12$.
+\end{frame}
+%------------------------------------------------
+\begin{frame}
+	\frametitle{Computer search}
+	 The group $SL(2,5)$ has only one involution; all the remaining $118$ elements form $59$ pairs of the form $\{x,x^{-1}\}$. \\~\\
+	 To check all Cayley graphs $C(G,S)$ for $G=SL(2,5)$ and $|S|=12$ we would have to generate all the ${59 \choose 6} = 45057474$ possibilities for $S$ and then check for the diameter of the resulting Cayley graphs. \\~\\
+	For the group $G=SL(2,5)$ and generating sets $S$ such that $|S|=d$ by our randomized algorithm we found the following number of generating sets giving Cayley graphs $C(G,S)$ of diameter $2$: \\~\\
+	\begin{tabular}[htbp]{l*{10}{c}r}
+		$d$ & $13$ & $14$ & $15$ & $16$ & $17$ & $18$ & $19$ & $20$ & $21$ \\
+		\hline
+ 		Found graphs & $0$  & $0$ & $1$ & $107$ & $345$ & $2451$  & $4120$ & $11669$ & $14926$ \\
+	\end{tabular} 
+\end{frame}
+%------------------------------------------------
+\begin{frame}
+	\frametitle{Algorithm for generation of cayley graph}
+	\lstinputlisting[language=Perl]{while.pl}
+\end{frame}
+%------------------------------------------------
+\begin{frame}
+	\frametitle{Algorithm for diameter}
+	\lstinputlisting[language=Perl]{diameter.pl}
+\end{frame}
+%------------------------------------------------
+\begin{frame}
+	\frametitle{An example of the output for $SL(2,3)$}
+	\begin{figure}[!ht]
+ 		\centering
+ 		\includegraphics[scale=0.12]{example.png}
+		\caption{One of the generated graphs from $SL(2,3)$ }
+	\end{figure}
+\end{frame}
+%------------------------------------------------
+\begin{frame}
+	\frametitle{Further research}
+	\begin{itemize}
+		\item Finding regular graphs of a given degree and girth of the smallest possible order is known as the degree/girth problem. With small changes to program we can systematically or randomly look for Cayley graphs and check its girth.
+		\item Applying our algorithm to generate graphs of diameter $2$ and comparably small degree that are Cayley graphs of $SL(2,q)$ for $q>5$.
+	\end{itemize}
+\end{frame}
+%------------------------------------------------
+\begin{frame}
+	\frametitle{References}
+    \footnotesize{
+    	\begin{thebibliography}{99} % Beamer does not support BibTeX so references must be inserted manually as below
+			\bibitem{Bas-Mil} E. T. Baskoro and M. Miller, On the construction of networks with minimum diameter,
+				Australian Computer Science Communications C 15 (1993) 739?743.
+
+			\bibitem{Bev-Ers} D. Bevan, G. Erskine and R. Lewis, Large circulant graphs of fized diameter and arbitrary degree, Ars Math. ontemp. 13 (2017), 275--29.
+			\bibitem{Sia-Sir} J. \v{S}iagiov\'a and J. \v{S}ir\'a\v{n}, Approaching the Moore bound for diameter two by Cayley graphs, J. Combin. Theory Ser. B 102 (2012) 470--4    73.
+        \end{thebibliography}
+    }
+\end{frame}
+%------------------------------------------------
+\begin{frame}
+\Huge{\centerline{The End}}
+\end{frame}
+%----------------------------------------------------------------------------------------
+\end{document} 
+\begin{frame}
+	\frametitle{Computer search of Cayley graphs}
+	We know that Cayley graph is lift of one vertex with $|S|$ edges. We exploit that property by computation of diameter on smaller graph to determine it.
+	\begin{theorem}[Diameter of Cayley graph]
+		Cayley graph $(\Gamma, S)$ has diameter $k$ if and only if \\
+		$ \forall x \in Cay(\Gamma, S) there \exists x_{1}, x_{2}, \dots ,x_{i} \in S$
+	\end{theorem}
 \end{frame}
 %------------------------------------------------
 \begin{frame}
@@ -173,97 +283,4 @@ Slovak University of Technology in Bratislava \\ % Your institution for the titl
 		\end{itemize}
  		Obrazok zdvihu na petersenov graf.
 
-\end{frame}
-%------------------------------------------------
-\begin{frame}
-	\frametitle{Cayley graphs}
-	Let $\Gamma$ be a group and let $S\subset \Gamma$ be a symmetric unit-free generating set for $\Gamma$; that is, we require that $S=S^{-1}$ and $1\notin S$.\\~\\
-	\begin{definition}[Cayley graphs]
-		The $\textit{Cayley graph}$ $C(\Gamma,S)$ is the graph with vertex set $\Gamma$ in which vertices $a,b$ are adjacent if $a^{-1}b\in S$.	
-	\end{definition} ~\\~\\
-	Best lower bound on Cayley graphs obtained by \v{S}iagiov\'a and \v{S}ir\'a\v{n} \cite{Sia-Sir}: 
-	\begin{theorem}
-	Let $D = \{ 2^{2m+\mu}+    (2+\delta)2^{m+1}-6,m \geq 1, \mu \in \{0,1\} \}$. Then, for every $d\in D$ one has $C_{d,2} > d^{2} - 6\sqrt{2}d^{3/2}$.
-	\end{theorem}
-\end{frame}
-%------------------------------------------------
-\begin{frame}
-	\frametitle{General linear and Special linear groups}
-		\begin{definition}[General linear group] Let $q$ be a power of a prime and let $GF(q)$ be the Galois field of order $q$. The {\em general linear group} $GL(m,q)$ consists of all non-singular $m\times m$ matrices over $GF(q)$ under multiplication of matrices.
-		Special linear group is subgroup of $GL(m,q)$ consiting of matrices with determinant equal to 1.
-		\end{definition}
-		\begin{theorem}[Order of $GL(m,q)$]
-			$|GL(m,q)| = (q^m - 1)(q^m - q) \cdots (q^m - q^{n-1})$
-		\end{theorem}
-		\begin{theorem}[Order of $SL(m,q)$]
-			$|SL(m,q)| = |GL(m,q)|/(q-1)$
-		\end{theorem}
-\end{frame}
-%------------------------------------------------
-% DEGREE DIAMETER
-\section{Computer search of graphs} 
-%------------------------------------------------
-\begin{frame}
-	\frametitle{Computer search of Cayley graphs}
-	In order to find graphs with given $d$ and $k$ we generted Cayley graphs from random symmetric unit-free sets $S$ of $SL(2,5)$. 
-	\medskip
-	With assumptions that: 
-	\begin{itemize}
-		\item Generating sets yield all elements of $|SL(2,5)| = 120$
-		\item Cayley graphs are regular with with $d=|S|$
-	\end{itemize} ~\\
-	we know by Moore bound that size of $S$ must be at least $12$ and all we have to check is diameter of graph. 
-\end{frame}
-%------------------------------------------------
-\begin{frame}
-	\frametitle{Computer search of Cayley graphs}
-	With one involution in $SL(2,5)$ and with unit-free property of symmetry we have $59$ pairs of elements with its inverses. To check all graphs for $d=12$ we have to generate and check diameter on ${59 \choose 6} = 45057474$ graphs. \\~\\
-	In our search we generated 150000 graphs for all listed degrees. \\~\\
-	\begin{tabular}[htbp]{l*{10}{c}r}
-		$d$ & $13$ & $14$ & $15$ & $16$ & $17$ & $18$ & $19$ & $20$ & $21$ \\
-		\hline
- 		Found graphs & $0$  & $0$ & $1$ & $107$ & $345$ & $2451$  & $4120$ & $11669$ & $14926$ \\
-	\end{tabular} 
-\end{frame}
-%------------------------------------------------
-\begin{frame}
-	\frametitle{Algorithm for generation of cayley graph}
-	\lstinputlisting[language=Perl, frame=sinlge]{while.pl}
-\end{frame}
-%------------------------------------------------
-\begin{frame}
-	\frametitle{Algorithm for diameter}
-	\lstinputlisting[language=Perl, frame=sinlge]{diameter.pl}
-\end{frame}
-%------------------------------------------------
-\begin{frame}
-	\frametitle{Output of program}
-	\begin{figure}[!ht]
- 		\centering
- 		\includegraphics[scale=0.12]{example.png}
-		\caption{One of the generated graphs from $SL(2,3)$ }
-	\end{figure}
-\end{frame}
-%------------------------------------------------
-\begin{frame}
-	\frametitle{Further research}
-	\begin{itemize}
-		\item Finding smallest graph with given girth and degree is konwn as Degree/girth problem. With small changes to program we can systematically or randomly look for Cayley graphs and check its girth.
-		\item Computations to find smallest graphs with $k=2$ in bigger Galois fields .
-	\end{itemize}
-\end{frame}
-%------------------------------------------------
-\begin{frame}
-\Huge{\centerline{The End}}
-\end{frame}
-%----------------------------------------------------------------------------------------
-\end{document} 
-
-\begin{frame}
-	\frametitle{Computer search of Cayley graphs}
-	We know that Cayley graph is lift of one vertex with $|S|$ edges. We exploit that property by computation of diameter on smaller graph to determine it.
-	\begin{theorem}[Diameter of Cayley graph]
-		Cayley graph $(\Gamma, S)$ has diameter $k$ if and only if \\
-		$ \forall x \in Cay(\Gamma, S) there \exists x_{1}, x_{2}, \dots ,x_{i} \in S$
-	\end{theorem}
 \end{frame}
