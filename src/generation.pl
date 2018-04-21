@@ -80,16 +80,20 @@ sub modulo
 
 sub compute_hash 
 {
-	my ($M, $zp) = @_;
+	my ($A, $zp) = @_;
 
-	my $hash = 0;
-	for my $i (0..1) {
-		for my $j (0..1) {
-			$hash = $zp * $hash + index2d($M, $i,$j);				
+	if($zp < 99) {
+		return index2d($A, 0,0) . index2d($A, 0,1) . index2d($A, 1,0) . index2d($A, 1,1);
+	} else {
+		my $hash = 0;
+		for my $i (0..1) {
+			for my $j (0..1) {
+				$hash = $zp * $hash + index2d($A, $i,$j);				
+			}
 		}
-	}
 
-	return $hash;
+		return $hash;
+	}
 }
 
 sub insert_result
@@ -235,11 +239,12 @@ sub check_one_diameter
 	if($diameter == 1) {
 		foreach my $index_no ( @{ $keys_ref } ) {
 			foreach my $table_entry_ref ( @{ $multiplication_results_ref->[$index_no] } ) {
-				if( $#{ $keys_ref } != $#{ $table_entry_ref } ) {
+				if($#{ $keys_ref } != $#{ $table_entry_ref } ) {
 					return 0;
 				}
 			}
 		}
+
 		return 1;
 	}
 
@@ -288,23 +293,25 @@ sub generate_cayley_graph_on_fixed_array
 	my @generating_nodes;
 
 	foreach my $element ( @generating_set ) {
-		push @keys, get_index($element);
+		push @keys, get_index($element, $zp);
 		push @stack, $element;
-		$generating_nodes[ get_index($element) ] = $element; 
+		$generating_nodes[ get_index($element, $zp) ] = $element; 
 	}
 
 	my $current_node = $stack[0]; 
-	push @{ $cayley_table[ get_index($current_node) ] }, [ $current_node ];
+	push @{ $cayley_table[ get_index($current_node, $zp) ] }, [ $current_node ];
 
 	while(@stack) {
 		foreach my $element (@generating_set) {
 			my $connected_node = ($current_node x $element) % $zp;	
-			push @{ ${ $cayley_table[ get_index($current_node) ] }[0] }, $connected_node;
+			if(any $connected_node != $current_node) {
+				push @{ ${ $cayley_table[ get_index($current_node, $zp) ] }[0] }, $connected_node;
+			}
 
-			if(not defined $generating_nodes[ get_index($connected_node) ]) {
-				push @keys, get_index($connected_node);				
+			if(not defined $generating_nodes[ get_index($connected_node, $zp) ]) {
+				push @keys, get_index($connected_node, $zp);				
 				push @stack, $connected_node;
-				$generating_nodes[ get_index($connected_node) ] = $connected_node;; 
+				$generating_nodes[ get_index($connected_node, $zp) ] = $connected_node;; 
 			} 		
 		}
 
@@ -312,7 +319,7 @@ sub generate_cayley_graph_on_fixed_array
 
 		if(@stack) {
 			$current_node = $stack[0];
-			push @{ $cayley_table[ get_index($current_node) ] }, [ $current_node ];
+			push @{ $cayley_table[ get_index($current_node, $zp) ] }, [ $current_node ];
 		}
 	}
 
@@ -374,7 +381,6 @@ sub generate_graph_from_table
 	}
 
 	my $diameter = $graph->diameter;
-	print "diameter from generat_graph_from_table $diameter\n";
 
 	return ( $graph, $generating_set_ref, $zp, $diameter );
 }
@@ -416,7 +422,20 @@ sub generate_graph
 
 sub get_index
 {
-	my ($A) = @_;
+	my ($A, $zp) = @_;
+
+	if($zp < 99) {
+		return index2d($A, 0,0) . index2d($A, 0,1) . index2d($A, 1,0) . index2d($A, 1,1);
+	} else {
+		my $hash = 0;
+		for my $i (0..1) {
+			for my $j (0..1) {
+				$hash = $zp * $hash + index2d($A, $i,$j);				
+			}
+		}
+
+		return $hash;
+	}
 
 	return index2d($A, 0,0) . index2d($A, 0,1) . index2d($A, 1,0) . index2d($A, 1,1);
 }
@@ -458,9 +477,7 @@ sub generate_SL_group
 				foreach my $l (0..$zpg) {
 					my $m = PDL::Matrix->pdl([[$i, $j],[$k, $l]]);
 					if(determinant_Zp($m, $zp) == 1) {
-						unless(all $m == $neutral_element) {
-							push @generating_set, $m;
-						}
+						push @generating_set, $m;
 					}
 				}
 			}
@@ -705,10 +722,12 @@ sub get_random_generating_set
 	my $chosen_index;
 
 	while(($#generating_set + 1) < $required_size_of_set) {
+			# get last element it has to be involution
 		if(($#generating_set + 1) == ($required_size_of_set - 1)) {
 				# Try just number of involutions in group to add random one 
 			foreach ( 0..$#{ $group_ref->[1] } ) {
 				$chosen_index = int(rand($#{ $group_ref->[1] } + 1 ));
+
 				my $involution = $group_ref->[0]->[$group_ref->[1]->[$chosen_index]];
 				unless(List::Util::any { all $_ == $involution } @generating_set) {
 					push @generating_set, $involution;
@@ -728,7 +747,7 @@ sub get_random_generating_set
 			return get_random_generating_set($group_ref, $zp, $required_size_of_set);
 		}
 
-		$chosen_index = int(rand($#{ $group_ref->[0] } + 1 ));
+		while(($chosen_index = int(rand($#{ $group_ref->[0] } + 1 ))) == $group_ref->[2]) {};
 		my $chosen_matrix = $group_ref->[0]->[$chosen_index];
 		push @generating_set, $chosen_matrix;
 
@@ -756,8 +775,10 @@ sub get_incremenet_generating_set
 		$combination = ${ $combinations_ref }->next;
 
 		foreach my $chosen_element ( @{ $combination } ) {
-			push @set, $group_ref->[0]->[$chosen_element];
-			push @set, find_group_inverse($group_ref->[0]->[$chosen_element], $zp);
+			if($chosen_element != $group_ref->[2]) {
+				push @set, $group_ref->[0]->[$chosen_element];
+				push @set, find_group_inverse($group_ref->[0]->[$chosen_element], $zp);
+			}
 		}
 
 		@generating_set = List::MoreUtils::uniq @set;
@@ -812,13 +833,13 @@ sub generate_sets_randomly
 			my @t0 = gettimeofday();
 			print "[$counter]\n"; $counter++;
 			my @cayley_graph = generate_cayley_graph($generating_set_ref, $zp, $hash_table_size);
-			print "Generovanie grafov: " . tv_interval( \@t0 ) . " sekund\n";
-			#my @graph = generate_graph_from_table(@cayley_graph);
-			#my $dim = find_diameter(@cayley_graph);
-
-			#if($dim == $graph[$#graph]) {
-			#	print "ok\n";
-			#} 		
+			my @graph = generate_graph_from_table(@cayley_graph);
+			if($graph[$#graph] != find_diameter(@cayley_graph)) {
+				print "PROBLEM\n";
+				print "graf diameter: $graph[$#graph]\n";
+				print "cayley diameter: ". find_diameter(@cayley_graph) . "\n";;
+				exit;
+			} 		
 		$pm->finish;
 	}
 }
@@ -901,27 +922,72 @@ sub graph_hunting
 
 }
 
+sub fill_cayley_table
+{
+	my ($group_ref, $zp) = @_;
+
+	my $group_size = $#{ $group_ref->[0] };
+	my @cayley_table;
+
+	foreach my $i ( 0..$group_size ) {
+		foreach my $j ( 0..$group_size ) {
+			print "[$i][$j]\n";
+			my $res = $group_ref->[0]->[$i] x $group_ref->[0]->[$j] % $zp;
+
+			my $k = 0;
+			while(any $res != $group_ref->[0]->[$k]) { $k++ };
+			$cayley_table[$i][$j] = $k;
+		}
+	}
+
+	open(my $file, ">", "../cayley_tables/SL(2,$zp)" . ".ct")
+		or die "cannot open > ../cayley_tablesSL(2,$zp).ct: $!";
+
+	foreach my $i ( 0..$group_size) { 
+		print $file join(" ", @{ $cayley_table[$i] }) . "\n";
+	}
+}
+
+sub find_neutral_element
+{
+	my ($group_ref, $zp) = @_;
+
+	my $eye = PDL::Matrix->pdl([[1,0],[0,1]]);
+
+	foreach my $i ( 0..$#{ $group_ref } ) {
+		if(all $group_ref->[$i] == $eye) {
+			return $i;
+		}
+	}
+}
+
+#check_random_graphs(\@group, $zp, $degree, $number_of_forks, $hash_table_size, $number_of_generated_graphs, $diameter);
+
 srand time;
 my $number_of_forks = 0;
 my $hash_table_size = 154485863;
 my $diameter = 2;
-my $zp = get_nth_prime(7);
+my $zp = get_nth_prime(2);
 my @group;
-my $number_of_generated_graphs = 1;
+my $number_of_generated_graphs = 1000;
 print "Zp: $zp\n";
 print "Order of SL(2,$zp): " . get_order_of_SL(2,$zp) . "\n";	
 print "Filling up arithmetic tables of finite field: ";
 fill_finite_field_arithmetic_tables($zp);
-print "\t\t\t\t\t\t[OK]\n";
+print "\t\t\t\t\t\t[DONE]\n";
 print "Generating group elements: ";
 push @group, generate_SL_group($zp);
-print "\t\t\t\t\t\t\t\t[OK]\n";
+print "\t\t\t\t\t\t\t\t[DONE]\n";
 print "Looking for involutions: ";
 push @group, find_involutions($group[0], $zp);
-print "\t\t\t\t\t\t\t\t[OK]\n";
+print "\t\t\t\t\t\t\t\t[DONE]\n";
+print "Looking for neutral element: ";
+push @group, find_neutral_element($group[0], $zp);
+print "\t\t\t\t\t\t\t\t[DONE]\n";
 print "############################################################################################\n";
+
+fill_cayley_table();
 
 my $degree = int(sqrt(get_order_of_SL(2,$zp))) + 1;
 
-#check_random_graphs(\@group, $zp, $degree, $number_of_forks, $hash_table_size, $number_of_generated_graphs, $diameter);
 generate_sets_randomly(\@group, $zp, $degree, $number_of_forks, $hash_table_size, $number_of_generated_graphs);
