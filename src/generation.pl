@@ -59,7 +59,14 @@ sub make_matrix_label
 {
 	my ($A, $zp) = @_;
 
-	return sprintf("%d", compute_hash($A, $zp));
+	my $hash = 0;
+	for my $i (0..1) {
+		for my $j (0..1) {
+			$hash = $zp * $hash + index2d($A, $i,$j);				
+		}
+	}
+
+	return sprintf("%d", $hash);
 }
 
 sub determinant_Zp 
@@ -573,9 +580,11 @@ sub find_involutions
 	my @indeces_of_involutions;
 
 	foreach my $i ( 0..$#{ $group_ref } ) {
-		my $m = ($group_ref->[$i] x $group_ref->[$i]) % $zp;
-		if(all $m == $eye) {
-			push @indeces_of_involutions, $i;
+		if(!(all $group_ref->[$i] == $eye)) {
+			my $m = ($group_ref->[$i] x $group_ref->[$i]) % $zp;
+			if(all $m == $eye) {
+				push @indeces_of_involutions, $i;
+			}
 		}
 	}
 
@@ -634,26 +643,29 @@ sub make_graphical_output
 	system "circo", "-Tsvg", "graf.dot", "-o", $folder . $filename . ".svg";
 }
 
-sub save_generating_set_and_diameter
+sub save_cayley_graph
 {
 	my ($keys_ref, $multiplication_results_ref, $generating_set_ref, $zp, $diameter, $folder, $filename) = @_;
 
 	my $order_of_graph = $#{ $keys_ref };
-	my $hash = "";
+	my @generating_set_label;
+
 	foreach my $mat ( @{ $generating_set_ref } ) {
-		$hash = $hash . compute_hash($mat, $zp) . ".";
+		push @generating_set_label, make_matrix_label($mat, $zp);
 	}
+
+	sort @generating_set_label;
 
 	if( not defined  $folder ) {
 		$folder = "results/";
 	}
 
 	if( not defined  $filename ) {
-		$filename = "GeneratingSetSize_" . ($#{ $generating_set_ref } + 1) . "_Diameter_" . $diameter . "_OrderOfGraph_" . $order_of_graph . "_Zp_" . $zp . "_$hash";
+		$filename = "GeneratingSetSize_" . ($#{ $generating_set_ref } + 1) . "_Diameter_" . $diameter . "_OrderOfGraph_" . $order_of_graph . "_Zp_" . $zp . "_" . join(".", @generating_set_label);
 	} 
 
-	open(my $file, ">", $folder . $filename . "gs")
-		or die "cannot open > " . $folder .  $filename . "gs" . ": $!";
+	open(my $file, ">", $folder . $filename . ".gs")
+		or die "cannot open > " . $folder .  $filename . ".gs" . ": $!";
 
 	print $file "Group: SL(2,$zp)\n";
 	print $file "Diameter of Cayley graph: $diameter\n";
@@ -757,8 +769,6 @@ sub get_random_generating_set
 		}
 
 		@generating_set = List::MoreUtils::uniq @generating_set;
-
-			# Only one element left to add, it has to be involution
 	}
 
 	return \@generating_set;
@@ -807,9 +817,9 @@ sub generate_sets_incrementally
 			if(check_diameter(@cayley_graph, 2)) {
 				my @graph = generate_graph_from_table(@cayley_graph);
 				if($graph[$#graph] == 2) {
-					save_generating_set_and_diametr(@cayley_graph, 2, "results/");
+					save_cayley_graph(@cayley_graph, 2, "results/");
 				} else {
-					save_generating_set_and_diameter(@cayley_graph, 2, "diameter_error/");
+					save_cayley_graph(@cayley_graph, 2, "diameter_error/");
 				}
 			} 		
 		$pm->finish;
@@ -820,7 +830,6 @@ sub generate_sets_randomly
 {
 	my ($group_ref, $zp, $size_of_generating_set, $number_of_forks, $hash_table_size, $number_of_graphs) = @_;
 
-	srand time;
 	my $pm = new Parallel::ForkManager( $number_of_forks );
 
 	my $counter = 1;
@@ -844,34 +853,95 @@ sub generate_sets_randomly
 	}
 }
 
+sub	generate_cayley_graph_with_diameter 
+{
+	my ($generating_set_ref, $zp, $hash_table_size, $size_of_generating_set, $diameter, $check_diameter_on_graph) = @_;
+	
+	my @cayley_graph = generate_cayley_graph($generating_set_ref, $zp, $hash_table_size);
+
+	if($check_diameter_on_graph) {
+		my @graph = generate_graph_from_table(@cayley_graph);
+		my $found_diameter = find_diameter(@cayley_graph);
+		if($graph[$#graph] != $found_diameter) {
+			print "!!!!!!!!!!!!!!!! DIAMETER ERROR !!!!!!!!!!!!!!!!!!!!!!!\n";
+			save_cayley_graph(@cayley_graph, $diameter, "diameter_error/");
+		} else {
+			print "\t\t[Diameter check] $graph[$#graph] == $found_diameter\n";
+		}
+	}
+
+	if(check_diameter(@cayley_graph, $diameter)) {
+		if(check_symmetric_set($generating_set_ref, $zp, $size_of_generating_set)) {
+			save_cayley_graph(@cayley_graph, $diameter, "results/");
+			return $diameter;
+		} else {
+			print "!!!!!!!!!!!!!!!! SET ERROR !!!!!!!!!!!!!!!!!!!!!!!\n";
+			save_cayley_graph(@cayley_graph, $diameter, "set_error/");
+			return 0;
+		}
+	} else {
+		return 0;
+	}
+
+	return 0;
+}
+
 sub check_random_graphs
 {
-	my ($group_ref, $zp, $size_of_generating_set, $number_of_forks, $hash_table_size, $number_of_graphs, $diameter) = @_;
+	my ($group_ref, $zp, $size_of_generating_set, $number_of_forks, $hash_table_size, $number_of_graphs, $time_limit, $diameter) = @_;
 
-	my $counter = 1;
+	my $counter = 0;
 	my $pm = new Parallel::ForkManager( $number_of_forks );
+	my @time;
+	my $graph_found = 0;
+
+	$pm->run_on_finish(
+		sub
+		{
+			my ($pid, $exit_code, $ident) = @_;
+			
+			print "\t[$ident] finished in " . tv_interval(\@time) . " sec with exit code: $exit_code\n";
+
+			if($ident == 1) {
+				my $graphs_in_hour = int($time_limit/tv_interval(\@time));
+				if($number_of_graphs > $graphs_in_hour) {
+					print "\t\t\t Adjusting number of generated graphs on d=$size_of_generating_set to $graphs_in_hour to get it under time limit: $time_limit sec\n";
+					$number_of_graphs = $graphs_in_hour;
+				}
+			}
+
+			if($exit_code) {
+				$graph_found = 1;
+			}
+		}
+	);
+
+	$pm->run_on_start(
+		sub 
+		{
+			my ($pid, $ident) = @_; 
+			@time = gettimeofday();
+			print "[$ident] generating graph on SL(2,$zp) with d=$size_of_generating_set\n";
+		}
+	);
 
 	while($counter <= $number_of_graphs) {
-		print "[$counter]\n"; $counter++;
+		$counter++;
+
+		if($graph_found) {
+			return 1;
+		}
 
 		my $generating_set_ref = get_random_generating_set($group_ref, $zp, $size_of_generating_set);
 
-		$pm->start and next;
-			my @cayley_graph = generate_cayley_graph($generating_set_ref, $zp, $hash_table_size);
-			if(check_diameter(@cayley_graph, $diameter)) {
-				#			my @graph = generate_graph_from_table(@cayley_graph);
-				if(check_symmetric_set($generating_set_ref, $zp, $size_of_generating_set)) {
-					print "Found it\n";
-					save_generating_set_and_diameter(@cayley_graph, $diameter, "results/");
-					return 0;
-				} else {
-					print "Error\n";
-					save_generating_set_and_diameter(@cayley_graph, $diameter, "set_error/");
-					return 0;
-				}
-			} 			
-		$pm->finish;
+		$pm->start("$counter") and next;
+			my $exit_code = generate_cayley_graph_with_diameter($generating_set_ref, $zp, $hash_table_size, $size_of_generating_set, $diameter, my $check_diameter_on_graph = 0);
+		$pm->finish($exit_code);
 	}
+
+	print "###########\n\tHaven't found anything in SL(2,$zp)\n\tNumber of generated graphs: $number_of_graphs\n\tSize of generating set: $size_of_generating_set\n###########\n";
+
+	return 0;
 }
 
 sub check_symmetric_set
@@ -882,9 +952,19 @@ sub check_symmetric_set
 	my $set_size = $#{ $generating_set_ref };
 
 	if(($set_size + 1) != $size) {
-		print "Set size error\n";
+		print "\tSet size error\n";
 		return 0;
 	} 		
+
+	foreach my $m ( @{ $generating_set_ref } ) {
+		if(all $m == $eye) {
+			print "\tNeutral element in set\n";
+			foreach my $n ( @{ $generating_set_ref } ) {
+				print $n;
+			}
+			return 0;
+		}
+	}
 
 	foreach my $i ( 1..$set_size ) {
 		unless(List::Util::any {$_ eq $i} @checked_matrices) {
@@ -901,7 +981,7 @@ sub check_symmetric_set
 					}
 				}
 				unless($flag) {
-					print "Inverse element not found\n";
+					print "\tInverse element not found\n";
 					return 0;
 				} 
 			} 		
@@ -910,16 +990,11 @@ sub check_symmetric_set
 
 	my @generating_set = List::MoreUtils::uniq @{ $generating_set_ref };
 	if($#generating_set != $#{ $generating_set_ref }) {
-		print "Uniq made generation set smaller!\n";
+		print "\tUniq made generation set smaller!\n";
 		return 0;
 	}
 
 	return 1;
-}
-
-sub graph_hunting
-{
-
 }
 
 sub fill_cayley_table
@@ -961,33 +1036,49 @@ sub find_neutral_element
 	}
 }
 
-#check_random_graphs(\@group, $zp, $degree, $number_of_forks, $hash_table_size, $number_of_generated_graphs, $diameter);
+sub init_group
+{
+	my ($group_ref, $zp) = @_;
 
-srand time;
-my $number_of_forks = 0;
-my $hash_table_size = 154485863;
-my $diameter = 2;
-my $zp = get_nth_prime(2);
-my @group;
-my $number_of_generated_graphs = 1000;
-print "Zp: $zp\n";
-print "Order of SL(2,$zp): " . get_order_of_SL(2,$zp) . "\n";	
-print "Filling up arithmetic tables of finite field: ";
-fill_finite_field_arithmetic_tables($zp);
-print "\t\t\t\t\t\t[DONE]\n";
-print "Generating group elements: ";
-push @group, generate_SL_group($zp);
-print "\t\t\t\t\t\t\t\t[DONE]\n";
-print "Looking for involutions: ";
-push @group, find_involutions($group[0], $zp);
-print "\t\t\t\t\t\t\t\t[DONE]\n";
-print "Looking for neutral element: ";
-push @group, find_neutral_element($group[0], $zp);
-print "\t\t\t\t\t\t\t\t[DONE]\n";
-print "############################################################################################\n";
+	print "Zp: $zp\n";
+	print "Order of SL(2,$zp): " . get_order_of_SL(2,$zp) . "\n";	
+	print "Filling up arithmetic tables of finite field: ";
+	fill_finite_field_arithmetic_tables($zp);
+	print "\t\t\t\t\t\t[DONE]\n";
+	print "Generating group elements: ";
+	push @{ $group_ref }, generate_SL_group($zp);
+	print "\t\t\t\t\t\t\t\t[DONE]\n";
+	print "Looking for involutions: ";
+	push @{ $group_ref }, find_involutions($group_ref->[0], $zp);
+	print "\t\t\t\t\t\t\t\t[DONE]\n";
+	print "Looking for neutral element: ";
+	push @{ $group_ref }, find_neutral_element($group_ref->[0], $zp);
+	print "\t\t\t\t\t\t\t\t[DONE]\n";
+	print "##############################################################################################\n";
+}
 
-fill_cayley_table();
+sub search_graphs_with_diameter
+{
+	my ($field_bound, $diameter) = @_;
 
-my $degree = int(sqrt(get_order_of_SL(2,$zp))) + 1;
+	srand time;
+	my $number_of_forks = 4;
+	my $hash_table_size = 154485863;
+	my $number_of_generated_graphs = 10;
+	my $time_limit = 3600; # seconds
 
-generate_sets_randomly(\@group, $zp, $degree, $number_of_forks, $hash_table_size, $number_of_generated_graphs);
+	my $nth_prime = 2;
+	while((my $zp = get_nth_prime($nth_prime)) < $field_bound) {
+		my @group;
+		my $zp = get_nth_prime($nth_prime);
+		init_group(\@group, $zp);
+		my $degree = int(sqrt($#{ $group[0] })) + 1;
+
+		while(!check_random_graphs(\@group, $zp, $degree, $number_of_forks, $hash_table_size, $number_of_generated_graphs, $time_limit, $diameter)) {
+			$degree++;
+		}
+		$nth_prime++;
+	}
+}
+
+search_graphs_with_diameter(99, 2);
