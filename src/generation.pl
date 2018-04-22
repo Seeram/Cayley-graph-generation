@@ -654,7 +654,7 @@ sub save_cayley_graph
 		push @generating_set_label, make_matrix_label($mat, $zp);
 	}
 
-	sort @generating_set_label;
+	@generating_set_label = sort @generating_set_label;
 
 	if( not defined  $folder ) {
 		$folder = "results/";
@@ -925,7 +925,7 @@ sub check_random_graphs
 		}
 	);
 
-	while($counter <= $number_of_graphs) {
+	while($counter < $number_of_graphs) {
 		$counter++;
 
 		if($graph_found) {
@@ -938,10 +938,6 @@ sub check_random_graphs
 			my $exit_code = generate_cayley_graph_with_diameter($generating_set_ref, $zp, $hash_table_size, $size_of_generating_set, $diameter, my $check_diameter_on_graph = 0);
 		$pm->finish($exit_code);
 	}
-
-	print "##############################################################################################\n";
-	print "Haven't found anything in SL(2,$zp)\nNumber of generated graphs: $number_of_graphs\nSize of generating set: $size_of_generating_set\n";
-	print "##############################################################################################\n";
 
 	return 0;
 }
@@ -1078,10 +1074,31 @@ sub search_graphs_with_diameter
 		my $degree = int(sqrt($#{ $group[0] })) + 1;
 
 		while(!check_random_graphs(\@group, $zp, $degree, $number_of_forks, $hash_table_size, $number_of_generated_graphs, $time_limit, $diameter)) {
+			print "##############################################################################################\n";
+			print "Haven't found anything in SL(2,$zp)\nNumber of generated graphs: $number_of_generated_graphs\nSize of generating set: $degree\n";
+			print "##############################################################################################\n";
+
 			$degree++;
 		}
 		$nth_prime++;
 	}
 }
 
-search_graphs_with_diameter(99, 2);
+sub generate_one_graph
+{
+	srand time;
+	my $number_of_forks = 0;
+	my $hash_table_size = 154485863;
+	my $number_of_generated_graphs = 1;
+	my $time_limit = 3600; # seconds
+	my $zp = get_nth_prime(5);
+	my $diameter = 2;
+	my @group;
+	init_group(\@group, $zp);
+	my $degree = int(sqrt($#{ $group[0] })) + 1;
+
+	check_random_graphs(\@group, $zp, $degree, $number_of_forks, $hash_table_size, $number_of_generated_graphs, $time_limit, $diameter);
+}
+
+generate_one_graph();
+#search_graphs_with_diameter(99, 2);
