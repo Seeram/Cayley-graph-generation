@@ -939,7 +939,9 @@ sub check_random_graphs
 		$pm->finish($exit_code);
 	}
 
-	print "###########\n\tHaven't found anything in SL(2,$zp)\n\tNumber of generated graphs: $number_of_graphs\n\tSize of generating set: $size_of_generating_set\n###########\n";
+	print "##############################################################################################\n";
+	print "Haven't found anything in SL(2,$zp)\nNumber of generated graphs: $number_of_graphs\nSize of generating set: $size_of_generating_set\n";
+	print "##############################################################################################\n";
 
 	return 0;
 }
@@ -1040,6 +1042,7 @@ sub init_group
 {
 	my ($group_ref, $zp) = @_;
 
+	print "##############################################################################################\n";
 	print "Zp: $zp\n";
 	print "Order of SL(2,$zp): " . get_order_of_SL(2,$zp) . "\n";	
 	print "Filling up arithmetic tables of finite field: ";
