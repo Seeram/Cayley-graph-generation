@@ -13,6 +13,7 @@ use Graph::Writer::Dot;
 use Data::Dumper;
 use List::MoreUtils qw( );
 use List::Util qw( );
+use Digest::MD5 qw( md5 );
 
 use Devel::Size qw( size total_size );
 use Number::Format qw( format_bytes );
@@ -22,7 +23,7 @@ use Parallel::ForkManager;
 use Math::GMPz qw( Rmpz_get_ui );
 use Math::Primality qw( next_prime );
 
-use Algorithm::Combinatorics qw( combinations variations_with_repetition );
+use Algorithm::Combinatorics qw( combinations variations_with_repetition variations );
 
 my @multiplication_inverse_finite_field;
 my @multiplication_finite_field;
@@ -172,7 +173,6 @@ sub print_hash_table
 
 }
 
-
 sub insert_hash
 {
 	my ($generating_nodes_ref, $node, $zp) = @_;
@@ -235,7 +235,7 @@ sub check_diameter
 	}
 }
 
-	# Check one diameter of graph, note graphs with diameter d are also with diameter (d + 1)  
+	# Check one diameter of graph, warning graphs with diameter d are also with diameter (d + 1)  
 sub check_one_diameter
 {
 	my ($keys_ref, $multiplication_results_ref, $generation_set_ref, $zp, $diameter) = @_;
@@ -281,7 +281,7 @@ sub generate_cayley_graph
 {
 	my ($generating_set_ref, $zp, $hash_table_size) = @_;
 
-	if($zp < 99) {
+	if(0) {
 		return generate_cayley_graph_on_fixed_array($generating_set_ref, $zp);
 	} else {
 		return generate_cayley_graph_on_hash_table($generating_set_ref, $zp, $hash_table_size);
@@ -594,20 +594,30 @@ sub find_involutions
 sub compute_order_set
 {
 	my ($generating_set_ref, $zp) = @_;
-	my @generating_set = @{ $generating_set_ref };
 
 	my $eye = PDL::Matrix->pdl([[1,0],[0,1]]);
-	foreach my $generating_element (@generating_set) {
+	my $order_max = 0;
+	my @orders;
+	my @orders_and_max;
+
+	foreach my $i ( 0..$#{ $generating_set_ref} ) {
 		my $order = 1;
-		my $res = $generating_element;
-		while(!(all $res == $eye)) {
-			$res = ($res x $generating_element) % $zp;
+		my $res = $generating_set_ref->[$i];
+		while(any $res != $eye) {
+			$res = ($res x $generating_set_ref->[$i]) % $zp;
 			$order++;
 		}
-		print "-------\n";
-		print "Order of element: $order\n";
-		print $generating_element;
+
+		if($order > $order_max) {
+			$order_max = $order;
+		}
+		push @orders, $order;
 	}
+
+	push @orders_and_max, \@orders;
+	push @orders_and_max, $order_max;
+
+	return \@orders_and_max;
 }
 
 sub make_graphical_output
@@ -648,20 +658,14 @@ sub save_cayley_graph
 	my ($keys_ref, $multiplication_results_ref, $generating_set_ref, $zp, $diameter, $folder, $filename) = @_;
 
 	my $order_of_graph = $#{ $keys_ref };
-	my @generating_set_label;
-
-	foreach my $mat ( @{ $generating_set_ref } ) {
-		push @generating_set_label, make_matrix_label($mat, $zp);
-	}
-
-	@generating_set_label = sort @generating_set_label;
+	my $postfix = int(rand(10000000000));
 
 	if( not defined  $folder ) {
 		$folder = "results/";
 	}
 
 	if( not defined  $filename ) {
-		$filename = "GeneratingSetSize_" . ($#{ $generating_set_ref } + 1) . "_Diameter_" . $diameter . "_OrderOfGraph_" . $order_of_graph . "_Zp_" . $zp . "_" . join(".", @generating_set_label);
+		$filename = "GeneratingSetSize_" . ($#{ $generating_set_ref } + 1) . "_Diameter_" . $diameter . "_OrderOfGraph_" . $order_of_graph . "_Zp_" . $zp . "_" . $postfix;
 	} 
 
 	open(my $file, ">", $folder . $filename . ".gs")
@@ -727,6 +731,27 @@ sub get_moore_bound
 	}
 }
 
+sub get_random_index 
+{
+
+	my ($group_ref) = @_;
+
+	my $neutral_element = $group_ref->[2];
+
+	while(1) {
+		my $chosen_index = int(rand($#{ $group_ref->[0] } + 1 ));
+		if($chosen_index != $neutral_element) {
+			my $chosen_index_order = $group_ref->[3]->[0]->[$chosen_index];
+			my $order_max = $group_ref->[3]->[1];
+			my $rand = rand();
+
+			if($rand < (($chosen_index_order / $order_max) * 0.8)) {
+				return $chosen_index;
+			}
+		}
+	}
+}
+
 sub get_random_generating_set 
 {
 	my ($group_ref, $zp, $required_size_of_set) = @_;
@@ -759,7 +784,9 @@ sub get_random_generating_set
 			return get_random_generating_set($group_ref, $zp, $required_size_of_set);
 		}
 
-		while(($chosen_index = int(rand($#{ $group_ref->[0] } + 1 ))) == $group_ref->[2]) {};
+		$chosen_index = get_random_index($group_ref);
+		#while(($chosen_index = int(rand($#{ $group_ref->[0] } + 1 ))) == $group_ref->[2]) {};
+
 		my $chosen_matrix = $group_ref->[0]->[$chosen_index];
 		push @generating_set, $chosen_matrix;
 
@@ -871,12 +898,16 @@ sub	generate_cayley_graph_with_diameter
 	}
 
 	if(check_diameter(@cayley_graph, $diameter)) {
-		if(check_symmetric_set($generating_set_ref, $zp, $size_of_generating_set)) {
-			save_cayley_graph(@cayley_graph, $diameter, "results/");
-			return $diameter;
+		if(($#{ $cayley_graph[0] } + 1) == get_order_of_SL(2, $zp)) {
+			if(check_symmetric_set($generating_set_ref, $zp, $size_of_generating_set)) {
+				save_cayley_graph(@cayley_graph, $diameter, "results/");
+				return $diameter;
+			} else {
+				print "!!!!!!!!!!!!!!!! SET ERROR !!!!!!!!!!!!!!!!!!!!!!!\n";
+				save_cayley_graph(@cayley_graph, $diameter, "set_error/");
+				return 0;
+			}
 		} else {
-			print "!!!!!!!!!!!!!!!! SET ERROR !!!!!!!!!!!!!!!!!!!!!!!\n";
-			save_cayley_graph(@cayley_graph, $diameter, "set_error/");
 			return 0;
 		}
 	} else {
@@ -928,18 +959,25 @@ sub check_random_graphs
 	while($counter < $number_of_graphs) {
 		$counter++;
 
-		if($graph_found) {
-			return 1;
-		}
 
 		my $generating_set_ref = get_random_generating_set($group_ref, $zp, $size_of_generating_set);
 
 		$pm->start("$counter") and next;
 			my $exit_code = generate_cayley_graph_with_diameter($generating_set_ref, $zp, $hash_table_size, $size_of_generating_set, $diameter, my $check_diameter_on_graph = 0);
 		$pm->finish($exit_code);
+
+		if($graph_found) {
+			$pm->wait_all_children;
+			return 1;
+		}
 	}
 
-	return 0;
+	$pm->wait_all_children;
+	if($graph_found) {
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 sub check_symmetric_set
@@ -1053,6 +1091,9 @@ sub init_group
 	print "Looking for neutral element: ";
 	push @{ $group_ref }, find_neutral_element($group_ref->[0], $zp);
 	print "\t\t\t\t\t\t\t\t[DONE]\n";
+	print "Computing order of elements: ";
+	push @{ $group_ref }, compute_order_set($group_ref->[0], $zp);
+	print "\t\t\t\t\t\t\t\t[DONE]\n";
 	print "##############################################################################################\n";
 }
 
@@ -1063,23 +1104,68 @@ sub search_graphs_with_diameter
 	srand time;
 	my $number_of_forks = 4;
 	my $hash_table_size = 154485863;
-	my $number_of_generated_graphs = 10;
-	my $time_limit = 3600; # seconds
+	my $number_of_generated_graphs = 100;
+	my $time_limit = 300; # seconds
 
-	my $nth_prime = 2;
+	my $nth_prime = 4;
 	while((my $zp = get_nth_prime($nth_prime)) < $field_bound) {
 		my @group;
 		my $zp = get_nth_prime($nth_prime);
 		init_group(\@group, $zp);
-		my $degree = int(sqrt($#{ $group[0] })) + 1;
+		my $moore_degree = int(sqrt($#{ $group[0] })) + 1;
+		my $degree = int(sqrt($#{ $group[0] })) + 3;
 
 		while(!check_random_graphs(\@group, $zp, $degree, $number_of_forks, $hash_table_size, $number_of_generated_graphs, $time_limit, $diameter)) {
-			print "##############################################################################################\n";
-			print "Haven't found anything in SL(2,$zp)\nNumber of generated graphs: $number_of_generated_graphs\nSize of generating set: $degree\n";
-			print "##############################################################################################\n";
+			print "##############################################################################################\n" . 
+				  "Haven't found anything in SL(2,$zp) with order " . get_order_of_SL(2,$zp) . "\n" . 
+				  "Going forward: " . ($degree - $moore_degree) . "\n" .
+				  "Number of generated graphs: $number_of_generated_graphs\n" .
+				  "Time limit: $time_limit\n" .
+				  "Moore degree: $moore_degree\n" .
+				  "Size of generating set: $degree\n" .
+			      "##############################################################################################\n";
 
 			$degree++;
 		}
+
+		my $step_back = 1;
+		my $adjusted_time_limit = 2 * $time_limit;
+		print "##############################################################################################\n" . 
+			  "Found something in SL(2,$zp) with order " . get_order_of_SL(2,$zp) . "\n" .
+			  "Number of generated graphs: $number_of_generated_graphs\n" . 
+			  "Moore degree: $moore_degree\n" .
+			  "Size of generating set: $degree\n\n" .
+			  "Going backwards taking $step_back. step back\n" .
+			  "Number of generated graphs: " . (2 * $step_back * $number_of_generated_graphs) . "\n" .
+			  "Time limit: " . $adjusted_time_limit . "\n" .
+			  "Moore degree: $moore_degree\n" .
+			  "Size of generating set: $degree\n" .
+			  "##############################################################################################\n";
+		while(check_random_graphs(\@group, 
+								  $zp, 
+								  $degree - $step_back, 
+								  $number_of_forks, 
+								  $hash_table_size, 
+								  2 * $step_back * $number_of_generated_graphs, 
+								  $adjusted_time_limit, 
+								  $diameter)) {
+			
+			$step_back++;
+			if(2 * $adjusted_time_limit > 5400) {
+				$adjusted_time_limit = 5400;
+			} else {
+				$adjusted_time_limit *= 2;
+			}
+			print "##############################################################################################\n" . 
+			      "Found something in SL(2,$zp) with order " . get_order_of_SL(2,$zp) . "\n" .
+				  "Going backwards taking $step_back. step back\n" .
+				  "Number of generated graphs: " . (2 * $step_back * $number_of_generated_graphs) . "\n" .
+				  "Time limit: " . $adjusted_time_limit . "\n" .
+			  	  "Moore degree: $moore_degree\n" .
+				  "Size of generating set: $degree\n" .
+			      "##############################################################################################\n";
+		}
+
 		$nth_prime++;
 	}
 }
@@ -1089,16 +1175,14 @@ sub generate_one_graph
 	srand time;
 	my $number_of_forks = 0;
 	my $hash_table_size = 154485863;
-	my $number_of_generated_graphs = 1;
+	my $number_of_generated_graphs = 5;
 	my $time_limit = 3600; # seconds
-	my $zp = get_nth_prime(5);
+	my $zp = get_nth_prime(4);
 	my $diameter = 2;
 	my @group;
 	init_group(\@group, $zp);
-	my $degree = int(sqrt($#{ $group[0] })) + 1;
+	my $degree = int(sqrt($#{ $group[0] })) + 1 + 20;
 
-	check_random_graphs(\@group, $zp, $degree, $number_of_forks, $hash_table_size, $number_of_generated_graphs, $time_limit, $diameter);
 }
 
-generate_one_graph();
-#search_graphs_with_diameter(99, 2);
+search_graphs_with_diameter(99, 2);
