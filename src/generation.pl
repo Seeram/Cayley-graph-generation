@@ -871,16 +871,16 @@ sub check_random_graphs
 		{
 			my ($pid, $exit_code, $ident) = @_;
 			
-			print "\t[$ident] finished in " . tv_interval(\@time) . " sec with exit code: $exit_code\n";
-
 			if($ident == 1) {
-				my $graphs_in_hour = int($time_limit/tv_interval(\@time)) * $number_of_forks;
-				if($number_of_graphs > $graphs_in_hour) {
-					print "\t\t\t Adjusting number of generated graphs on d=$size_of_generating_set to $graphs_in_hour to get it under time limit: $time_limit sec\n";
-					$number_of_graphs = $graphs_in_hour;
+				print $exit_code;
+				my $graphs_in_time_limit = int(($time_limit / ($exit_code / $number_of_forks)))  - $number_of_forks;
+				if($number_of_graphs > $graphs_in_time_limit) {
+					print "\t\t\t Adjusting number of generated graphs on d=$size_of_generating_set to $graphs_in_time_limit to get it under time limit: $time_limit sec\n";
+					$number_of_graphs = $graphs_in_time_limit;
 				}
-			}
+				return;
 
+			}
 			if($exit_code) {
 				$graph_found = 1;
 			}
@@ -891,7 +891,6 @@ sub check_random_graphs
 		sub 
 		{
 			my ($pid, $ident) = @_; 
-			@time = gettimeofday();
 			print "[$ident/$number_of_graphs] generating graph on SL(2,$zp) with d=$size_of_generating_set\n";
 		}
 	);
@@ -907,7 +906,12 @@ sub check_random_graphs
 		my $generating_set_ref = get_random_generating_set($group_ref, $zp, $size_of_generating_set);
 
 		$pm->start("$counter") and next;
+			@time = gettimeofday();
 			my $exit_code = generate_cayley_graph_with_diameter($generating_set_ref, $zp, $hash_table_size, $size_of_generating_set, $diameter, my $check_diameter_on_graph = 0);
+			print "\t[$counter] finished in " . tv_interval(\@time) . " sec with exit code: $exit_code\n";
+			if($counter == 1) {
+				$pm->finish(tv_interval(\@time));
+			}	
 		$pm->finish($exit_code);
 
 	}
@@ -1042,10 +1046,10 @@ sub search_graphs_with_diameter
 	my ($field_bound, $diameter) = @_;
 
 	srand time;
-	my $number_of_forks = 4;
+	my $number_of_forks = 8;
 	my $hash_table_size = 154485863;
 	my $number_of_generated_graphs = 50000;
-	my $time_limit = 1800; # seconds
+	my $time_limit = 300; # seconds
 
 	my $nth_prime = 5;
 	while((my $zp = get_nth_prime($nth_prime)) < $field_bound) {
@@ -1053,8 +1057,11 @@ sub search_graphs_with_diameter
 		my $zp = get_nth_prime($nth_prime);
 		init_group(\@group, $zp);
 		my $moore_degree = int(sqrt($#{ $group[0] })) + 1;
-		my $degree = int($moore_degree * 1.25);
+		my $degree = int($moore_degree * 1.25) + 1;
 
+		if($degree % 2) {
+			$degree -= 1;	
+		}	
 		while(!check_random_graphs(\@group, $zp, $degree, $number_of_forks, $hash_table_size, $number_of_generated_graphs, $time_limit, $diameter)) {
 			print "##############################################################################################\n" . 
 				  "Haven't found anything in SL(2,$zp) with order " . get_order_of_SL(2,$zp) . "\n" . 
@@ -1065,11 +1072,10 @@ sub search_graphs_with_diameter
 				  "Size of generating set: $degree\n" .
 			      "##############################################################################################\n";
 
-			$degree++;
 		}
 
 		my $step_back = 1;
-		my $adjusted_time_limit = 2 * $time_limit;
+		my $adjusted_time_limit = 4 * $time_limit;
 		print "##############################################################################################\n" . 
 			  "Found something in SL(2,$zp) with order " . get_order_of_SL(2,$zp) . "\n" .
 			  "Number of generated graphs: $number_of_generated_graphs\n" . 
@@ -1079,11 +1085,11 @@ sub search_graphs_with_diameter
 			  "Number of generated graphs: " . (2 * $step_back * $number_of_generated_graphs) . "\n" .
 			  "Time limit: " . $adjusted_time_limit . "\n" .
 			  "Moore degree: $moore_degree\n" .
-			  "Size of generating set: $degree\n" .
+			  "Size of generating set: " . ($degree - $step_back * 2) .  "\n" .
 			  "##############################################################################################\n";
 		while(check_random_graphs(\@group, 
 								  $zp, 
-								  $degree - $step_back, 
+								  $degree - $step_back * 2, 
 								  $number_of_forks, 
 								  $hash_table_size, 
 								  2 * $step_back * $number_of_generated_graphs, 
@@ -1094,7 +1100,7 @@ sub search_graphs_with_diameter
 			if(2 * $adjusted_time_limit > 5400) {
 				$adjusted_time_limit = 5400;
 			} else {
-				$adjusted_time_limit *= 2;
+				$adjusted_time_limit *= 3;
 			}
 			print "##############################################################################################\n" . 
 			      "Found something in SL(2,$zp) with order " . get_order_of_SL(2,$zp) . "\n" .
@@ -1102,7 +1108,7 @@ sub search_graphs_with_diameter
 				  "Number of generated graphs: " . (2 * $step_back * $number_of_generated_graphs) . "\n" .
 				  "Time limit: " . $adjusted_time_limit . "\n" .
 			  	  "Moore degree: $moore_degree\n" .
-				  "Size of generating set: $degree\n" .
+				  "Size of generating set: ". ($degree - $step_back * 2) . "\n" .
 			      "##############################################################################################\n";
 		}
 		$nth_prime++;
