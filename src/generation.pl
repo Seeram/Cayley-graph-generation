@@ -1085,7 +1085,7 @@ sub search_graphs_with_diameter
 	my $number_of_forks = 8;
 	my $hash_table_size = 154485863;
 	my $number_of_generated_graphs = 50000;
-	my $time_limit = 300; # seconds
+	my $time_limit = 1200; # seconds
 
 	my $nth_prime = 5;
 	while((my $zp = get_nth_prime($nth_prime)) < $field_bound) {
@@ -1099,6 +1099,7 @@ sub search_graphs_with_diameter
 			$degree -= 1;	
 		}	
 		while(!check_random_graphs(\@group, $zp, $degree, $number_of_forks, $hash_table_size, $number_of_generated_graphs, $time_limit, $diameter)) {
+			$degree += 2;
 			print "##############################################################################################\n" . 
 				  "Haven't found anything in SL(2,$zp) with order " . get_order_of_SL(2,$zp) . "\n" . 
 				  "Going forward: " . ($degree - $moore_degree) . "\n" .
