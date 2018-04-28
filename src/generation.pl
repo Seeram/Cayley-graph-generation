@@ -90,18 +90,14 @@ sub compute_hash
 {
 	my ($A, $zp) = @_;
 
-	if($zp < 99) {
-		return index2d($A, 0,0) . index2d($A, 0,1) . index2d($A, 1,0) . index2d($A, 1,1);
-	} else {
-		my $hash = 0;
-		for my $i (0..1) {
-			for my $j (0..1) {
-				$hash = $zp * $hash + index2d($A, $i,$j);				
-			}
+	my $hash = 0;
+	for my $i (0..1) {
+		for my $j (0..1) {
+			$hash = $zp * $hash + index2d($A, $i,$j);				
 		}
-
-		return $hash;
 	}
+
+	return $hash;
 }
 
 sub insert_result
@@ -109,7 +105,6 @@ sub insert_result
 	my ($multiplication_results_ref, $node_place, $node_to_insert, $zp, $hash_table_size ) = @_;
 
 	my $hash_no = compute_hash($node_place, $zp);
-	#	my $index_no = $hash_no % $hash_table_size;
 	my $index_no = $hash_no;
 
 		# First parent node on index
@@ -278,62 +273,6 @@ sub check_one_diameter
 }
 
 sub generate_cayley_graph
-{
-	my ($generating_set_ref, $zp, $hash_table_size) = @_;
-
-	if(0) {
-		return generate_cayley_graph_on_fixed_array($generating_set_ref, $zp);
-	} else {
-		return generate_cayley_graph_on_hash_table($generating_set_ref, $zp, $hash_table_size);
-	}
-}
-
-sub generate_cayley_graph_on_fixed_array
-{
-	my ($generating_set_ref, $zp) = @_;
-	my @cayley_table;
-	my %nodes;
-	
-	my @generating_set = @{ $generating_set_ref };
-	my @keys;
-	my @stack;
-	my @generating_nodes;
-
-	foreach my $element ( @generating_set ) {
-		push @keys, get_index($element, $zp);
-		push @stack, $element;
-		$generating_nodes[ get_index($element, $zp) ] = $element; 
-	}
-
-	my $current_node = $stack[0]; 
-	push @{ $cayley_table[ get_index($current_node, $zp) ] }, [ $current_node ];
-
-	while(@stack) {
-		foreach my $element (@generating_set) {
-			my $connected_node = ($current_node x $element) % $zp;	
-			if(any $connected_node != $current_node) {
-				push @{ ${ $cayley_table[ get_index($current_node, $zp) ] }[0] }, $connected_node;
-			}
-
-			if(not defined $generating_nodes[ get_index($connected_node, $zp) ]) {
-				push @keys, get_index($connected_node, $zp);				
-				push @stack, $connected_node;
-				$generating_nodes[ get_index($connected_node, $zp) ] = $connected_node;; 
-			} 		
-		}
-
-		shift @stack;
-
-		if(@stack) {
-			$current_node = $stack[0];
-			push @{ $cayley_table[ get_index($current_node, $zp) ] }, [ $current_node ];
-		}
-	}
-
-	return ( \@keys, \@cayley_table, $generating_set_ref, $zp );
-}
-
-sub generate_cayley_graph_on_hash_table
 {
 	my ($generating_set_ref, $zp, $hash_table_size) = @_;
 	my @multiplication_results;
@@ -601,7 +540,7 @@ sub compute_order_set
 	my @orders_and_max;
 
 	foreach my $i ( 0..$#{ $generating_set_ref} ) {
-		my $order = 0;
+		my $order = 1;
 		my $res = $generating_set_ref->[$i];
 		while(any $res != $eye) {
 			$res = ($res x $generating_set_ref->[$i]) % $zp;
@@ -898,6 +837,7 @@ sub	generate_cayley_graph_with_diameter
 		}
 	}
 
+	print "\t\t\t\t\t\t\tDiameter: " . find_diameter(@cayley_graph) . "\n";
 	if(check_diameter(@cayley_graph, $diameter)) {
 		if(($#{ $cayley_graph[0] } + 1) == get_order_of_SL(2, $zp)) {
 			if(check_symmetric_set($generating_set_ref, $zp, $size_of_generating_set)) {
@@ -1103,12 +1043,12 @@ sub search_graphs_with_diameter
 	my ($field_bound, $diameter) = @_;
 
 	srand time;
-	my $number_of_forks = 8;
+	my $number_of_forks = 4;
 	my $hash_table_size = 154485863;
 	my $number_of_generated_graphs = 50000;
 	my $time_limit = 1800; # seconds
 
-	my $nth_prime = 5;
+	my $nth_prime = 3;
 	while((my $zp = get_nth_prime($nth_prime)) < $field_bound) {
 		my @group;
 		my $zp = get_nth_prime($nth_prime);
