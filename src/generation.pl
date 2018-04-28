@@ -28,6 +28,7 @@ use Algorithm::Combinatorics qw( combinations variations_with_repetition variati
 my @multiplication_inverse_finite_field;
 my @multiplication_finite_field;
 my @addition_inverse_finite_field;
+my @global_time = gettimeofday();
 
 sub fill_finite_field_arithmetic_tables
 {
@@ -926,7 +927,7 @@ sub check_random_graphs
 		sub 
 		{
 			my ($pid, $ident) = @_; 
-			print "[$ident/$number_of_graphs] generating graph on SL(2,$zp) with d=$size_of_generating_set\n";
+			print "[" . sprintf("%5.2lf", tv_interval(\@global_time)) . "][$ident/$number_of_graphs] generating graph on SL(2,$zp) with d=$size_of_generating_set\n";
 		}
 	);
 
@@ -943,7 +944,7 @@ sub check_random_graphs
 		$pm->start("$counter") and next;
 			@time = gettimeofday();
 			my $exit_code = generate_cayley_graph_with_diameter($generating_set_ref, $zp, $hash_table_size, $size_of_generating_set, $diameter, my $check_diameter_on_graph = 0);
-			print "\t[$counter] finished in " . tv_interval(\@time) . " sec with exit code: $exit_code\n";
+			print "\t[" . sprintf("%5.2lf", tv_interval(\@global_time)) . "][$counter] finished in " . tv_interval(\@time) . " sec with exit code: $exit_code\n";
 			if($counter == 1) {
 				$pm->finish(tv_interval(\@time));
 			}	
