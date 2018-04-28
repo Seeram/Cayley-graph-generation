@@ -837,7 +837,6 @@ sub	generate_cayley_graph_with_diameter
 		}
 	}
 
-	print "\t\t\t\t\t\t\tDiameter: " . find_diameter(@cayley_graph) . "\n";
 	if(check_diameter(@cayley_graph, $diameter)) {
 		if(($#{ $cayley_graph[0] } + 1) == get_order_of_SL(2, $zp)) {
 			if(check_symmetric_set($generating_set_ref, $zp, $size_of_generating_set)) {
@@ -875,7 +874,7 @@ sub check_random_graphs
 			print "\t[$ident] finished in " . tv_interval(\@time) . " sec with exit code: $exit_code\n";
 
 			if($ident == 1) {
-				my $graphs_in_hour = int($time_limit/tv_interval(\@time));
+				my $graphs_in_hour = int($time_limit/tv_interval(\@time)) * $number_of_forks;
 				if($number_of_graphs > $graphs_in_hour) {
 					print "\t\t\t Adjusting number of generated graphs on d=$size_of_generating_set to $graphs_in_hour to get it under time limit: $time_limit sec\n";
 					$number_of_graphs = $graphs_in_hour;
@@ -1048,7 +1047,7 @@ sub search_graphs_with_diameter
 	my $number_of_generated_graphs = 50000;
 	my $time_limit = 1800; # seconds
 
-	my $nth_prime = 3;
+	my $nth_prime = 5;
 	while((my $zp = get_nth_prime($nth_prime)) < $field_bound) {
 		my @group;
 		my $zp = get_nth_prime($nth_prime);
