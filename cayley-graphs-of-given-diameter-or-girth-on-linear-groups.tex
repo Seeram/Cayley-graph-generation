@@ -16,8 +16,8 @@
 \graphicspath{ {pictures/} }
 \renewcommand{\thesection}{\arabic{section}}
 
-\author{Matus Behun}
-\title{Cayley graphs of given diameter on linear groups}
+\author{Mat\'u\v{s} Behun}
+\title{Cayley graphs of given diameter or girth on linear groups}
 
 \usepackage{hyperref}
     \hypersetup{colorlinks,citecolor=red,filecolor=black,linkcolor=blue,urlcolor=blue,pdftex}
@@ -29,27 +29,53 @@
 %====================================================================================================================================================
 % FIRST PAGE
 %====================================================================================================================================================
-\begin{titlepage}
-     \centering
-     \begin{figure}[ht!]
-     \centering
-     \includegraphics[width=90mm]{logo.png}
-     \end{figure}
-     {\scshape\LARGE Slovak University of Technology in Bratislava \par}
-     \vspace{1cm}
-     {\scshape\Large Student scientific conference\par}
-     \vspace{1.5cm}
-     {\huge\bfseries Cayley graphs of given degree and diameter on linear groups\par}
-     \vspace{2cm}
-	 {\Large\itshape Matú\v{s} Behun, MPM\par}
-     \vfill
-	 Supervisor\par
-	 doc. RNDr. Jana \v{S}iagiová, PhD. 
-     \vfill
+
+\thispagestyle{empty}
+{
+     \topmargin=0pt
+     \centerline {\large \bf{Slovak University of Technology in Bratislava}}
+     \vskip 0.2cm
+     \centerline{\large \bf{Faculty of Civil Engineering}}
+     \vskip 5cm
+     \centerline{\Large \bf{Cayley graphs of given degree and diameter on linear groups}}
+     \vskip 0.2cm
+     \vskip 0.5cm
+     \centerline{\large \bf{Bachelor Thesis}}
+     \vskip 5cm          %\vskip 2cm             %zmena kvoli zobrazovaniu dnesneho datumu
+     \normalsize
+         \begin{tabular}[l]{p{0.27\textwidth}p{0.73\textwidth}}
+			 \v{S}tud\'ijny program: & Matematicko-po\v{c}ita\v{c}ov\'e modelovanie \\
+         	\v{S}ud\'ijny odbor: & Aplikovan\'a matematika \\
+         	\v{S}koliace pracovisko: & Katedra matematiky a deskript\'ivnej geometrie \\
+			 Ved\'uci diplomovej pr\'ace: & Jana \v{S}iagiov\'a \\
+         \end{tabular}
+     \vskip 3cm
+     \centerline{\large \bf{Bratislava 2018}}
+     \vskip 0.2cm
+	 \centerline{\large \bf{Mat\'u\v{s} Behun}}
+}
+
+%\begin{titlepage}
+%     \centering
+%     \begin{figure}[ht!]
+%     \centering
+%     \includegraphics[width=90mm]{logo.png}
+%     \end{figure}
+%     {\scshape\LARGE Slovak University of Technology in Bratislava \par}
+%     \vspace{1cm}
+%     {\scshape\Large Student scientific conference\par}
+%     \vspace{1.5cm}
+%     {\huge\bfseries Cayley graphs of given degree and diameter on linear groups\par}
+%     \vspace{2cm}
+%	 {\Large\itshape Matú\v{s} Behun, MPM\par}
+%     \vfill
+%	 Supervisor\par
+%	 doc. RNDr. Jana \v{S}iagiová, PhD. 
+%     \vfill
  
  % Bottom of the page
-     {\large Bratislava 14th of April 2018}
- \end{titlepage}
+%     {\large Bratislava 14th of April 2018}
+% \end{titlepage}
  \newpage
 
 %====================================================================================================================================================
@@ -61,7 +87,7 @@
 In its simplest form, networks can be modeled by graphs in a natural way in which network nodes are represented by vertices of the graph and links between nodes are represented by undirected edges of the graph. Restrictions on the network, such as limits on the number of links attached to a node, or limits on the number of links needed to connect any two nodes, or the length of a shortest circuit, then transform to restrictions on the graph model (for the indicated cases these would be restrictions on vertex degrees, on the diameter, and on the girth of the graph).
 \medskip
 
-In graph theory this leads to two important problems: the {\em degree/diameter problem} to construct the largest possible graphs of a given maximum degree and a given diameter, and the {\em degree/girth problem} to construct the smallest possible regular graphs of a given degree and a given girth; in both cases the adjectives `large' and `small' refer to the order (i.e., the number of vertices) of a graph. The survey papers \cite{Mil-Sir} and \cite{Exo-Jaj}, respectively, contain a large amount of information on both problems. In this work we primarily address the degree/diameter problem restricted to Cayley graphs of certain two-dimensional linear groups, giving details in what follows.
+In graph theory this leads to two important problems: the {\em degree/diameter problem} to construct the largest possible graphs of a given maximum degree and a given diameter, and the {\em degree/girth problem} to construct the smallest possible regular graphs of a given degree and a given girth; in both cases the adjectives `large' and `small' refer to the order (i.e., the number of vertices) of a graph. The survey papers \cite{Mil-Sir} and \cite{Exo-Jaj}, respectively, contain a large amount of information on both problems. In this work we address both problems restricted to Cayley graphs of certain two-dimensional linear groups, giving details in what follows.
 
 
 \newpage
@@ -337,39 +363,21 @@ Cayley graph $C(SL(2,3),S)$ has order 24, $d=6$ and $k=2$.
 	\caption{ Output of circos ~\cite{Circos} of $C(SL(2,3), S)$ }
 \end{figure}
 
-The generating set S of the group $G=SL(2,3)$ in this example has the form $\{ x_1,x_1^{-1},x_2,x_2^{-1},x_3,x_3^{-1}\}$. To verify that the Cayley graph $C(G,S)$ has diameter $2$ one would have to show that the set $S$ together with the identity and with all products $x_i^{\pm 1}y_j^{\pm 1}$ gives the entire group $G$. Although this could be done by hand in this example, we deferred this task to a code that we designed for a more general purpose and which we list below.
+The generating set S of the group $G=SL(2,3)$ in this example has the form $\{ x_1,x_1^{-1},x_2,x_2^{-1},x_3,x_3^{-1}\}$. To verify that the Cayley graph $C(G,S)$ has diameter $2$ one would have to show that the set $S$ together with the identity and with all products $x_i^{\pm 1}y_j^{\pm 1}$ gives the entire group $G$. 
 
 \lstset{
 	basicstyle=\footnotesize,
 	tabsize=2
 }
-\lstinputlisting[language=Perl, frame=sinlge]{perl.pl}
-\begin{algorithm}
-        \caption{Cayley graph generation}
-        \label{alg1}    
-        \algsetup{indent=1em}
-        \begin{algorithmic}[1]
-                \REQUIRE $generation\_set[], n$
-                \STATE $stack[] \leftarrow generation\_set[]$
-                \STATE $stack\_element \leftarrow stack[0]$
-                \WHILE{$stack[]$ \NOT empty}
-                        \FORALL{$generating\_element \leftarrow generation\_set[]$}
-                                \STATE $multiplication\_result \leftarrow (stack\_element * generating\_element)$ mod $n$
-                                \STATE $multiplication\_results[stack\_element]$ append $multiplication\_result$
-                                \STATE $stack[]$ append $multiplication\_result$
-                        \ENDFOR
-                        \STATE shift to the left $stack[]$
-                        \STATE $stack\_element \leftarrow stack[0]$
-                \ENDWHILE
-                \RETURN $multiplication\_results$
-        \end{algorithmic}
-\end{algorithm}
 
-\subsection{Computer search of graphs}
+\subsection{Generation of cayley graphs with diameter}
+\lstinputlisting[language=Perl, frame=sinlge]{cayley_graph_generation.pl}
 
-Here we present results of computer search of graphs in $SL(2,5)$ group. Order for $SL(2,5) = 120$ and it's assumed that Cayley graph will yield all elements of group. In search we were looking for graphs with diameter two. Moore bound for given parameter is $d=11$ therefore search was done on degree $12$ and up to 21. 
+\subsection{Computer search of graphs with diameter}
 
-Generation sets were random and we generated and tested diameter two for 50000 graphs for all degrees. \\ \\
+Here we present results of computer seach of graphs. We have choosed two approaches in order to find graphs with diameter two. In early stages of program we have tried to find graphs with generating fixed size of graphs on degree $d$. Later on we used adaptive algorithm to search any graph of diameter two with ability to improve its results if possible. 
+
+Search with fixed size of generated graphs was used on two smaller groups $SL(2,5)$ and $SL(2,7)$. It's asssumed that Cayley graph will yield all elements of groups. Here we present table of results for $SL(2,5)$ with Moore bound for parameters $k=2$ and $|SL(2,5)| = 120$ is $d=11$, therefore search was done on degree $12$. $50000$ random graphs were genreated on each degree with following results:
 
 \begin{tabular}[htbp]{l*{10}{c}r}
 	$d$	& $12$ & $13$ & $14$ & $15$ & $16$ & $17$ & $18$ & $19$ & $20$ & $21$ \\
@@ -377,7 +385,45 @@ Generation sets were random and we generated and tested diameter two for 50000 g
 	Found graphs & $0$ & $0$  & $0$ & $1$ & $107$ & $345$ & $2451$  & $4120$ & $11669$ & $14926$ \\
 \end{tabular} \\ \\ 
 
-Search for graphs in $SL(2,7)$ with order $336$ has failed to find any graph for $d=20$ up to $25$.
+Same approach was used on graphs in $SL(2,7)$ with order of $336$ with Moore bound on $d=19$. We have searched $150000$ graphs on each degree from $20$ to $30$ with only $10$ graphs found on $d=30$. 
+
+Tu pridu nove vysledky
+
+\section{The degree/girth problem}
+Finding graphs with smallest possible order denoted $n_{d,g}$ with given degree $d$ and girth $g\geq3$ is known as {\em degree/girth problem}. Motivation for findind such graphs could arise from constructing graphs with no cycles with length $g$ or less and its similarity to {\em degree/diameter problem}. Problem was studied first by Biggs ~\cite{Biggs} on regular graphs. 
+\subsection{Moore bound}
+For odd $g$ we have Moore bound denoted by $M_{d,g}$ 
+\begin{equation*}
+	n_{d,g} \geq M(d,g) = 1 + d + d(d - 1) + d(d - 1)^{2} + \dots + d(d - 1)^{\frac{g-3}{2}}
+\end{equation*}	
+and for even $g$
+\begin{equation*}
+	n_{d,g} \geq M(d,g) = 2(1 + (d - 1) + (d - 1)^{2} + \dots + (d - 1)^{\frac{g-2}{2}})
+\end{equation*}	
+
+For odd $g$ Moore bound constructed same as Moore bound for degree/diameter problem with $k=(g-1)/2$. For even $g$ we start with edge and from incident vertices we continue until we reach depth $(g-2)/2$. 
+\section{Moore graphs}
+Graphs with Moore bound equal to $M(d,g)$ are called Moore graphs or cages. We list all ceses with $n_{d,g} = M_{d,g}$ below:
+
+\begin{itemize} 
+	\item{\makebox[2cm]{For $d=2$,\hfill}$g \geq 2$ - circles}
+	\item{\makebox[2cm]{For $g=3$,\hfill}$d \geq 22$ - complete graphs}
+	\item{\makebox[2cm]{For $g=5$,\hfill}$d \geq 2$ - complete bipartite graphs}
+	\item{\makebox[2cm]{For $g=5$,\hfill}$d=2$ - circle with length $5$}
+	\item[]{\makebox[2cm]{\hfill}$d=3$ - Peterssen graph}
+	\item[]{\makebox[2cm]{\hfill}$d=7$ - Hoffman-Singleton graph}
+	\item[]{\makebox[2cm]{\hfill}$d=57$ - possible, graph is unknown }
+	\item{\makebox[3cm]{For $g \in {6,8,12}$,\hfill}if $d-1$ is prime factor}
+\end{itemize}
+
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[scale=0.15]{Heawood_graph.png}
+	\caption{Heawood graph is Moore graph with $d=3$ and $g=6$ }
+\end{figure}
+
+\subsection{Generation of cayley graphs with girth}
+\lstinputlisting[language=Perl, frame=sinlge]{find_girth.pl}
 
 \begin{thebibliography}{xx}
 
@@ -401,6 +447,8 @@ Maximum degree in graphs of diameter 2, Networks 10
 \bibitem{Mil-Sir} M. Miller and J. \v{S}ir\'a\v{n},  Moore graphs and beyond: A survey, 2nd Ed., Electr. J. Combin. 2013, Dynamic Survey DS15.
 
 \bibitem{Sia-Sir} J. \v{S}iagiov\'a and J. \v{S}ir\'a\v{n}, Approaching the Moore bound for diameter two by Cayley graphs, J. Combin. Theory Ser. B 102 (2012) 470--473.
+
+\bibitem{Biggs} N.I. Biggs, Girth, valency and excess, Linear Algebra Appl. 31 (1980) 55-59
 
 \bibitem{Circos} Circo, http://circos.ca
 
