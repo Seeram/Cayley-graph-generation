@@ -363,6 +363,8 @@ We present algorithm for generation of Cayley graph in pseudocode. ~\\
 
 On lines $8,10,12$ we denoted by $[ r ]$ putting resulting matrix into so called associative array also known as dictionary or hash array. It's worth mentioning that there exists perfect hash function for matrices over finite fields for such purposes. Algorithm uses $stack[]$ for storing matrices which weren't multiplied over generating set while $generating\_nodes[]$ to keep them unique to keep memory overhead low at cost of computation of hash. 
 
+Precomputations could be made for finding inverse and creating Cayley table for matrix multiplications, making generation of graph and diameter check matter of accessing memory. While this implementation should give faster performance results, it was considered at later stages and was not implemented. Precomputations of Cayley table are limited by size of RAM memory and possible only in smaller groups. 
+
 To check diameter of graph one has to make only computations on generating set. To check wheter graph has diameter $k$ it's required least if graph has not of diameter $k-1$. To find unknown $k$ one has to iterate through all $k \in {1 \dots}$ diameters. We didn't use algorithm for special case of $k=1$ which was checked only by checking degree of all nodes in graph.  ~\\
 
 \lstinputlisting[language=Perl, frame=sinlge]{check_diameter.pl}
@@ -381,41 +383,48 @@ Search with fixed size of generated graphs was used on two smaller groups $SL(2,
 
 Same approach was used on graphs in $SL(2,7)$ with order of $336$ with Moore bound on $d=19$. We have searched $150000$ graphs on each degree from $20$ to $30$ with only $10$ graphs found on $d=30$. 
 
-For comparsion we present latest known results for Cayley graphs with $k=2$
+By adaptive algorithm we mean automatized search of graphs in group. Program needs to be set up with starting size of generating set, time limit spent per degree, maximum of generated graphs per degree and number of parallel processes. In order to find some graph of given diameter program's tries to find any graph on degree. In case time limit is up it's continuing on set with bigger size making found graph further from Moore bound with bigger probability to find some. After first successfuly found graph search continues on smaller generating size with bigger time limit.
 
+Tu pojdu vysledky z hladania lepsich grafov zo Zp 11, 13, 19
+
+For comparsion we present latest known results for Cayley graphs with $k=2$
 \begin{center}
-	\begin{tabular}{| l | l | l | l | l | l |}
-		\hline
-		$d$ & Order & \% Moore Bound & 			$d$ & Order & \% Moore Bound \\ \hline
-		$4$ & $13$ & $76.47\%$ & 				$31$ & $648$ & $67.35\%$ \\ \hline
-		$5$ & $18$ & $69.23\%$ &       			$32$ & $648$ & $63.21\%$ \\ \hline
-		$6$ & $32$ & $86.48\%$ &       			$33$ & $648$ & $59.44\%$ \\ \hline
-		$7$ & $36$ & $72\%$ &       			$34$ & $648$ & $56\%$ \\ \hline
-		$8$ & $48$ & $73.48\%$ &       			$35$ & $648$ & $52.85\%$ \\ \hline
-		$9$ & $60$ & $73.17\%$ &       			$36$ & $648$ & $49.96\%$ \\ \hline
-		$10$ & $72$ & $71.28\%$ &       			$37$ & $800$ & $58.39\%$ \\ \hline
-		$11$ & $84$ & $68.85\%$ &       			$38$ & $800$ & $55.36\%$ \\ \hline
-		$12$ & $96$ & $66.20\%$ &       			$39$ & $800$ & $52.56\%$ \\ \hline
-		$13$ & $112$ & $65.88\%$ &       			$40$ & $968$ & $60.46\%$ \\ \hline
-		$14$ & $128$ & $64.97\%$ &       			$41$ & $968$ & $57.55\%$ \\ \hline
-		$15$ & $144$ & $63.71\%$ &       			$42$ & $968$ & $54.84\%$ \\ \hline
-		$16$ & $200$ & $77.82\%$ &       			$43$ & $968$ & $52.32\%$ \\ \hline
-		$17$ & $200$ & $68.96\%$ &       			$44$ & $968$ & $49.97\%$ \\ \hline
-		$18$ & $200$ & $61.53\%$ &       			$45$ & $1058$ & $52.22\%$ \\ \hline
-		$19$ & $200$ & $55.24\%$ &       			$46$ & $1152$ & $54.41\%$ \\ \hline
-		$20$ & $210$ & $55.36\%$ &       			$47$ & $1152$ & $52.12\%$ \\ \hline
-		$21$ & $288$ & $65.15\%$ &       			$48$ & $1152$ & $49.97\%$ \\ \hline
-		$22$ & $288$ & $59.38\%$ &       			$49$ & $1352$ & $56.28\%$ \\ \hline
-		$23$ & $392$ & $73.96\%$ &       			$50$ & $1352$ & $54.05\%$ \\ \hline
-		$24$ & $392$ & $67.93\%$ &       			$51$ & $1352$ & $51.96\%$ \\ \hline
-		$25$ & $392$ & $62.61\%$ &       			$52$ & $1352$ & $49.98\%$ \\ \hline
-		$26$ & $392$ & $57.90\%$ &       			$53$ & $1458$ & $51.88\%$ \\ \hline
-		$27$ & $392$ & $53.69\%$ &       			$54$ & $1568$ & $53.75\%$ \\ \hline
-		$28$ & $512$ & $65.52\%$ &       			$55$ & $1568$ & $51.81\%$ \\ \hline
-		$29$ & $512$ & $60.80\%$ &       			$56$ & $1568$ & $49.98\%$ \\ \hline
-		$30$ & $512$ & $56.82\%$ &       			$57$ & $1682$ & $51.75\%$ \\ \hline
-	\end{tabular}  
+	\scalebox{0.6}{
+		\begin{tabular}{| l | l | l | l | l | l |}
+			\hline
+			$d$ & Order & \% Moore Bound & 			$d$ & Order & \% Moore Bound \\ \hline
+			$4$ & $13$ & $76.47\%$ & 				$31$ & $648$ & $67.35\%$ \\ \hline
+			$5$ & $18$ & $69.23\%$ &       			$32$ & $648$ & $63.21\%$ \\ \hline
+			$6$ & $32$ & $86.48\%$ &       			$33$ & $648$ & $59.44\%$ \\ \hline
+			$7$ & $36$ & $72\%$ &       			$34$ & $648$ & $56\%$ \\ \hline
+			$8$ & $48$ & $73.48\%$ &       			$35$ & $648$ & $52.85\%$ \\ \hline
+			$9$ & $60$ & $73.17\%$ &       			$36$ & $648$ & $49.96\%$ \\ \hline
+			$10$ & $72$ & $71.28\%$ &       			$37$ & $800$ & $58.39\%$ \\ \hline
+			$11$ & $84$ & $68.85\%$ &       			$38$ & $800$ & $55.36\%$ \\ \hline
+			$12$ & $96$ & $66.20\%$ &       			$39$ & $800$ & $52.56\%$ \\ \hline
+			$13$ & $112$ & $65.88\%$ &       			$40$ & $968$ & $60.46\%$ \\ \hline
+			$14$ & $128$ & $64.97\%$ &       			$41$ & $968$ & $57.55\%$ \\ \hline
+			$15$ & $144$ & $63.71\%$ &       			$42$ & $968$ & $54.84\%$ \\ \hline
+			$16$ & $200$ & $77.82\%$ &       			$43$ & $968$ & $52.32\%$ \\ \hline
+			$17$ & $200$ & $68.96\%$ &       			$44$ & $968$ & $49.97\%$ \\ \hline
+			$18$ & $200$ & $61.53\%$ &       			$45$ & $1058$ & $52.22\%$ \\ \hline
+			$19$ & $200$ & $55.24\%$ &       			$46$ & $1152$ & $54.41\%$ \\ \hline
+			$20$ & $210$ & $55.36\%$ &       			$47$ & $1152$ & $52.12\%$ \\ \hline
+			$21$ & $288$ & $65.15\%$ &       			$48$ & $1152$ & $49.97\%$ \\ \hline
+			$22$ & $288$ & $59.38\%$ &       			$49$ & $1352$ & $56.28\%$ \\ \hline
+			$23$ & $392$ & $73.96\%$ &       			$50$ & $1352$ & $54.05\%$ \\ \hline
+			$24$ & $392$ & $67.93\%$ &       			$51$ & $1352$ & $51.96\%$ \\ \hline
+			$25$ & $392$ & $62.61\%$ &       			$52$ & $1352$ & $49.98\%$ \\ \hline
+			$26$ & $392$ & $57.90\%$ &       			$53$ & $1458$ & $51.88\%$ \\ \hline
+			$27$ & $392$ & $53.69\%$ &       			$54$ & $1568$ & $53.75\%$ \\ \hline
+			$28$ & $512$ & $65.52\%$ &       			$55$ & $1568$ & $51.81\%$ \\ \hline
+			$29$ & $512$ & $60.80\%$ &       			$56$ & $1568$ & $49.98\%$ \\ \hline
+			$30$ & $512$ & $56.82\%$ &       			$57$ & $1682$ & $51.75\%$ \\ \hline
+		\end{tabular}  
+	}
 \end{center}
+
+For implementation of our algorithms we choosed {\em Perl} programming language. Perl is high-level, general-purpose, interpreted programming language with great documentation and online community maintaining easy to use libraries. While Perl being high-level programming language multiplication of matrices in our program were actually implemented in C programming language implementation in choosed language more suitable. For this purpose we have used library called PDL or perl data language available at {\em CPAN}~\cite{CPAN}.
 
 \section{The degree/girth problem}
 Finding graphs with smallest possible order denoted $n_{d,g}$ with given degree $d$ and girth $g\geq3$ is known as {\em degree/girth problem}. Motivation for findind such graphs could arise from constructing graphs with no cycles with length $g$ or less and its similarity to {\em degree/diameter problem}. Problem was studied first by Biggs ~\cite{Biggs} on regular graphs. 
@@ -458,6 +467,15 @@ Same as for diameter we check girth of graph making computations on generating s
 
 \lstinputlisting[language=Perl, frame=sinlge]{check_girth.pl}
 
+Tu pojdu vysledky
+
+\section{Conclusion}
+
+\section{Abstract}
+
+This bachelor thesis discuss two problems concerning construction of graphs with given parameters, namely {\em degree/diameter} and {\em degree/girth} problem. In our work we describe both problems, its theoretically possible bounds and some research results with focus on special case of Cayley graphs. We present algorithm for generating Cayley graph and exploitation of symmetry of Cayley graphs with computation of it's girth and diameter just on its symmeteric generating set. We also triedto find graphs as close to theoretical bound of both problems as possible and we list some of results in our randomized search in Special linear group.
+
+
 \begin{thebibliography}{xx}
 
 \bibitem{Bas-Mil} E. T. Baskoro and M. Miller, On the construction of networks with minimum diameter,
@@ -484,6 +502,8 @@ Maximum degree in graphs of diameter 2, Networks 10
 \bibitem{Biggs} N.I. Biggs, Girth, valency and excess, Linear Algebra Appl. 31 (1980) 55-59
 
 \bibitem{Circos} Circo, http://circos.ca
+
+\bibitem{CPAN} PDL, https://metacpan.org/pod/PDL 
 
 \end{thebibliography}
 
