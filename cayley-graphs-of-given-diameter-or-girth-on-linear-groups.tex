@@ -351,7 +351,7 @@ The generating set S of the group $G=SL(2,3)$ in this example has the form $\{ x
 
 \subsection{Generation of cayley graphs with given diameter}
 
-All of our Cayley graphs which are generated through its symmetric sets were choosed randomly. As mentioned earlier choosing random symmetric sets consits of choosing elements of group with its inverses over finite field arithmetic. In our implementation all elements of group were precomputed. Every element $A$ had its inverse computed through formula:
+All of our Cayley graphs which are generated through its symmetric sets were choosed randomly. As mentioned earlier choosing random symmetric sets consits of choosing elements of group with its inverses over finite field arithmetic. In our implementation all elements of group were precomputed. Every element $A$ had its inverse computed by formula:
 \begin{align}
 	\frac{1}{det(A)}adjugate(A) = A^{-1}
 \end{align}
@@ -454,7 +454,7 @@ Graphs with Moore bound equal to $M(d,g)$ are called Moore graphs or cages. We l
 Here we present example of Cayley graph on group $SL(2,3)$ with order $|SL(2,3)|=24$
 
 \subsection{Generation of cayley graphs with given girth}
-Same as for diameter we check girth of graph making computations on generating set. Checking if girth $g$ on graph we have to confirm that graphs doesn't have cycle with length $3 \leq n \leq g-1$.	
+Same as for diameter we check girth of graph making computations on generating set. Checking if girth $g$ on graph we have to confirm that graphs doesn't have cycle with length $3 \leq n \leq g-1$. Here we present algorithm used for computation of girth:
 
 \lstinputlisting[language=Perl, frame=sinlge]{check_girth.pl}
 

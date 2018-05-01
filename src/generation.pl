@@ -103,7 +103,7 @@ sub compute_hash
 
 sub insert_result
 {
-	my ($multiplication_results_ref, $node_place, $node_to_insert, $zp, $hash_table_size ) = @_;
+	my ($multiplication_results_ref, $node_place, $node_to_insert, $zp ) = @_;
 
 	my $hash_no = compute_hash($node_place, $zp);
 	my $index_no = $hash_no;
@@ -130,10 +130,10 @@ sub insert_result
 
 sub find_result
 {
-	my ($multiplication_results_ref, $node_to_find, $zp, $hash_table_size) = @_;
+	my ($multiplication_results_ref, $node_to_find, $zp ) = @_;
 
 	my $hash_no = compute_hash($node_to_find, $zp);
-	my $index_no = $hash_no % $hash_table_size;
+	my $index_no = $hash_no;
 
 
 	if(defined($multiplication_results_ref->[$index_no])) {
@@ -199,11 +199,11 @@ sub find_hash
 
 sub find_diameter
 {
-	my ($keys_ref, $multiplication_results_ref, $generation_set_ref, $zp) = @_;
+	my ($generation_set_ref, $zp) = @_;
 	my @checked_diameters = 1..10;
 
 	foreach my $diameter ( @checked_diameters ) {
-		if(check_one_diameter($keys_ref, $multiplication_results_ref, $generation_set_ref, $zp, $diameter)) {
+		if(check_one_diameter($generation_set_ref, $zp, $diameter)) {
 			return $diameter;
 		}
 	}
@@ -214,14 +214,14 @@ sub find_diameter
 
 sub check_diameter
 {
-	my ($keys_ref, $multiplication_results_ref, $generation_set_ref, $zp, $diameter) = @_;
+	my ($generation_set_ref, $zp, $diameter) = @_;
 
 	if($diameter == 1) {
-		return check_one_diameter($keys_ref, $multiplication_results_ref, $generation_set_ref, $zp, $diameter);
+		return check_one_diameter($generation_set_ref, $zp, $diameter);
 	} 	
 
-	if(check_one_diameter($keys_ref, $multiplication_results_ref, $generation_set_ref, $zp, $diameter)) {
-	  if(!check_one_diameter($keys_ref, $multiplication_results_ref, $generation_set_ref, $zp, $diameter - 1)) {
+	if(check_one_diameter($generation_set_ref, $zp, $diameter)) {
+	  if(!check_one_diameter($generation_set_ref, $zp, $diameter - 1)) {
 		  return 1;
 	  } else {
 		  return 0;
@@ -234,18 +234,21 @@ sub check_diameter
 	# Check one diameter of graph, warning graphs with diameter d are also with diameter (d + 1)  
 sub check_one_diameter
 {
-	my ($keys_ref, $multiplication_results_ref, $generation_set_ref, $zp, $diameter) = @_;
+	my ($generation_set_ref, $zp, $diameter) = @_;
 
 	my @generation_set = @{ $generation_set_ref }; 
 	my @hash_storage;
 
 	if($diameter == 1) {
-		foreach my $index_no ( @{ $keys_ref } ) {
-			foreach my $table_entry_ref ( @{ $multiplication_results_ref->[$index_no] } ) {
-				if($#{ $keys_ref } != $#{ $table_entry_ref } ) {
+		my @cayley_graph = generate_cayley_graph( $generation_set_ref, $zp );
+
+		foreach my $index_no ( @{ $cayley_graph[0] } ) {
+			foreach my $table_entry_ref ( @{ $cayley_graph[1]->[$index_no] } ) {
+				if($#{ $cayley_graph[0] } != $#{ $table_entry_ref } ) { 
 					return 0;
 				}
 			}
+
 		}
 
 		return 1;
@@ -266,21 +269,24 @@ sub check_one_diameter
 		push @hash_storage, compute_hash($m, $zp);
 	}
 
-	foreach my $key ( @{ $keys_ref } ) {
-		return 0 unless(List::Util::any {$_ eq $key} @hash_storage);
-	}
+	@hash_storage = List::MoreUtils::uniq @hash_storage;
 
-	return 1;
+	if(($#hash_storage + 1) == get_order_of_SL(2,$zp)) {
+		return 1;	
+	} else {
+		return 0;
+ 	}	
 }
 
 sub check_one_girth
 {
-	my ($keys_ref, $multiplication_results_ref, $generation_set_ref, $zp, $girth) = @_;
+	my ($generation_set_ref, $zp, $girth) = @_;
 
 	if($girth < 3) {
 		print "Wrong girth in check one girth";
 		exit;
 	}
+
 	my $eye = PDL::Matrix->pdl([[1,0],[0,1]]);
 
 	my @generation_set = @{ $generation_set_ref }; 
@@ -302,17 +308,17 @@ sub check_one_girth
 
 sub check_girth
 {
-	my ($keys_ref, $multiplication_results_ref, $generation_set_ref, $zp, $girth) = @_;
+	my ($generation_set_ref, $zp, $girth) = @_;
 
 	if($girth < 3) {
 		print "Wrong girth in check one girth";
 		exit;
 	}
 
-	if(check_one_girth($keys_ref, $multiplication_results_ref, $generation_set_ref, $zp, $girth)) {
+	if(check_one_girth($generation_set_ref, $zp, $girth)) {
 		foreach my $i ( 3..($girth - 1)) {
-			if(check_one_girth($keys_ref, $multiplication_results_ref, $generation_set_ref, $zp, $i)) {
-				return $i;	
+			if(check_one_girth($generation_set_ref, $zp, $i)) {
+				return 0;	
 			}
 		}
 		return $girth;
@@ -323,7 +329,7 @@ sub check_girth
 
 sub generate_cayley_graph
 {
-	my ($generating_set_ref, $zp, $hash_table_size) = @_;
+	my ( $generating_set_ref, $zp ) = @_;
 	my @multiplication_results;
 	my %generating_nodes;
 	
@@ -332,7 +338,7 @@ sub generate_cayley_graph
 	my @stack;
 
 	foreach my $gs_element ( @generating_set ) {
-		insert_hash(\%generating_nodes, $gs_element, $zp, $hash_table_size );
+		insert_hash(\%generating_nodes, $gs_element, $zp);
 		push @keys, compute_hash($gs_element, $zp);
 		push @stack, $gs_element;
 	}
@@ -342,9 +348,9 @@ sub generate_cayley_graph
 	while(@stack) {
 		foreach my $generating_element (@generating_set) {
 			my $multiplication_result = ($current_node x $generating_element) % $zp;	
-			insert_result(\@multiplication_results, $current_node,  $multiplication_result, $zp, $hash_table_size);
+			insert_result(\@multiplication_results, $current_node,  $multiplication_result, $zp);
 			if(find_hash(\%generating_nodes, $multiplication_result, $zp)) {
-				insert_hash(\%generating_nodes, $multiplication_result, $zp, $hash_table_size );
+				insert_hash(\%generating_nodes, $multiplication_result, $zp);
 				push @keys, compute_hash($multiplication_result, $zp);
 				push @stack, $multiplication_result;
 			}
@@ -375,7 +381,9 @@ sub generate_graph_from_cayley_graph
 		}
 	}
 
-	return ( $graph, $generating_set_ref, $zp );
+	my $diameter = $graph->diameter;
+
+	return ( $graph, $generating_set_ref, $zp, $diameter );
 }
 
 sub generate_graph
@@ -640,9 +648,8 @@ sub make_graphical_output
 
 sub save_cayley_graph
 {
-	my ($keys_ref, $multiplication_results_ref, $generating_set_ref, $zp, $diameter, $folder, $filename) = @_;
+	my ($generating_set_ref, $zp, $diameter, $folder, $filename) = @_;
 
-	my $order_of_graph = $#{ $keys_ref };
 	my $postfix = int(rand(10000000000));
 
 	if( not defined  $folder ) {
@@ -650,7 +657,7 @@ sub save_cayley_graph
 	}
 
 	if( not defined  $filename ) {
-		$filename = "GeneratingSetSize_" . ($#{ $generating_set_ref } + 1) . "_Diameter_" . $diameter . "_OrderOfGraph_" . $order_of_graph . "_Zp_" . $zp . "_" . $postfix;
+		$filename = "GeneratingSetSize_" . ($#{ $generating_set_ref } + 1) . "_Diameter_" . $diameter . "_OrderOfGraph_" . get_order_of_SL(2, $zp) . "_Zp_" . $zp . "_" . $postfix;
 	} 
 
 	open(my $file, ">", $folder . $filename . ".gs")
@@ -659,7 +666,7 @@ sub save_cayley_graph
 	print $file "Group: SL(2,$zp)\n";
 	print $file "Diameter of Cayley graph: $diameter\n";
 	print $file "Generating set size: " . ($#{ $generating_set_ref } + 1) . "\n";
-	print $file "Order of graph: " . $order_of_graph . "\n";
+	print $file "Order of graph: " . get_order_of_SL(2,$zp) . "\n";
 	print $file "Generating set:\n";
 
 	foreach my $matrix ( @{ $generating_set_ref } ) {
@@ -865,24 +872,50 @@ sub generate_sets_randomly
 		$pm->finish;
 	}
 }
+sub	generate_cayley_graph_with_girth 
+{
+	my ($generating_set_ref, $zp, $hash_table_size, $size_of_generating_set, $girth) = @_;
+
+	if(check_girth($generating_set_ref, $zp, $girth)) {
+		if(check_symmetric_set($generating_set_ref, $zp, $size_of_generating_set)) {
+			save_cayley_graph($generating_set_ref, $girth, "results/girth/");
+			return $girth;
+		} else {
+			print "!!!!!!!!!!!!!!!! SET ERROR !!!!!!!!!!!!!!!!!!!!!!!\n";
+			save_cayley_graph($generating_set_ref, $girth, "set_error/");
+			return 0;
+		}
+	} else {
+		return 0;
+	}
+
+	return 0;
+}
 
 sub	generate_cayley_graph_with_diameter 
 {
-	my ($generating_set_ref, $zp, $hash_table_size, $size_of_generating_set, $diameter, $check_diameter_on_graph) = @_;
-	
-	my @cayley_graph = generate_cayley_graph($generating_set_ref, $zp, $hash_table_size);
+	my ($generating_set_ref, $zp, $hash_table_size, $size_of_generating_set, $diameter, $check_diameter) = @_;
 
-	if(check_diameter(@cayley_graph, $diameter)) {
-		if(($#{ $cayley_graph[0] } + 1) == get_order_of_SL(2, $zp)) {
-			if(check_symmetric_set($generating_set_ref, $zp, $size_of_generating_set)) {
-				save_cayley_graph(@cayley_graph, $diameter, "results/");
-				return $diameter;
+	if($check_diameter) {
+			my @cayley_graph = generate_cayley_graph($generating_set_ref, $zp, $hash_table_size);
+			my @graph = generate_graph_from_cayley_graph(@cayley_graph);
+			my $found_diameter = find_diameter($generating_set_ref, $zp);
+			my $graph_diameter = $graph[$#graph];
+			if($graph_diameter != $found_diameter) {
+				print "!!!!!!!!!!!!!!!! DIAMETER ERROR !!!!!!!!!!!!!!!!!!!!!!!\n";
+				save_cayley_graph($generating_set_ref, $diameter, "diameter_error/");
 			} else {
-				print "!!!!!!!!!!!!!!!! SET ERROR !!!!!!!!!!!!!!!!!!!!!!!\n";
-				save_cayley_graph(@cayley_graph, $diameter, "set_error/");
-				return 0;
+				print "\t\t[Diameter check] $graph[$#graph] == $found_diameter\n";
 			}
+	}
+
+	if(check_diameter($generating_set_ref, $zp, $diameter)) {
+		if(check_symmetric_set($generating_set_ref, $zp, $size_of_generating_set)) {
+			save_cayley_graph($generating_set_ref, $diameter, "results/");
+			return $diameter;
 		} else {
+			print "!!!!!!!!!!!!!!!! SET ERROR !!!!!!!!!!!!!!!!!!!!!!!\n";
+			save_cayley_graph($generating_set_ref, $diameter, "set_error/");
 			return 0;
 		}
 	} else {
@@ -908,10 +941,9 @@ sub check_random_graphs
 			my ($pid, $exit_code, $ident) = @_;
 			
 			if($ident == 1) {
-				print $exit_code;
-				my $graphs_in_time_limit = int(($time_limit / ($exit_code / $number_of_forks)))  - $number_of_forks;
+				my $graphs_in_time_limit = int(($time_limit / ($exit_code + 0.00000001 / $number_of_forks)))  - $number_of_forks;
 				if($number_of_graphs > $graphs_in_time_limit) {
-					print "\t\t\t Adjusting number of generated graphs on d=$size_of_generating_set to $graphs_in_time_limit to get it under time limit: $time_limit sec\n";
+					print "\t\t\tAdjusting number of generated graphs on d=$size_of_generating_set to $graphs_in_time_limit to get it under time limit: $time_limit sec\n";
 					$number_of_graphs = $graphs_in_time_limit;
 				}
 				return;
@@ -1079,13 +1111,13 @@ sub init_group
 
 sub search_graphs_with_diameter
 {
-	my ($field_bound, $diameter, $property) = @_;
+	my ($field_bound, $diameter) = @_;
 
 	srand time;
 	my $number_of_forks = 8;
 	my $hash_table_size = 154485863;
-	my $number_of_generated_graphs = 50000;
-	my $time_limit = 1200; # seconds
+	my $number_of_generated_graphs = 1000;
+	my $time_limit = 10; # seconds
 
 	my $nth_prime = 5;
 	while((my $zp = get_nth_prime($nth_prime)) < $field_bound) {
@@ -1093,7 +1125,7 @@ sub search_graphs_with_diameter
 		my $zp = get_nth_prime($nth_prime);
 		init_group(\@group, $zp);
 		my $moore_degree = int(sqrt($#{ $group[0] })) + 1;
-		my $degree = int($moore_degree * 1.25) + 1;
+		my $degree = int($moore_degree * 1.25) + 4;
 
 		if($degree % 2) {
 			$degree -= 1;	
@@ -1152,6 +1184,28 @@ sub search_graphs_with_diameter
 	}
 }
 
+sub search_graphs_with_girth
+{
+	my ($field_bound, $diameter, $property) = @_;
+
+	srand time;
+	my $number_of_forks = 8;
+	my $hash_table_size = 154485863;
+	my $number_of_generated_graphs = 50000;
+	my $time_limit = 60; # seconds
+
+	my $nth_prime = 3;
+	while((my $zp = get_nth_prime($nth_prime)) < $field_bound) {
+		my @group;
+		my $zp = get_nth_prime($nth_prime);
+		init_group(\@group, $zp);
+		my $moore_degree;	# doplnit 
+		my $degree; # doplnit
+
+		$nth_prime++;
+	}
+}
+
 sub generate_one_graph
 {
 	srand time;
@@ -1188,4 +1242,5 @@ sub generate_one_graph
 }
 
 
-search_graphs_with_diameter(99, 2, "diameter");
+
+search_graphs_with_diameter(99, 2);
