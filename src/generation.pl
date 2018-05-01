@@ -896,26 +896,26 @@ sub	generate_cayley_graph_with_diameter
 {
 	my ($generating_set_ref, $zp, $hash_table_size, $size_of_generating_set, $diameter, $check_diameter) = @_;
 
-	if($check_diameter) {
-			my @cayley_graph = generate_cayley_graph($generating_set_ref, $zp, $hash_table_size);
-			my @graph = generate_graph_from_cayley_graph(@cayley_graph);
-			my $found_diameter = find_diameter($generating_set_ref, $zp);
-			my $graph_diameter = $graph[$#graph];
-			if($graph_diameter != $found_diameter) {
-				print "!!!!!!!!!!!!!!!! DIAMETER ERROR !!!!!!!!!!!!!!!!!!!!!!!\n";
-				save_cayley_graph($generating_set_ref, $diameter, "diameter_error/");
-			} else {
-				print "\t\t[Diameter check] $graph[$#graph] == $found_diameter\n";
-			}
-	}
 
 	if(check_diameter($generating_set_ref, $zp, $diameter)) {
 		if(check_symmetric_set($generating_set_ref, $zp, $size_of_generating_set)) {
-			save_cayley_graph($generating_set_ref, $diameter, "results/");
+			if($check_diameter) {
+					my @cayley_graph = generate_cayley_graph($generating_set_ref, $zp, $hash_table_size);
+					my @graph = generate_graph_from_cayley_graph(@cayley_graph);
+					my $found_diameter = find_diameter($generating_set_ref, $zp);
+					my $graph_diameter = $graph[$#graph];
+					if($graph_diameter != $found_diameter) {
+						print "!!!!!!!!!!!!!!!! DIAMETER ERROR !!!!!!!!!!!!!!!!!!!!!!!\n";
+						save_cayley_graph($generating_set_ref, $zp, $diameter, "diameter_error/");
+					} else {
+						print "\t\t[Diameter check] $graph[$#graph] == $found_diameter\n";
+					}
+			}
+			save_cayley_graph($generating_set_ref, $zp, $diameter, "results/");
 			return $diameter;
 		} else {
 			print "!!!!!!!!!!!!!!!! SET ERROR !!!!!!!!!!!!!!!!!!!!!!!\n";
-			save_cayley_graph($generating_set_ref, $diameter, "set_error/");
+			save_cayley_graph($generating_set_ref, $zp, $diameter, "set_error/");
 			return 0;
 		}
 	} else {
@@ -941,7 +941,7 @@ sub check_random_graphs
 			my ($pid, $exit_code, $ident) = @_;
 			
 			if($ident == 1) {
-				my $graphs_in_time_limit = int(($time_limit / ($exit_code + 0.00000001 / $number_of_forks)))  - $number_of_forks;
+				my $graphs_in_time_limit = int(($time_limit / ($exit_code + 0.1 / ($number_of_forks + 0.1))))  - $number_of_forks;
 				if($number_of_graphs > $graphs_in_time_limit) {
 					print "\t\t\tAdjusting number of generated graphs on d=$size_of_generating_set to $graphs_in_time_limit to get it under time limit: $time_limit sec\n";
 					$number_of_graphs = $graphs_in_time_limit;
@@ -975,7 +975,7 @@ sub check_random_graphs
 
 		$pm->start("$counter") and next;
 			@time = gettimeofday();
-			my $exit_code = generate_cayley_graph_with_diameter($generating_set_ref, $zp, $hash_table_size, $size_of_generating_set, $diameter, my $check_diameter_on_graph = 0);
+			my $exit_code = generate_cayley_graph_with_diameter($generating_set_ref, $zp, $hash_table_size, $size_of_generating_set, $diameter, my $check_diameter_on_graph = 1);
 			print "\t[" . sprintf("%5.2lf", tv_interval(\@global_time)) . "][$counter] finished in " . tv_interval(\@time) . " sec with exit code: $exit_code\n";
 			if($counter == 1) {
 				$pm->finish(tv_interval(\@time));
@@ -1119,7 +1119,7 @@ sub search_graphs_with_diameter
 	my $number_of_generated_graphs = 1000;
 	my $time_limit = 10; # seconds
 
-	my $nth_prime = 5;
+	my $nth_prime = 3;
 	while((my $zp = get_nth_prime($nth_prime)) < $field_bound) {
 		my @group;
 		my $zp = get_nth_prime($nth_prime);
@@ -1209,7 +1209,7 @@ sub search_graphs_with_girth
 sub generate_one_graph
 {
 	srand time;
-	my $number_of_forks = 0;
+	my $number_of_forks = 8;
 	my $hash_table_size = 154485863;
 	my $number_of_generated_graphs = 5;
 	my $time_limit = 3600; # seconds
