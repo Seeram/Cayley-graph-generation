@@ -1,4 +1,4 @@
- \documentclass[a4paper,12pt,oneside]{report}%pridat twoside, do [] pre obojstrannu tlac
+\documentclass[a4paper,12pt,oneside]{report}%pridat twoside, do [] pre obojstrannu tlac
     \pagestyle{headings}
     \usepackage[top=2.5cm, bottom=2.5cm, left=3.5cm, right=2cm]{geometry} %odporucane okraje
 	\linespread{1.50}
@@ -61,6 +61,12 @@
 %====================================================================================================================================================
 % END OF FIRST PAGE
 %====================================================================================================================================================
+
+\section{Abstract}
+
+This bachelor thesis discuss two problems concerning construction of graphs with given restriction, namely {\em degree/diameter} and {\em degree/girth} problem. In our work we describe both problems, the associated theoretical bounds and some research results with focus on Cayley graphs on 2-dimensional special linear groups over finite fields. We present algorithm for generating such Cayley graphs of diameter 2, looking for smallest possible degree. We used randomized search over generating sets of predetermined sizes in small special linear groups of dimension 2 over finite fields.
+
+\newpage
 
 \section{Introduction}
 
@@ -172,7 +178,6 @@ Of course, degrees of all the vertices $(u,g)$ in the lift are equal to the degr
 A number of the largest currently known ${d,k}$-graphs can be described as lifts. For example, all the graphs giving the values of $n_{3,7}$, $n_{3,8}$, $n_{4,4}$, $n_{5,3}$, $n_{5,5}$, $n_{6,3}$, $n_{6,4}$, $n_{7,3}$, $n_{14, 3}$ and $n_{16,2}$ obtained by computer search turn out to be lifts \cite{Mil-Sir}.
 
 
-
 \subsection{Cayley graphs}
 Let $\Gamma$ be a group and let $S\subset \Gamma$ be a symmetric unit-free generating set for $\Gamma$; that is, we require that $S=S^{-1}$ and $1\notin S$. The $\textit{Cayley graph}$ $C(\Gamma,S)$ is the graph with vertex set $\Gamma$ in which vertices $a,b$ are adjacent if $a^{-1}b\in S$. Observe that now the group $\Gamma$ acts regularly and hence freely on the vertex set of $C(\Gamma,S)$ as a group of automorphisms, so that the quotient graph $C(\Gamma,S)/\Gamma$ has just one vertex. By the remark in the previous section about groups of automorphisms acting freely in vertices it follows that Cayley graphs are simply lifts of one-vertex graphs (which will in general contain multiple loops and semi-edges but we will not go into the corresponding details).
 \medskip
@@ -180,9 +185,7 @@ Let $\Gamma$ be a group and let $S\subset \Gamma$ be a symmetric unit-free gener
 The diameter testing of lifts now easily translates into testing diameter of Cayley graphs as follows: A Cayley graph $C(\Gamma,S)$ has diameter at most $k$ if and only if every element of $\Gamma$ can be expressed as a product of at most $k$ elements of the generating set $S$. Equivalently, the diameter of a Cayley graph $C(\Gamma,S)$ is {\em equal} to $k$ if and only if $k$ is the smallest number such that every element of $\Gamma$ can be expressed as a product of at most $k$ elements of $S$.
 \medskip
 
-By $Cay_{d,k}$ we denote the largest order of a Cayley $(d,k)$-graph. In \cite{Jaj-Mac} it was proved that for every fixed $d \geq 3$ and $c \geq 2$ there is a set $A$ of natural numbers with positive density s.t. $C_{d,k} \leq M_{d,k}-c$ for all $k\in A$.
-\medskip
-
+By $Cay_{d,k}$ we denote the largest order of a Cayley $(d,k)$-graph.
 The currently best available lower bound on $C_{d,2}$ was obtained by \v{S}iagiov\'a and \v{S}ir\'a\v{n} \cite{Sia-Sir} and reads as follows. Let $D = \{ 2^{2m+\mu}+(2+\delta)2^{m+1}-6,m \geq 1, \mu \in \{0,1\} \}$. Then, for every $d\in D$ one has $C_{d,2} > d^{2} - 6\sqrt{2}d^{3/2}$.
 
 In the special case of Cayley graphs of diameter $k=2$ on Abelian groups there is a relatively straightforward lower bound of the form
@@ -202,10 +205,10 @@ We will be particularly interested in the case $m=2$ and $q=p$ for some prime nu
 
 \subsection{Example of Cayley graph}
 
-For example we generate Cayley graph on group $SL(2,3)$ with order $|SL(2,3)| = 24$ consiting of \\ \\
+As an example we present a Cayley graph for the group $SL(2,3)$. This group has order 24 and for completeness and for the sake of the example we give here a complete list of its elements: \\ \\
 $
-SL(2,3) = 
-\bigg\{ 
+SL(2,3) =
+\bigg\{
 \begin{bmatrix}
 	1 & 0 \\
 	0 & 1
@@ -237,7 +240,7 @@ SL(2,3) =
 \begin{bmatrix}
 	1 & 0 \\
 	1 & 1
-\end{bmatrix}, 
+\end{bmatrix},
 \begin{bmatrix}
 	1 & 0 \\
 	2 & 1
@@ -245,7 +248,7 @@ SL(2,3) =
 \begin{bmatrix}
 	1 & 1 \\
 	0 & 1
-\end{bmatrix}, 
+\end{bmatrix},
 \begin{bmatrix}
 	1 & 1 \\
 	1 & 2
@@ -293,7 +296,7 @@ SL(2,3) =
 \begin{bmatrix}
 	2 & 2 \\
 	0 & 2
-\end{bmatrix}, 
+\end{bmatrix},
 \begin{bmatrix}
 	2 & 2 \\
 	1 & 0
@@ -301,13 +304,13 @@ SL(2,3) =
 \begin{bmatrix}
 	2 & 2 \\
 	2 & 1
-\end{bmatrix} 
+\end{bmatrix}
 \bigg\}
-$. \\ \\ 
-For generating set $S$ with three pairs of elements and its inverses \\ \\ 
+$. \\ \\
+Let us now consider the following inverse-closed and unit-free generating set for $SL(2,3)$: \\ \\
 $
-S = 
-\bigg\{ 
+S =
+\bigg\{
 \begin{bmatrix}
 	1 & 1 \\
 	1 & 2
@@ -332,9 +335,9 @@ S =
 	1 & 1 \\
 	2 & 0
 \end{bmatrix}
-\bigg\} 
+\bigg\}
 $ \\ \\
-Cayley graph $C(SL(2,3),S)$ has order 24, $d=6$ and $k=2$.  
+The corresponding Cayley graph $C(SL(2,3),S)$ has order $24$, degree $d=6$ and diameter $k=2$.
 
 \begin{figure}[!ht]
 	\centering
@@ -342,7 +345,28 @@ Cayley graph $C(SL(2,3),S)$ has order 24, $d=6$ and $k=2$.
 	\caption{ Output of circos ~\cite{Circos} of $C(SL(2,3), S)$ }
 \end{figure}
 
-The generating set S of the group $G=SL(2,3)$ in this example has the form $\{ x_1,x_1^{-1},x_2,x_2^{-1},x_3,x_3^{-1}\}$. To verify that the Cayley graph $C(G,S)$ has diameter $2$ one would have to show that the set $S$ together with the identity and with all products $x_i^{\pm 1}y_j^{\pm 1}$ gives the entire group $G$. 
+The generating set $S$ of the group $G=SL(2,3)$ in this example has the form $\{ x_1,x_1^{-1},x_2,x_2^{-1},x_3,x_3^{-1}\}$. To verify that the Cayley graph $C(G,S)$ has diameter $2$ one would have to show that the set $S$ together with the identity and with all products $x_i^{\pm 1}y_j^{\pm 1}$ gives the entire group $G$.
+
+***Include here the text you had in the Students Conference version.***
+%%%%%
+We tested the above code on a larger group, $G=SL(2,5)$, of order $120$. By the Moore bound for diameter $2$ the first feasible size of a symmetric unit-free generat    ing set $S$ is $|S|=12$.
+ 
+To have an idea how big the task of checking all such subsets be, let us make a calculation. The group $G$ has exactly one involution and so $118$ non-involutory el    ements coming in pairs (an element with its inverse). So, one has a set $118/2=59$ elements (containing no inverse pair) to choose from. Assuming that our set $S$ do    es not contain an involution, we would have to test all choices of $12/2=6$ elements from a set of $59$ elements, which means testing ${59 \choose 6} = 45057474 $ ca    ses, that is, more than 45 million of possibilities (and this is just a lower bound). This shows that even this modestly looking case is computationally demanding (w    hen taking into account that after a set has been chosen one still has to test for diameter)
+
+ 
+Since the numbers would increase dramatically for larger degrees we decided to restrict ourselves to a random search for suitable generating set $S$ that would give     a Cayley graph $C(G,S)$ of diameter $2$. The following table summarizes our random search results for generating sets $S$ of size $d$ for the group $G=SL(2,5)$ such     that the Cayley graph $C(G,S)$ has diameter $2$:
+ 
+ 
+\begin{tabular}[htbp]{l*{10}{c}r}
+     $d$ & $12$ & $13$ & $14$ & $15$ & $16$ & $17$ & $18$ & $19$ & $20$ & $21$ \\
+\hline
+     Found graphs & $0$ & $0$  & $0$ & $1$ & $107$ & $345$ & $2451$  & $4120$ & $11669$ & $14926$ \\
+\end{tabular} \\ \\
+ 
+We also run our randomized algorithm to find Cayley graphs of relatively small degree and diameter $2$ for the next group in this family, $SL(2,7)$, of order $336$.     It turned out that our randomized search failed to find any such Cayley graph of degree $d$ satisfying $20 \le d \le 25$. Again, $20$ is the first realistic degree t    o try, but now the number of possibilities to search through is astronomical. Indeed, by a similar calculation as illustrated above, one would obtain ${167\choose 10    } = 3532580013585348 $ possibilities! Thus,  for a randomized search such a negative result is not a surprise.
+ 
+As already mentioned, we could not find results (or a code) related to the degree/diameter problem for special linear groups. On the other hand, such groups play an     important role in the study of symmetric discrete structures, which makes them prime candidates to be tested in the context of the degree/diameter problem as well.
+%%%%%
 
 \lstset{
 	basicstyle=\footnotesize,
@@ -351,39 +375,29 @@ The generating set S of the group $G=SL(2,3)$ in this example has the form $\{ x
 
 \subsection{Generation of cayley graphs with given diameter}
 
-All of our Cayley graphs which are generated through its symmetric sets were choosed randomly. As mentioned earlier choosing random symmetric sets consits of choosing elements of group with its inverses over finite field arithmetic. In our implementation all elements of group were precomputed. Every element $A$ had its inverse computed by formula:
-\begin{align}
-	\frac{1}{det(A)}adjugate(A) = A^{-1}
-\end{align}
-We also keept all involutions apart in case of choosing last element for sets with odd size. 
+All of our Cayley graphs which are generated through its symmetric sets were which choosed randomly. Elements choosed to all generating sets were precomputed before. We also keept all involutions apart in case of choosing last element for sets with odd size. We present algorithm for generation of Cayley graph in the form of a pseudocode. 
+As an input procedure takes {\em generating set} in our case symmetric set of matrices. We copy all matrices into {\em stack} array functioning as a placeholder for all elements which weren't multiplied by elements for {\em generating set}. We make a mark on each of them in array {\em generating nodes} to make sure they won't get into {\em stack} again. We also put mark on first one with variable {\em current node}, name is a shortcut for currently generating node. Procedure continues into loop with terminantion set on empty {\em stack} array, in other words we are out of unique generating nodes. Inner loop is multiplying our marked node from stack by all elements in {\em generating set}. Every result is placed in two dimensional array called {\em cayley graph} on place of {\em current node} which is an array. Such assigning puts {\em result} at the end of array. Structure of {\em cayley graph} can be interpreted as graph with indeces being nodes and array on each such node as directed edges with origing in it. Result of multiplication is then tested for uniqness in {\em if} condition by checking index in {\em generating nodes} array. If it's unique we put it at the end of stack and make a mark in {\em generating nodes}. Exiting inner loop we continue by throwing out first element in {\em stack} and making first one {\em current node}. Procedure ends with returning of filled up {\em cayley graph}.  ~\\
 
-We present algorithm for generation of Cayley graph in pseudocode. ~\\
+\lstinputlisting[language=Perl, frame=sinlge]{cayley_graph_generation.pl}
 
-\lstinputlisting[language=Perl, frame=sinlge]{cayley_graph_generation.pl} 
-
-On lines $8,10,12$ we denoted by $[ r ]$ putting resulting matrix into so called associative array also known as dictionary or hash array. It's worth mentioning that there exists perfect hash function for matrices over finite fields for such purposes. Algorithm uses $stack[]$ for storing matrices which weren't multiplied over generating set while $generating\_nodes[]$ to keep them unique to keep memory overhead low at cost of computation of hash. 
-
-Precomputations could be made for finding inverse and creating Cayley table for matrix multiplications, making generation of graph and diameter check matter of accessing memory. While this implementation should give faster performance results, it was considered at later stages and was not implemented. Precomputations of Cayley table are limited by size of RAM memory and possible only in smaller groups. 
-
-To check diameter of graph one has to make only computations on generating set. To check wheter graph has diameter $k$ it's required least if graph has not of diameter $k-1$. To find unknown $k$ one has to iterate through all $k \in {1 \dots}$ diameters. We didn't use algorithm for special case of $k=1$ which was checked only by checking degree of all nodes in graph.  ~\\
+On lines $8,10,12$ we denoted by $[ r ]$  the operation of putting the resulting matrix into a so-called associative array, also known as dictionary or hash array. It's worth mentioning that there exists a perfect hash function for matrices over finite fields for such purposes. Our algorithm uses $stack[]$ for storing matrices which were not multiplied by generators  while $generating\_nodes[]$ is used to keep them unique to maintain memory overhead low at cost of hash computation.
 
 \lstinputlisting[language=Perl, frame=sinlge]{check_diameter.pl}
 
-\subsection{Computer search of graphs with diameter}
+\subsection{Computer search of graphs with diameter two}
 
-Here we present results of computer seach of graphs. We have choosed two approaches in order to find graphs with diameter two. In early stages of program we have tried to find graphs with generating fixed size of graphs on degree $d$. Later on we used adaptive algorithm to search any graph of diameter two with ability to improve its results if it's feasible. 
-
-Search with fixed size of generated graphs was used on two smaller groups $SL(2,5)$ and $SL(2,7)$. It's asssumed that Cayley graph will yield all elements of groups. Here we present table of results for $SL(2,5)$ with Moore bound for parameters $k=2$ and $|SL(2,5)| = 120$ is $d=11$, therefore search was done on degree $12$. $50000$ random graphs were genreated on each degree with following results: \\
+Here we present results of computer seach for Cayley graphs of diameter $2$ on special linear groups of small order. We have chosed two approaches in order to find graphs of diameter two and of degree as small as possible. In early stages of program we have tried to generate graphs with generating set with fixed size, $d$. 
+Later we used adaptive algorithm to search any graph of diameter two with ability to improve its results if it's feasible. Search with fixed size of generating set was used on two smaller groups $SL(2,5)$ and $SL(2,7)$. Here we present a table of results for $SL(2,5)$ for which the Moore bound for  parameters $k=2$ and $|SL(2,5)| = 120$ gives $11$ as the smallest feasible value of the degree $d$ to be considered. We begun our search at the value $d=12$. $50000$ random graphs were generated for each degree appearing in the table: \\
 
 \begin{tabular}[htbp]{l*{10}{c}r}
 	$d$	& $12$ & $13$ & $14$ & $15$ & $16$ & $17$ & $18$ & $19$ & $20$ & $21$ \\
 \hline
 	Found graphs & $0$ & $0$  & $0$ & $1$ & $107$ & $345$ & $2451$  & $4120$ & $11669$ & $14926$ \\
-\end{tabular} \\ \\ 
+\end{tabular} \\ \\
 
-Same approach was used on graphs in $SL(2,7)$ with order of $336$ with Moore bound on $d=19$. We have searched $150000$ graphs on each degree from $20$ to $30$ with only $10$ graphs found on $d=30$. 
+The same approach was used on Cayley graphs for the group $SL(2,7)$ with order of $336$ with Moore bound giving the minimum value of $d=19$. We have searched $150000$ graphs on each degree from $20$ to $30$ with only $10$ graphs found on $d=30$.
 
-By adaptive algorithm we mean automatized search of graphs in group. Program needs to be set up with starting size of generating set, time limit spent per degree, maximum of generated graphs per degree and number of parallel processes. In order to find some graph of given diameter program's tries to find any graph on degree. In case time limit is up it's continuing on set with bigger size making found graph further from Moore bound with bigger probability to find some. After first successfuly found graph search continues on smaller generating size with bigger time limit.
+By an adaptive algorithm we mean automatized search of graphs in groups. The program needs to be set up with starting size of a generating set, time limit spent per degree, maximum of generated graphs per degree and number of parallel processes. In order to find some graph with diameter $2$ the program tries to find any graph of a given  degree. In the case when the time limit is reached, the program continues to work with a generating set of a larger size. After first successfuly found graph the search continues on smaller-size generating set with bigger time limit.
 
 Tu pojdu vysledky z hladania lepsich grafov zo Zp 11, 13, 19
 
@@ -420,16 +434,16 @@ For comparsion we present latest known results for Cayley graphs with $k=2$
 			$28$ & $512$ & $65.52\%$ &       			$55$ & $1568$ & $51.81\%$ \\ \hline
 			$29$ & $512$ & $60.80\%$ &       			$56$ & $1568$ & $49.98\%$ \\ \hline
 			$30$ & $512$ & $56.82\%$ &       			$57$ & $1682$ & $51.75\%$ \\ \hline
-		\end{tabular}  
+		\end{tabular}
 	}
 \end{center}
 
-For implementation of our algorithms we choosed {\em Perl} programming language. Perl is high-level, general-purpose, interpreted programming language with great documentation and online community maintaining easy to use libraries. While Perl being high-level programming language multiplication of matrices in our program were actually implemented in C programming language implementation in choosed language more suitable. For this purpose we have used library called PDL or perl data language available at {\em CPAN}~\cite{CPAN}.
+For implementation of our algorithms we chose the {\em Perl} programming language. Perl is high-level, general-purpose, interpreted programming language with great documentation and online community maintaining easy to use libraries. While Perl being high-level programming language, multiplication of matrices in our program were actually implemented in C programming language. For this purpose we have used the library called PDL or perl data language available at {\em CPAN}~\cite{CPAN}.
 
 \section{The degree/girth problem}
-Finding graphs with smallest possible order denoted $n_{d,g}$ with given degree $d$ and girth $g\geq3$ is known as {\em degree/girth problem}. Motivation for findind such graphs could arise from constructing graphs with no cycles with length $g$ or less and its similarity to {\em degree/diameter problem}. Problem was studied first by Biggs ~\cite{Biggs} on regular graphs. 
+Finding regular graphs with smallest possible order denoted $n_{d,g}$ with given degree $d$ and girth $g\geq3$ is known as {\em degree/girth problem}. Motivation for finding such graphs could arise from constructing graphs with no cycles of length less than $g$ and its similarity to {\em degree/diameter problem}. The problem was studied first by Biggs ~\cite{Biggs}.
 \subsection{Moore bound}
-For odd $g$ we have Moore bound denoted by $M_{d,g}$ 
+For odd $g$ we have the Moore bound denoted by $M_{d,g}$
 \begin{equation*}
 	n_{d,g} \geq M(d,g) = 1 + d + d(d - 1) + d(d - 1)^{2} + \dots + d(d - 1)^{\frac{g-3}{2}}
 \end{equation*}	
@@ -438,50 +452,49 @@ and for even $g$
 	n_{d,g} \geq M(d,g) = 2(1 + (d - 1) + (d - 1)^{2} + \dots + (d - 1)^{\frac{g-2}{2}})
 \end{equation*}	
 
-For odd $g$ Moore bound constructed same as Moore bound for degree/diameter problem with $k=(g-1)/2$. For even $g$ we start with edge and from incident vertices we continue until we reach depth $(g-2)/2$. 
+For odd $g$ the Moore bound is obtained in the same way as the Moore bound for the degree/diameter problem for the diameter $k=(g-1)/2$. For even $g$ we start with an edge and from its incident vertices we continue growing two spanning trees until we reach depth $(g-2)/2$.
 \subsection{Moore graphs}
-Graphs with Moore bound equal to $M(d,g)$ are called Moore graphs or cages. We list all ceses with $n_{d,g} = M_{d,g}$ below:
+Graphs of degree $d$ and girth $g$ with order equal to $M(d,g)$ are called Moore graphs or cages. We list all cases with $n_{d,g} = M_{d,g}$ below:
 
-\begin{itemize} 
+\begin{itemize}
 	\item{\makebox[2cm]{For $d=2$,\hfill}$g \geq 2$ - circles}
-	\item{\makebox[2cm]{For $g=3$,\hfill}$d \geq 22$ - complete graphs}
-	\item{\makebox[2cm]{For $g=5$,\hfill}$d \geq 2$ - complete bipartite graphs}
-	\item{\makebox[2cm]{For $g=5$,\hfill}$d=2$ - circle with length $5$}
+	\item{\makebox[2cm]{For $g=3$,\hfill}$d \geq 2$ - complete graphs}
+	\item{\makebox[2cm]{For $g=4$,\hfill}$d \geq 2$ - complete bipartite graphs}
+	\item{\makebox[2cm]{For $g=5$,\hfill}$d=2$ - circle of length $5$}
 	\item[]{\makebox[2cm]{\hfill}$d=3$ - Peterssen graph}
 	\item[]{\makebox[2cm]{\hfill}$d=7$ - Hoffman-Singleton graph}
-	\item[]{\makebox[2cm]{\hfill}$d=57$ - possible, graph is unknown }
-	\item{\makebox[3cm]{For $g \in {6,8,12}$,\hfill}if $d-1$ is prime factor}
+	\item[]{\makebox[2cm]{\hfill}$d=57$ - this value has not been excluded but no such graph has been found yet }
+	\item{\makebox[3cm]{For $g \in {6,8,12}$,\hfill}if $d-1$ is a prime power}
 \end{itemize}
 
 \begin{figure}[!ht]
 	\centering
 	\includegraphics[scale=0.15]{Heawood_graph.png}
-	\caption{Heawood graph is Moore graph with $d=3$ and $g=6$ }
+	\caption{The Heawood graph is a Moore graph with $d=3$ and $g=6$ }
 \end{figure}
 
-\subsection{Example of Cayley graph}
-Here we present example of Cayley graph on group $SL(2,3)$ with order $|SL(2,3)|=24$
+\subsection{Example of a Cayley graph ***specify parameters***}
+Here we present an example of a Cayley graph on the group $SL(2,3)$ of order $|SL(2,3)|=24$
 
-\subsection{Generation of cayley graphs with given girth}
-Same as for diameter we check girth of graph making computations on generating set. Checking if girth $g$ on graph we have to confirm that graphs doesn't have cycle with length $3 \leq n \leq g-1$. Here we present algorithm used for computation of girth:
+\subsection{Generation of Cayley graphs with given girth}
+
+As in the case of diameter, for determining the girth of a Cayley graph it is sufficient to consider only multiplication by elements of the generating set. 
+To conclude that a graph has girth $g$ it is sufficient to have a cycle of length $g$ but no cycles of any smaller length. Here we present our algorithm used for computation of  the girth of a Cayley graph:
 
 \lstinputlisting[language=Perl, frame=sinlge]{check_girth.pl}
 
 Tu pojdu vysledky
 
+\newpage
+
 \section{Conclusion}
 
-In our work we discussed problems of construction of graphs with restriction on {\em degree/diameter} and {\em degree/girth}. We discussed theoretical bounds on both problems called after Moore and special cases of graphs reaching Moore bound. We introduced Cayley graphs as special case with symmetric properties. Symmetric properties allowed making them ideal for computation of our restrictions of random graphs. Considering Cayley graphs generated from special linear group over Galois field we have tried to find best possible resutls with computer search with some graphs found in smaller groups. We described implementation and our approach in search for such graphs with our results.   
-
-\section{Abstract}
-
-This bachelor thesis discuss two problems concerning construction of graphs with given restriction, namely {\em degree/diameter} and {\em degree/girth} problem. In our work we describe both problems, its theoretically possible bounds and some research results with focus on special case of Cayley graphs. We present algorithm for generating Cayley graph and exploitation of symmetry of Cayley graphs with computation of it's girth and diameter just on its symmeteric generating set. We also triedto find graphs as close to theoretical bound of both problems as possible and we list some of results in our randomized search in Special linear group consisting of linear transformations over Glois field with smaller prime orders.
-
+In our work we discussed problems of construction of graphs with restriction on {\em degree/diameter} and {\em degree/girth}. We discussed theoretical bounds on both problems called after Moore and special cases of graphs reaching the Moore bound. We introduced Cayley graphs as a special case of graphs with a `high level of symmetry'. Cayley graphs of a given degree and diameter (or girth) have been considered before, but to the best of our knowledge not on special two-dimensional linear groups. This was the reason why we tried to extend the search to such groups of comparatively small order, and to diameter 2 and small girth. We described implementation and our approach in search for such graphs with our results.
 
 \begin{thebibliography}{xx}
 
 \bibitem{Bas-Mil} E. T. Baskoro and M. Miller, On the construction of networks with minimum diameter,
-Australian Computer Science Communications C 15 (1993) 739–743.
+Australian Computer Science Communications C 15 (1993) 739?743.
 
 \bibitem{Bev-Ers} D. Bevan, G. Erskine and R. Lewis, Large circulant graphs of fized diameter and arbitrary degree, Ars Math. ontemp. 13 (2017), 275--29.
 
@@ -495,8 +508,6 @@ Maximum degree in graphs of diameter 2, Networks 10
 
 \bibitem{Hof-Sin} A. J. Hoffman and R. R. Singleton, On Moore graphs with diameter $2$ and $3$, IBM J. Res. Develop. 4 (1960), 497--504.
 
-\bibitem{Jaj-Mac} R. Jajcay, M. Ma\v{c}aj and J. \v{S}ir\'a\v{n}, 
-
 \bibitem{Mil-Sir} M. Miller and J. \v{S}ir\'a\v{n},  Moore graphs and beyond: A survey, 2nd Ed., Electr. J. Combin. 2013, Dynamic Survey DS15.
 
 \bibitem{Sia-Sir} J. \v{S}iagiov\'a and J. \v{S}ir\'a\v{n}, Approaching the Moore bound for diameter two by Cayley graphs, J. Combin. Theory Ser. B 102 (2012) 470--473.
@@ -505,16 +516,8 @@ Maximum degree in graphs of diameter 2, Networks 10
 
 \bibitem{Circos} Circo, http://circos.ca
 
-\bibitem{CPAN} PDL, https://metacpan.org/pod/PDL 
+\bibitem{CPAN} PDL, https://metacpan.org/pod/PDL
 
 \end{thebibliography}
 
 \end{document}
-
-\subsubsection{Star product and compounding}
-
-Star product and compounding are techniques for producing large graphs with given degree and diameter. \\
-
-Star product of two graphs $H$ and $K$. Fix orientation of $H$ and let $E$ be set of oriented edges of $H$. For each dart $uv \in E$, let $\phi_{uv}$ be a bijection on the set $V(K)$. Vertex set of star product $H \star K$ is $V(H) \times V(K)$, and a vertex $(u,k)$ is joined to $(v,l)$ in new graph if and only if either $u = v$ and $kl$ is an edge of $K$, or if $uv \in E$ and $l = \phi_{uv}(k)$.
-
-Compounding of two graphs $G$ and $H$ is made by taking $|V(H)|$ copies of $G$, indexed by vertices of $H$, and joining of two copies $G_{u}$, $G_{v}$ of $G$ by edge whenever $uv$ is an edge of $H$.
