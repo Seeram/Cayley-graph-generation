@@ -347,27 +347,6 @@ The corresponding Cayley graph $C(SL(2,3),S)$ has order $24$, degree $d=6$ and d
 
 The generating set $S$ of the group $G=SL(2,3)$ in this example has the form $\{ x_1,x_1^{-1},x_2,x_2^{-1},x_3,x_3^{-1}\}$. To verify that the Cayley graph $C(G,S)$ has diameter $2$ one would have to show that the set $S$ together with the identity and with all products $x_i^{\pm 1}y_j^{\pm 1}$ gives the entire group $G$.
 
-***Include here the text you had in the Students Conference version.***
-%%%%%
-We tested the above code on a larger group, $G=SL(2,5)$, of order $120$. By the Moore bound for diameter $2$ the first feasible size of a symmetric unit-free generat    ing set $S$ is $|S|=12$.
- 
-To have an idea how big the task of checking all such subsets be, let us make a calculation. The group $G$ has exactly one involution and so $118$ non-involutory el    ements coming in pairs (an element with its inverse). So, one has a set $118/2=59$ elements (containing no inverse pair) to choose from. Assuming that our set $S$ do    es not contain an involution, we would have to test all choices of $12/2=6$ elements from a set of $59$ elements, which means testing ${59 \choose 6} = 45057474 $ ca    ses, that is, more than 45 million of possibilities (and this is just a lower bound). This shows that even this modestly looking case is computationally demanding (w    hen taking into account that after a set has been chosen one still has to test for diameter)
-
- 
-Since the numbers would increase dramatically for larger degrees we decided to restrict ourselves to a random search for suitable generating set $S$ that would give     a Cayley graph $C(G,S)$ of diameter $2$. The following table summarizes our random search results for generating sets $S$ of size $d$ for the group $G=SL(2,5)$ such     that the Cayley graph $C(G,S)$ has diameter $2$:
- 
- 
-\begin{tabular}[htbp]{l*{10}{c}r}
-     $d$ & $12$ & $13$ & $14$ & $15$ & $16$ & $17$ & $18$ & $19$ & $20$ & $21$ \\
-\hline
-     Found graphs & $0$ & $0$  & $0$ & $1$ & $107$ & $345$ & $2451$  & $4120$ & $11669$ & $14926$ \\
-\end{tabular} \\ \\
- 
-We also run our randomized algorithm to find Cayley graphs of relatively small degree and diameter $2$ for the next group in this family, $SL(2,7)$, of order $336$.     It turned out that our randomized search failed to find any such Cayley graph of degree $d$ satisfying $20 \le d \le 25$. Again, $20$ is the first realistic degree t    o try, but now the number of possibilities to search through is astronomical. Indeed, by a similar calculation as illustrated above, one would obtain ${167\choose 10    } = 3532580013585348 $ possibilities! Thus,  for a randomized search such a negative result is not a surprise.
- 
-As already mentioned, we could not find results (or a code) related to the degree/diameter problem for special linear groups. On the other hand, such groups play an     important role in the study of symmetric discrete structures, which makes them prime candidates to be tested in the context of the degree/diameter problem as well.
-%%%%%
-
 \lstset{
 	basicstyle=\footnotesize,
 	tabsize=2
@@ -380,22 +359,33 @@ As an input procedure takes {\em generating set} in our case symmetric set of ma
 
 \lstinputlisting[language=Perl, frame=sinlge]{cayley_graph_generation.pl}
 
-On lines $8,10,12$ we denoted by $[ r ]$  the operation of putting the resulting matrix into a so-called associative array, also known as dictionary or hash array. It's worth mentioning that there exists a perfect hash function for matrices over finite fields for such purposes. Our algorithm uses $stack[]$ for storing matrices which were not multiplied by generators  while $generating\_nodes[]$ is used to keep them unique to maintain memory overhead low at cost of hash computation.
+On lines $5,12,14,16$ we denoted by $[ result ]$  the operation of putting the resulting matrix into a so-called associative array, also known as dictionary or hash array. It's worth mentioning that there exists a perfect hash function for matrices over finite fields for such purposes.
+
+
 
 \lstinputlisting[language=Perl, frame=sinlge]{check_diameter.pl}
 
+For implementation of our algorithms we chose the {\em Perl} programming language. Perl is high-level, general-purpose, interpreted programming language with great documentation and online community maintaining easy to use libraries. While Perl being high-level programming language, multiplication of matrices in our program were actually implemented in C programming language. For this purpose we have used the library called PDL or perl data language available at {\em CPAN}~\cite{CPAN}.
+
 \subsection{Computer search of graphs with diameter two}
 
-Here we present results of computer seach for Cayley graphs of diameter $2$ on special linear groups of small order. We have chosed two approaches in order to find graphs of diameter two and of degree as small as possible. In early stages of program we have tried to generate graphs with generating set with fixed size, $d$. 
-Later we used adaptive algorithm to search any graph of diameter two with ability to improve its results if it's feasible. Search with fixed size of generating set was used on two smaller groups $SL(2,5)$ and $SL(2,7)$. Here we present a table of results for $SL(2,5)$ for which the Moore bound for  parameters $k=2$ and $|SL(2,5)| = 120$ gives $11$ as the smallest feasible value of the degree $d$ to be considered. We begun our search at the value $d=12$. $50000$ random graphs were generated for each degree appearing in the table: \\
-
+We tested the above code on a group, $G=SL(2,5)$, of order $120$. By the Moore bound for diameter $2$ the first feasible size of a symmetric unit-free generating set $S$ is $|S|=12$.
+ 
+To have an idea how big the task of checking all such subsets be, let us make a calculation. The group $G$ has exactly one involution and so $118$ non-involutory elements coming in pairs (an element with its inverse). So, one has a set $118/2=59$ elements (containing no inverse pair) to choose from. Assuming that our set $S$ does not contain an involution, we would have to test all choices of $12/2=6$ elements from a set of $59$ elements, which means testing ${59 \choose 6} = 45057474 $ cases, that is, more than 45 million of possibilities (and this is just a lower bound). This shows that even this modestly looking case is computationally demanding (when taking into account that after a set has been chosen one still has to test for diameter)
+ 
+Since the numbers would increase dramatically for larger degrees we decided to restrict ourselves to a random search for suitable generating set $S$ that would give     a Cayley graph $C(G,S)$ of diameter $2$. The following table summarizes our random search results for generating sets $S$ of size $d$ for the group $G=SL(2,5)$ such     that the Cayley graph $C(G,S)$ has diameter $2$: ~ \\
+ 
 \begin{tabular}[htbp]{l*{10}{c}r}
-	$d$	& $12$ & $13$ & $14$ & $15$ & $16$ & $17$ & $18$ & $19$ & $20$ & $21$ \\
+     $d$ & $12$ & $13$ & $14$ & $15$ & $16$ & $17$ & $18$ & $19$ & $20$ & $21$ \\
 \hline
-	Found graphs & $0$ & $0$  & $0$ & $1$ & $107$ & $345$ & $2451$  & $4120$ & $11669$ & $14926$ \\
+     Found graphs & $0$ & $0$  & $0$ & $1$ & $107$ & $345$ & $2451$  & $4120$ & $11669$ & $14926$ \\
 \end{tabular} \\ \\
 
-The same approach was used on Cayley graphs for the group $SL(2,7)$ with order of $336$ with Moore bound giving the minimum value of $d=19$. We have searched $150000$ graphs on each degree from $20$ to $30$ with only $10$ graphs found on $d=30$.
+ We also run our randomized algorithm to find Cayley graphs of relatively small degree and diameter $2$ for the next group in this family, $SL(2,7)$, of order $336$.The same approach was used on Cayley graphs for the group $SL(2,7)$ with order of $336$ with Moore bound giving the minimum value of $d=19$. We have searched $150000$ graphs on each degree from $20$ to $30$ with only $10$ graphs found on $d=30$. Again, $20$ is the first realistic degree to try, but now the number of possibilities to search through is astronomical. Indeed, by a similar calculation as illustrated above, one would obtain ${167\choose 10} = 3532580013585348$ possibilities! Thus, for a randomized search such a small number of resulting graphs is not a surprise.
+ 
+As already mentioned, we could not find results (or a code) related to the degree/diameter problem for special linear groups. On the other hand, such groups play an     important role in the study of symmetric discrete structures, which makes them prime candidates to be tested in the context of the degree/diameter problem as well.
+
+%%% TU POKRACUJ S Adaptive search algorithm
 
 By an adaptive algorithm we mean automatized search of graphs in groups. The program needs to be set up with starting size of a generating set, time limit spent per degree, maximum of generated graphs per degree and number of parallel processes. In order to find some graph with diameter $2$ the program tries to find any graph of a given  degree. In the case when the time limit is reached, the program continues to work with a generating set of a larger size. After first successfuly found graph the search continues on smaller-size generating set with bigger time limit.
 
@@ -437,8 +427,6 @@ For comparsion we present latest known results for Cayley graphs with $k=2$
 		\end{tabular}
 	}
 \end{center}
-
-For implementation of our algorithms we chose the {\em Perl} programming language. Perl is high-level, general-purpose, interpreted programming language with great documentation and online community maintaining easy to use libraries. While Perl being high-level programming language, multiplication of matrices in our program were actually implemented in C programming language. For this purpose we have used the library called PDL or perl data language available at {\em CPAN}~\cite{CPAN}.
 
 \section{The degree/girth problem}
 Finding regular graphs with smallest possible order denoted $n_{d,g}$ with given degree $d$ and girth $g\geq3$ is known as {\em degree/girth problem}. Motivation for finding such graphs could arise from constructing graphs with no cycles of length less than $g$ and its similarity to {\em degree/diameter problem}. The problem was studied first by Biggs ~\cite{Biggs}.
