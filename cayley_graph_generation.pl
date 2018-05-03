@@ -1,16 +1,23 @@
-1	push all from generating_set[] to stack[]
-2   current_node = first element of stack[]
-3   
-4   while stack[] not empty
-5		foreach generating_element in generating_set[]
-6 			r = current_node x generating_element % Zp
-7			cayley_graph[ current_node ] = r
-8
-9			if generating_nodes[r] is empty
-10				push stack[], r
-11 				generating_nodes[r] = r
-12
-13		shift to the left stack[]
+1 function cayley_graph_generation(generating_set[])
+2 {
+3     push all from generating_set[] to stack[]
+4
+5     foreach element in generating_set[]
+6         generating_nodes[ element ] = element
+7
+8     current_node = first element of stack[]
+9   
+10    while stack[] not empty
+11        foreach generating_element in generating_set[]
+12            result = current_node x generating_element % Zp
+13            cayley_graph[ current_node ] = result
 14
-15		if stack[] not empty
-16			current_node = first element of stack[]
+15        if generating_nodes[ result ] is empty
+16            push stack[], result
+17            generating_nodes[ result ] = result
+18
+19        shift to the left stack[]
+20        current_node = first element of stack[]
+21
+22    return cayley_graph[]
+21}

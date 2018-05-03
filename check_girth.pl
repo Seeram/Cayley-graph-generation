@@ -13,11 +13,11 @@
 13	if(find_cycle(generating_set[], grith) {
 14		foreach i in ( 3..girth - 1 )	{
 15			if(find_cycle(generating_set[], i)) {
-16				return has not given girth
+16				return girth i
 17			}
 18		}
 19		return graph has given girth 
 20	} else {
-21		return has not given girth
+21		return has bigger girth
 22	}
 23 }
