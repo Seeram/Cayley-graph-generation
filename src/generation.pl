@@ -288,22 +288,40 @@ sub check_one_girth
 	}
 
 	my $eye = PDL::Matrix->pdl([[1,0],[0,1]]);
-
 	my @generation_set = @{ $generation_set_ref }; 
 
-	my $variations = variations_with_repetition([0...$#generation_set], $girth);
+	my $variations = variations_with_repetition([0..$#generation_set], $girth);
 	while (my $variation = $variations->next) {
 		my $m = $generation_set[$variation->[0]];
 		foreach my $j ( 1..($girth-1) ) {
 			$m = ($m x $generation_set[$variation->[$j]]) % $zp;
-		}
-		if(all $m == $eye) {
-			return 1;	
+			if(all $m == $eye) {
+				if($j == ($girth -1)) {
+						# Found cycle				
+					return 1;
+				} else {
+						# Too early
+					return 0;
+				}
+			}
 		}
 	}
 
 	return 0;
+}
 
+sub find_girth
+{
+	my ($generating_set_ref, $zp) = @_;
+
+	foreach my $girth ( 3..100 ) {
+		if(check_girth($generating_set_ref, $zp, $girth)) {
+			return $girth;
+		} else {
+		}
+	}
+
+	return 0;
 }
 
 sub check_girth
@@ -311,15 +329,15 @@ sub check_girth
 	my ($generation_set_ref, $zp, $girth) = @_;
 
 	if($girth < 3) {
-		print "Wrong girth in check one girth";
+		print "Girth less than 3 as an input";
 		exit;
 	}
 
 	if(check_one_girth($generation_set_ref, $zp, $girth)) {
 		foreach my $i ( 3..($girth - 1)) {
 			if(check_one_girth($generation_set_ref, $zp, $i)) {
-				return 0;	
-			}
+				return $i;	
+			} 		
 		}
 		return $girth;
 	} else {
@@ -616,7 +634,9 @@ sub compute_order_set
 
 sub make_graphical_output
 {
-	my ($graph, $generating_set_ref, $zp, $filename) = @_;
+	my ($graph, $generating_set_ref, $zp, $diameter, $filename) = @_;
+
+	
 
 	my $writer = Graph::Writer::Dot->new();
 	$writer->write_graph($graph, 'graf.dot');
@@ -745,6 +765,21 @@ sub get_random_index
 	}
 }
 
+sub get_random_index_girth
+{
+
+	my ($group_ref) = @_;
+
+	my $neutral_element = $group_ref->[2];
+
+	while(1) {
+		my $chosen_index = int(rand($#{ $group_ref->[0] } + 1 ));
+		if($chosen_index != $neutral_element) {
+			return $chosen_index;
+		}
+	}
+}
+
 sub get_random_generating_set 
 {
 	my ($group_ref, $zp, $required_size_of_set) = @_;
@@ -777,7 +812,7 @@ sub get_random_generating_set
 			return get_random_generating_set($group_ref, $zp, $required_size_of_set);
 		}
 
-		$chosen_index = get_random_index($group_ref);
+		$chosen_index = get_random_index_girth($group_ref);
 		#while(($chosen_index = int(rand($#{ $group_ref->[0] } + 1 ))) == $group_ref->[2]) {};
 
 		my $chosen_matrix = $group_ref->[0]->[$chosen_index];
@@ -871,25 +906,6 @@ sub generate_sets_randomly
 		#		} 		
 		$pm->finish;
 	}
-}
-sub	generate_cayley_graph_with_girth 
-{
-	my ($generating_set_ref, $zp, $hash_table_size, $size_of_generating_set, $girth) = @_;
-
-	if(check_girth($generating_set_ref, $zp, $girth)) {
-		if(check_symmetric_set($generating_set_ref, $zp, $size_of_generating_set)) {
-			save_cayley_graph($generating_set_ref, $girth, "results/girth/");
-			return $girth;
-		} else {
-			print "!!!!!!!!!!!!!!!! SET ERROR !!!!!!!!!!!!!!!!!!!!!!!\n";
-			save_cayley_graph($generating_set_ref, $girth, "set_error/");
-			return 0;
-		}
-	} else {
-		return 0;
-	}
-
-	return 0;
 }
 
 sub	generate_cayley_graph_with_diameter 
@@ -1184,28 +1200,6 @@ sub search_graphs_with_diameter
 	}
 }
 
-sub search_graphs_with_girth
-{
-	my ($field_bound, $diameter, $property) = @_;
-
-	srand time;
-	my $number_of_forks = 8;
-	my $hash_table_size = 154485863;
-	my $number_of_generated_graphs = 50000;
-	my $time_limit = 60; # seconds
-
-	my $nth_prime = 3;
-	while((my $zp = get_nth_prime($nth_prime)) < $field_bound) {
-		my @group;
-		my $zp = get_nth_prime($nth_prime);
-		init_group(\@group, $zp);
-		my $moore_degree;	# doplnit 
-		my $degree; # doplnit
-
-		$nth_prime++;
-	}
-}
-
 sub generate_one_graph
 {
 	srand time;
@@ -1241,6 +1235,42 @@ sub generate_one_graph
 	print "Fin\n";
 }
 
+sub search_graphs_with_girth
+{
+	my ($field_bound, $diameter, $property) = @_;
+
+	srand time;
+	my $number_of_forks = 12;
+	my $hash_table_size = 154485863;
+	my $number_of_generated_graphs = 50000;
+	my $time_limit = 60; # seconds
+	my $zp = get_nth_prime(6);
+	my @group;
+	init_group(\@group, $zp);
+	my $moore_degree = int(sqrt($#{ $group[0] }));
+	my $pm = new Parallel::ForkManager( $number_of_forks );
 
 
-search_graphs_with_diameter(99, 2);
+	foreach my $degree ( $moore_degree..(2 * $moore_degree) ) {
+		print "Starting with degree $degree\n";
+		foreach (1..1000) {
+			my $generating_set_ref = get_random_generating_set(\@group, $zp, $degree);
+
+			$pm->start and next;
+			my $girth = find_girth($generating_set_ref, $zp);
+			if(find_girth($generating_set_ref, $zp) == 5) {
+				print "Girth: $girth\n";
+				my @cayley_graph = generate_cayley_graph($generating_set_ref, $zp, $hash_table_size);
+				my @graph = generate_graph_from_cayley_graph(@cayley_graph);
+				make_graphical_output(@graph, "new");
+				<STDIN>;
+			} else {
+				print "$girth\n";
+			}
+
+			$pm->finish;
+		}
+	}
+}
+
+search_graphs_with_girth();
