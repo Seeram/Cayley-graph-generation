@@ -1211,11 +1211,18 @@ sub search_graphs_with_girth
 	srand time;
 <<<<<<< HEAD
 	my $number_of_forks = 4;
+<<<<<<< Updated upstream
 ||||||| merged common ancestors
 	my $number_of_forks = 12;
 =======
 	my $number_of_forks = 0;
 >>>>>>> 2daf026e8a84357db8f518d3bfc055c0b051287c
+||||||| merged common ancestors
+=======
+=======
+	my $number_of_forks = 0;
+>>>>>>> 2daf026e8a84357db8f518d3bfc055c0b051287c
+>>>>>>> Stashed changes
 	my $hash_table_size = 154485863;
 	my $number_of_generated_graphs = 50000;
 	my $time_limit = 60; # seconds
