@@ -254,6 +254,10 @@ sub check_one_diameter
 		return 1;
 	}
 
+	foreach my $m ( @{ $generation_set_ref } ) {
+		push @hash_storage, compute_hash($m, $zp);
+	}
+
 	foreach my $i ( 2..$diameter ) {
 		my $variations = variations_with_repetition([0...$#generation_set], $i);
 		while (my $variation = $variations->next) {
@@ -261,15 +265,12 @@ sub check_one_diameter
 			foreach my $j ( 1..($i-1) ) {
 				$m = ($m x $generation_set[$variation->[$j]]) % $zp;
 			}
-			push @hash_storage, compute_hash($m, $zp);
+			my $hash = compute_hash($m, $zp);
+			unless(List::Util::any { $_ == $hash } @hash_storage) {
+				push @hash_storage, compute_hash($m, $zp);
+			}
 		}
 	}
-
-	foreach my $m ( @{ $generation_set_ref } ) {
-		push @hash_storage, compute_hash($m, $zp);
-	}
-
-	@hash_storage = List::MoreUtils::uniq @hash_storage;
 
 	if(($#hash_storage + 1) == get_order_of_SL(2,$zp)) {
 		return 1;	
@@ -812,8 +813,7 @@ sub get_random_generating_set
 			return get_random_generating_set($group_ref, $zp, $required_size_of_set);
 		}
 
-		$chosen_index = get_random_index_girth($group_ref);
-		#while(($chosen_index = int(rand($#{ $group_ref->[0] } + 1 ))) == $group_ref->[2]) {};
+		$chosen_index = get_random_index($group_ref);
 
 		my $chosen_matrix = $group_ref->[0]->[$chosen_index];
 		push @generating_set, $chosen_matrix;
@@ -912,7 +912,6 @@ sub	generate_cayley_graph_with_diameter
 {
 	my ($generating_set_ref, $zp, $hash_table_size, $size_of_generating_set, $diameter, $check_diameter) = @_;
 
-
 	if(check_diameter($generating_set_ref, $zp, $diameter)) {
 		if(check_symmetric_set($generating_set_ref, $zp, $size_of_generating_set)) {
 			if($check_diameter) {
@@ -986,8 +985,9 @@ sub check_random_graphs
 			return 1;
 		}
 
-
+		print "Trying to get set\n";
 		my $generating_set_ref = get_random_generating_set($group_ref, $zp, $size_of_generating_set);
+
 
 		$pm->start("$counter") and next;
 			@time = gettimeofday();
@@ -1130,84 +1130,52 @@ sub search_graphs_with_diameter
 	my ($field_bound, $diameter) = @_;
 
 	srand time;
-	my $number_of_forks = 8;
+	my $number_of_forks = 4;
 	my $hash_table_size = 154485863;
-	my $number_of_generated_graphs = 1000;
-	my $time_limit = 10; # seconds
+	my $number_of_generated_graphs = 10000;
+	my $time_limit = 1000; # seconds
 
-	my $nth_prime = 3;
-	while((my $zp = get_nth_prime($nth_prime)) < $field_bound) {
-		my @group;
-		my $zp = get_nth_prime($nth_prime);
-		init_group(\@group, $zp);
-		my $moore_degree = int(sqrt($#{ $group[0] })) + 1;
-		my $degree = int($moore_degree * 1.25) + 4;
+	my @group;
+	my $zp = 11;
+	init_group(\@group, $zp);
+	my $moore_degree = int(sqrt($#{ $group[0] })) + 1;
+	my $degree = 15;
 
-		if($degree % 2) {
-			$degree -= 1;	
-		}	
-		while(!check_random_graphs(\@group, $zp, $degree, $number_of_forks, $hash_table_size, $number_of_generated_graphs, $time_limit, $diameter)) {
-			$degree += 2;
-			print "##############################################################################################\n" . 
-				  "Haven't found anything in SL(2,$zp) with order " . get_order_of_SL(2,$zp) . "\n" . 
-				  "Going forward: " . ($degree - $moore_degree) . "\n" .
-				  "Number of generated graphs: $number_of_generated_graphs\n" .
-				  "Time limit: $time_limit\n" .
-				  "Moore degree: $moore_degree\n" .
-				  "Size of generating set: $degree\n" .
-			      "##############################################################################################\n";
+	if($degree % 2) {
+		$degree -= 1;	
+	}	
 
-		}
+	my $step_back = 1;
 
-		my $step_back = 1;
-		my $adjusted_time_limit = 4 * $time_limit;
+	while(check_random_graphs(\@group, 
+							  $zp, 
+							  $degree - $step_back * 2, 
+							  $number_of_forks, 
+							  $hash_table_size, 
+							  2 * $step_back * $number_of_generated_graphs, 
+							  $time_limit, 
+							  2)) {
+		
+		$step_back++;
 		print "##############################################################################################\n" . 
 			  "Found something in SL(2,$zp) with order " . get_order_of_SL(2,$zp) . "\n" .
-			  "Number of generated graphs: $number_of_generated_graphs\n" . 
-			  "Moore degree: $moore_degree\n" .
-			  "Size of generating set: $degree\n\n" .
 			  "Going backwards taking $step_back. step back\n" .
 			  "Number of generated graphs: " . (2 * $step_back * $number_of_generated_graphs) . "\n" .
-			  "Time limit: " . $adjusted_time_limit . "\n" .
+			  "Time limit: " . $time_limit . "\n" .
 			  "Moore degree: $moore_degree\n" .
-			  "Size of generating set: " . ($degree - $step_back * 2) .  "\n" .
+			  "Size of generating set: ". ($degree - $step_back * 2) . "\n" .
 			  "##############################################################################################\n";
-		while(check_random_graphs(\@group, 
-								  $zp, 
-								  $degree - $step_back * 2, 
-								  $number_of_forks, 
-								  $hash_table_size, 
-								  2 * $step_back * $number_of_generated_graphs, 
-								  $adjusted_time_limit, 
-								  $diameter)) {
-			
-			$step_back++;
-			if(2 * $adjusted_time_limit > 5400) {
-				$adjusted_time_limit = 5400;
-			} else {
-				$adjusted_time_limit *= 3;
-			}
-			print "##############################################################################################\n" . 
-			      "Found something in SL(2,$zp) with order " . get_order_of_SL(2,$zp) . "\n" .
-				  "Going backwards taking $step_back. step back\n" .
-				  "Number of generated graphs: " . (2 * $step_back * $number_of_generated_graphs) . "\n" .
-				  "Time limit: " . $adjusted_time_limit . "\n" .
-			  	  "Moore degree: $moore_degree\n" .
-				  "Size of generating set: ". ($degree - $step_back * 2) . "\n" .
-			      "##############################################################################################\n";
-		}
-		$nth_prime++;
 	}
 }
 
 sub generate_one_graph
 {
 	srand time;
-	my $number_of_forks = 8;
+	my $number_of_forks = 4;
 	my $hash_table_size = 154485863;
 	my $number_of_generated_graphs = 5;
 	my $time_limit = 3600; # seconds
-	my $zp = get_nth_prime(3);
+	my $zp = get_nth_prime(4);
 	my @group;
 	init_group(\@group, $zp);
 	my $degree = int(sqrt($#{ $group[0] }));
@@ -1240,11 +1208,11 @@ sub search_graphs_with_girth
 	my ($field_bound, $diameter, $property) = @_;
 
 	srand time;
-	my $number_of_forks = 12;
+	my $number_of_forks = 4;
 	my $hash_table_size = 154485863;
 	my $number_of_generated_graphs = 50000;
 	my $time_limit = 60; # seconds
-	my $zp = get_nth_prime(6);
+	my $zp = get_nth_prime(4);
 	my @group;
 	init_group(\@group, $zp);
 	my $moore_degree = int(sqrt($#{ $group[0] }));
@@ -1273,4 +1241,5 @@ sub search_graphs_with_girth
 	}
 }
 
-search_graphs_with_girth();
+search_graphs_with_diameter(99, 2);
+#search_graphs_with_girth();
