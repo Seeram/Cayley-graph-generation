@@ -45,10 +45,10 @@
      \vskip 5cm          %\vskip 2cm             %zmena kvoli zobrazovaniu dnesneho datumu
      \normalsize
          \begin{tabular}[l]{p{0.27\textwidth}p{0.73\textwidth}}
-			 \v{S}tud\'ijny program: & Matematicko-po\v{c}ita\v{c}ov\'e modelovanie \\
-         	\v{S}ud\'ijny odbor: & Aplikovan\'a matematika \\
-         	\v{S}koliace pracovisko: & Katedra matematiky a deskript\'ivnej geometrie \\
-			 Ved\'uci z\'avere\v{c}nej pr\'ace: & Jana \v{S}iagiov\'a \\
+			 Study program: & Mathematical and Computational Modelling  \\
+			 Major: & 9.1.9 Applied Mathematics  \\
+         	 Department: & Department of Mathematics and Constructive Geometry\\
+			 Supervisor: & Jana \v{S}iagiov\'a \\
          \end{tabular}
      \vskip 3cm
      \centerline{\large \bf{Bratislava 2018}}
@@ -64,7 +64,9 @@
 
 \section{Abstract}
 
-This bachelor thesis discuss two problems concerning construction of graphs with given restriction, namely {\em degree/diameter} and {\em degree/girth} problem. In our work we describe both problems, the associated theoretical bounds and some research results with focus on Cayley graphs on 2-dimensional special linear groups over finite fields. We present algorithm for generating such Cayley graphs of diameter 2, looking for smallest possible degree. We used randomized search over generating sets of predetermined sizes in small special linear groups of dimension 2 over finite fields.
+This bachelor thesis discuss two problems concerning construction of graphs with given restriction, namely {\em degree/diameter} and {\em degree/girth} problem. In our work we describe both problems, the associated theoretical bounds and some research results with focus on Cayley graphs on $2$-dimensional special linear groups over finite fields. We present algorithm for generating such Cayley graphs of diameter 2, looking for smallest possible degree. We used randomized search over generating sets of predetermined sizes in small special linear groups of dimension 2 over finite fields. ~ \\
+
+Pr\'aca pojedn\'ava o dvoch probl\'emoch pri kon\v{s}trukci\'i grafov s predur\v{c}en\'ymi obmedzeniami, konkr\'etne probl\'em stup\v{n}a a priemeru a stup\v{n}a a obvodu. V pr\'aci popisujeme oba probl\'emy, ich teoretick\'e ohrani\v{c}enia a v\'ysledky vedeck\'eho v\'yskumu so zameran\'im na Cayleyho grafy on $2$-rozmern\'ych \v{s}peci\'alnych line\'arnych grup\'ach nad kone\v{c}n\'ymi po\v{l}ami. V pr\'aci uv\'adzame algoritmus pre generovanie Cayleyho grafu priemeru 2, pri ktor\'ych h\v{l}ad\'ame tak\'y s \v{c}o najmen\v{s}\'im mo\v{z}n\'ym stup\v{n}om. Na h\v{l}adanie sme pou\v{z}ili n\'ahodn\'e vyh\v{l}ad\'avanie v mno\v{z}in\'ach s predur\v{c}enou ve\v{l}os\v{t}ou v mal\'ych \v{s}peci\'alnych line\'arnych grup\'ach dimenzie 2 nad kone\v{c}n\'ymi po\v{l}ami.
 
 \newpage
 
@@ -354,27 +356,30 @@ The generating set $S$ of the group $G=SL(2,3)$ in this example has the form $\{
 
 \subsection{Generation of cayley graphs with given diameter}
 
-We present algorithm for generation of Cayley graph in the form of a pseudocode with short description. ~ \\
-As an input procedure takes {\em generating\_set} in our case symmetric set of matrices. We copy all matrices into {\em stack} array functioning as a placeholder for all elements which weren't multiplied by elements from {\em generating\_set}. We make a mark on each of them in array {\em generating\_nodes} to make sure they won't get into {\em stack} again. We also put mark on first one with variable {\em current\_node}, name is a shortcut for currently generating node. Procedure continues into loop with terminantion set on empty {\em stack} array, in other words we are out of unique generating nodes. Inner loop is multiplying our marked node from stack by all elements in {\em generating\_set}. Every result is placed in two dimensional array called {\em cayley\_graph} on place of {\em current\_node} which is an array. Such assigning puts {\em result} at the end of array. Structure of {\em cayley\_graph} can be interpreted as graph with indeces being nodes and array on each such node as directed edges with origing in it. Result of multiplication is then tested for uniqness in {\em if} condition by checking index in {\em generating\_nodes} array. If it's unique we put it at the end of stack and make a mark in {\em generating nodes}. Exiting inner loop we continue by throwing out first element or shift in {\em stack} and making first one {\em current\_node}. Procedure ends with returning filled up {\em cayley\_graph} structure.  ~\\
+We present an algorithm for generation of Cayley graphs of given degree and diameter in the form of a pseudocode with a short description. ~ \\
+Input of the procedure is {\em generating\_set} in our case symmetric set of matrices in SL(2,q), where q is a prime number.
+
+We copy all matrices into {\em stack} array functioning as a placeholder for all elements which were not multiplied by elements from {\em generating\_set}. We make a mark on each of them in the  {\em generating\_nodes} array to make sure they will not get into {\em stack} again. We also put a mark on the first one with variable {\em current\_node}, the name being a shortcut for currently generating node. The procedure continues into a loop with terminantion set on emptying the {\em stack} array, which means having no generating nodes. The inner loop is multiplying our marked node from stack by all elements in {\em generating\_set}. Every result is placed in a two-dimensional array called {\em cayley\_graph} on index of {\em current\_node} which is an array. Such assigning puts appends {\em result} at the end of array. The structure of {\em cayley\_graph} can be interpreted as graph with indices being nodes and array on each such node as directed edges emanating from it. The result of multiplication is then tested for uniqness in {\em if} condition by checking index in {\em generating\_nodes} array. If it is unique we put it at the end of stack and make a mark in {\em generating nodes}. After exiting the inner loop we continue by throwing out first element in {\em stack} and making first one the {\em current\_node}. The procedure ends with returning filled up {\em cayley\_graph} structure.  ~\\
 
 \lstinputlisting[language=Perl, frame=sinlge]{cayley_graph_generation.pl}
 
-On lines $6,13,15,17$ we denoted by $[ result ]$  the operation of putting the resulting matrix into a so-called associative array, also known as dictionary or hash array. It's worth mentioning that there exists a perfect hash function for matrices over finite fields for such purposes.
+On lines $6,13,15,17$ we denoted by $[ result ]$  the operation of putting the resulting matrix into a so-called associative array, also known as dictionary or hash array. It is worth mentioning that there exists a perfect hash function for matrices over finite fields for such purposes.
 
-Checking diameter of Cayley graph can be done via multiplications on {\em generating\_set}. In next part we describe algorithm for such pourpose with brief description. As an input procedure takes {\em generating\_set} and {\em diameter} we want check on graph. First we put all elements of {\em generating\_set} into {\em reached\_nodes}. Next loop iterates over all $n \in \{2 \dots diameter\}$. While inner loop iterates over all variations with repetition of indeces of length $n$ from {\em generating\_set}. We assign each variation to array {\em var} and multiply {\em generating\_set} elements in same order as saved indeces in {\em var}. We put multiplicatoin result into {\em reached\_nodes}. After exiting inner loop we get all multiplication results we want of length $n$ with it's possible wheter Cayley graph has diameter {\em n}. Graph has diameter {\em n} if we got all nodes of Cayley graph. Our function checks all diameters up to {\em diameter}. If algorithm fails to return any diameter graph has bigger one. Algorithm doesn't deal with case of diameter $1$ which can be done by checking degrees on each vertex on Cayley graph. case for checking graphs with diameter $2$. Only after confirmation that our algorithm will produce all nodes we have to generate graph and check degree of vertices. ~\\
+Checking diameter of Cayley graph can be done via multiplications on {\em generating\_set}. In the next part we briefly describe an algorithm for such pourpose. Input of procedure is {\em generating\_set} and {\em diameter} we want check on graph. First we put all elements of {\em generating\_set} into {\em reached\_nodes}. The next loop iterates over all $n \in \{2 \dots diameter\}$, while the inner loop iterates over all variations with repetition of indices of length $n$ from {\em generating\_set}. We assign each variation to the array {\em var} and multiply the {\em generating\_set} elements in the same order as saved indices in {\em var}. We put multiplicatoin result into {\em reached\_nodes}. After exiting inner loop we get all multiplication results we want of length $n$ and we continue by checking if Cayley graph has diameter {\em n}. The graph has diameter {\em n} if  we have this way generated  all nodes of the graph. Our function checks all diameters up to {\em diameter}. If algorithm fails to return any diameter, the diameter of the graph is larger than our preset value. Our algorithm does not deal with the case of diameter $1$. Only after confirmation that our algorithm will produce all nodes we generate the graph and check the vertex degree. ~\\
+
 
 \lstinputlisting[language=Perl, frame=sinlge]{check_diameter.pl}
 
-Implementation of algorithms is done in the {\em Perl} programming language. Perl is high-level, general-purpose, interpreted programming language with great documentation and online community maintaining easy to use libraries. While Perl being high-level programming language, multiplication of matrices in our program were actually implemented in C programming language. For this purpose we have used the library called PDL or perl data language available at {\em CPAN}~\cite{CPAN}.
+Implementation of algorithms is done in the {\em Perl} programming language. Perl is a high-level, general-purpose, interpreted programming language with great documentation and online community maintaining easy to use libraries. While Perl being high-level programming language, multiplication of matrices in our program were actually implemented in C programming language. For this purpose we have used the library called PDL or perl data language available at {\em CPAN}~\cite{CPAN}.
 
 \subsection{Computer search of graphs with diameter $2$}
 
-We tested the above code on a group, $G=SL(2,5)$, of order $120$. By the Moore bound for diameter $2$ the first feasible size of a symmetric unit-free generating set $S$ is $|S|=12$.
- 
+We tested the above code on the group $G=SL(2,5)$, of order $120$. By the Moore bound for diameter $2$ the first feasible size of a symmetric unit-free generating set $S$ is $|S|=12$.
+
 To have an idea how big the task of checking all such subsets be, let us make a calculation. The group $G$ has exactly one involution and so $118$ non-involutory elements coming in pairs (an element with its inverse). So, one has a set $118/2=59$ elements (containing no inverse pair) to choose from. Assuming that our set $S$ does not contain an involution, we would have to test all choices of $12/2=6$ elements from a set of $59$ elements, which means testing ${59 \choose 6} = 45057474 $ cases, that is, more than 45 million of possibilities (and this is just a lower bound). This shows that even this modestly looking case is computationally demanding (when taking into account that after a set has been chosen one still has to test for diameter)
- 
+
 Since the numbers would increase dramatically for larger degrees we decided to restrict ourselves to a random search for suitable generating set $S$ that would give     a Cayley graph $C(G,S)$ of diameter $2$. The following table summarizes our random search results for generating sets $S$ of size $d$ for the group $G=SL(2,5)$ such     that the Cayley graph $C(G,S)$ has diameter $2$: ~ \\
- 
+
 \begin{tabular}[htbp]{l*{10}{c}r}
      $d$ & $12$ & $13$ & $14$ & $15$ & $16$ & $17$ & $18$ & $19$ & $20$ & $21$ \\
 \hline
@@ -382,14 +387,13 @@ Since the numbers would increase dramatically for larger degrees we decided to r
 \end{tabular} \\ \\
 
  We also run our randomized algorithm to find Cayley graphs of relatively small degree and diameter $2$ for the next group in this family, $SL(2,7)$, of order $336$.The same approach was used on Cayley graphs for the group $SL(2,7)$ with order of $336$ with Moore bound giving the minimum value of $d=19$. We have searched $150000$ graphs on each degree from $20$ to $30$ with only $10$ graphs found on $d=30$. Again, $20$ is the first realistic degree to try, but now the number of possibilities to search through is astronomical. Indeed, by a similar calculation as illustrated above, one would obtain ${167\choose 10} = 3532580013585348$ possibilities! Thus, for a randomized search such a small number of resulting graphs is not a surprise.
- 
+
 As already mentioned, we could not find results (or a code) related to the degree/diameter problem for special linear groups. On the other hand, such groups play an     important role in the study of symmetric discrete structures, which makes them prime candidates to be tested in the context of the degree/diameter problem as well.
 
-In later stages program was modified to find any graph with diameter 2 even in groups with bigger order by making restrictions on computations. The program needs to be set up with starting size of a generating set, time limit spent per degree, maximum of generated graphs per degree and number of parallel processes. In order to find some graph with diameter $2$ the program tries to find any graph of a given  degree In the case when the time limit is reached, the program continues to work with a generating set of a bigger size. After first successfuly found graph the search continues by making generating set smaller with bigger time limit spent on degree.
+In later stages our program was modified to find a graph with diameter 2 even in groups with bigger order by making restrictions on computations. The program needs to be set up with starting size of a generating set, time limit spent per degree, maximum of generated graphs per degree and number of parallel processes. In order to find some graph with diameter $2$ the program tries to find any graph of a given  degree In the case when the time limit is reached, the program continues to work with a generating set of a bigger size. After first successfuly found graph the search continues by making generating set smaller with bigger time limit spent on degree.
+By this approach we have found $2$ Cayley graphs for $SL(2,11)$ with order $76$ and $SL(2,13)$ with order $100$. 
 
-Tu pojdu vysledky z hladania lepsich grafov zo Zp 11, 13, 19
-
-For comparsion we present latest known results for Cayley graphs with $k=2$
+For comparison we present latest known results for Cayley graphs with $k=2$, taken from ~\cite{Combinatorics}
 \begin{center}
 	\scalebox{0.6}{
 		\begin{tabular}{| l | l | l | l | l | l |}
@@ -459,18 +463,15 @@ Graphs of degree $d$ and girth $g$ with order equal to $M(d,g)$ are called Moore
 	\caption{The Heawood graph is a Moore graph with $d=3$ and $g=6$ }
 \end{figure}
 
-\subsection{Example of a Cayley graph ***specify parameters***}
-Here we present an example of a Cayley graph on the group $SL(2,3)$ of order $|SL(2,3)|=24$
-
 \subsection{Generation of Cayley graphs with given girth}
 
 As in the case of diameter, for determining the girth of a Cayley graph it is sufficient to consider only multiplication by elements of the generating set.
-To conclude that a graph has girth $g$ it is sufficient to have a cycle of length $g$ but no cycles of any smaller length. 
-Here we present our algorithm used for computation of the girth of a Cayley graph. We divided algorithm into two procedures with finding cycles of graph and one making decision about size of girth. 
-We start by {\em check\_girth} procedure taking generating set and looking size of girth on graph. 
-At the beginning call {\em find\_cycle} procedure with {\em girth} we are trying to find. In case we found any cycle with such length we have to check all cycles with $length \in \{3 \dots girth - 1\}$. Any success in in condition on line $15$ results with returning girth of graph smaller than {\em girth}. In case we couldn't find any of them graph has given girth.
+To conclude that a graph has girth $g$ it is sufficient to have a cycle of length $g$ but no cycles of any smaller length.
+Here we present our algorithm used for computation of the girth of a Cayley graph. We divided algorithm into two procedures with finding cycles of graph and one making decision about size of girth.
+Input of {\em check\_girth} procedure is {\em generating\_set} and size of girth on graph we want to check.
+At the beginning we call the {\em find\_cycle} procedure with {\em girth} we are trying to find. In the case we found any cycle of such a length we have to check all cycles of $length \in \{3 \dots girth - 1\}$. Any success in in condition on line $15$ results with returning girth of graph smaller than {\em girth}. 
 
-Procedure {\em find\_cycle} taking same arguments is iterating over all variations with repetition with order of {\em girth} and assigning indeces into {\em var} array. Multiplication result is made by multiplying elements of {\em generating set} in same order as in {\em var}. Imidiatelly after we got our result we check wheter it's neutral element. If condition is true we have found cycle with length of {\em girth}. False for all cases gives as negative result for such cycle.
+The procedure {\em find\_cycle} taking the same arguments as  iterating over all variations with repetition with order equal to {\em girth} and assigning indices into {\em var} array. We multiply elements of the {\em generating set} in same order as in {\em var}. Immediately after obtaining our result we check whether they contain the neutral element. If this condition is true we have found a cycle of length of {\em girth}. False values for  all cases mean a negative result for such a cycle.
 
 \lstinputlisting[language=Perl, frame=sinlge]{check_girth.pl}
 
@@ -506,6 +507,8 @@ Maximum degree in graphs of diameter 2, Networks 10
 \bibitem{Circos} Circo, http://circos.ca
 
 \bibitem{CPAN} PDL, https://metacpan.org/pod/PDL
+
+\bibitem{Combinatorics} Combinatoricswiki.org, http://www.combinatoricswiki.org/wiki/The\_Degree\_Diameter\_Problem\_for\_Cayley\_Graphs 
 
 \end{thebibliography}
 
