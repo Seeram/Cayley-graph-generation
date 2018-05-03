@@ -1,0 +1,258 @@
+\documentclass[portrait,a0,final]{a0poster}
+
+%nieco od Jakuba:
+  \pdfpagewidth=\paperwidth                           % zabezpecuje, aby to v~pdf malo rovnaky rozmer ako v~dvi,
+  \pdfpageheight=\paperheight                         % tie za beznych okolnosti nemusia moc dobre korelovat
+
+%Slovencina
+%\usepackage{slovak}
+
+%\usepackage{slovak}
+%\usepackage[utf8]{inputenc}
+
+%\usepackage[slovak]{babel}
+%\usepackage[cp1250]{inputenc}
+%\usepackage[T1]{fontenc} %pekne makcene
+
+%male popisy obrazkov a~grafika
+\usepackage[font=small,margin=0.5cm]{caption} % margin reguluje okraje popisu obrazka (v pripade, ze je na sirku strany a~ma viac ako 1 riadok)
+\usepackage[dvips]{graphicx}
+\usepackage{wrapfig}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{epstopdf}   %bez tohto pdflatex nezoberie eps obazky
+\usepackage{listings}
+\lstset{ 
+	basicstyle=\footnotesize,
+    tabsize=3,
+} 
+
+%grid obrazkov
+\usepackage{subfig}
+
+\newcounter{eqn}
+\renewcommand*{\theeqn}{\alph{eqn})}
+\newcommand{\num}{\refstepcounter{eqn}\text{\theeqn}\;}
+
+\makeatletter
+\newcommand{\putindeepbox}[2][0.7\baselineskip]{{%
+    \setbox0=\hbox{#2}%
+    \setbox0=\vbox{\noindent\hsize=\wd0\unhbox0}
+    \@tempdima=\dp0
+    \advance\@tempdima by \ht0
+    \advance\@tempdima by -#1\relax
+    \dp0=\@tempdima
+    \ht0=#1\relax
+    \box0
+}}
+\makeatother
+
+%farebne tabulky
+\usepackage{colortbl}
+\usepackage[table]{xcolor}
+%na otacanie tabuliek
+\usepackage{rotating}
+
+%odsadenie prveho odstavca
+\usepackage{indentfirst}
+
+%Matematicke vyrazy
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\usepackage{verbatim}
+\usepackage[official]{eurosym}
+\usepackage{url}
+
+%algoritmy
+\usepackage[lined,boxed]{algorithm2e}
+
+%definicie
+\newcommand{\p}{\partial}
+ \def\epsilon{\varepsilon}
+ \def\Bf#1{\mathbf{#1}}
+
+%TRUBAC
+\usepackage[left=2cm,right=2cm,top=0cm,bottom=0cm, paperwidth=841mm, paperheight=1201.42mm]{geometry}
+\usepackage{a0poster}
+\usepackage{multicol}
+\usepackage[]{indentfirst,latexsym}
+
+\usepackage{pstricks,pst-grad}
+
+\renewcommand{\rmdefault}{phv} % Arial
+\renewcommand{\sfdefault}{phv} % Arial
+
+% Hrubka oddelovaca medzi stlpcami
+\columnseprule=2pt
+% Medzera medzi oddelovacmi stlpcov a textom
+\columnsep=100pt
+
+%====================================================================================================================================================
+%====================================================================================================================================================
+
+\begin{document}
+
+% Font + riadkovanie
+\renewcommand{\baselinestretch}{1.5}
+\fontsize{25pt}{20pt}
+\selectfont
+
+\begin{center}
+\includegraphics[width=\textwidth]{header.eps}
+\end{center}
+
+\centerline{\huge \bf{Cayley graphs of given diameter or girth on linear groups}}
+\vskip 1cm 
+\centerline{\Large Mat\'u\v{s} Behun}
+\vskip 0.5cm
+\leaders\vrule width \textwidth\vskip 3pt % or other desired thickness
+%\noindent\hrulefill
+
+\begin{multicols}{3}
+\paragraph{Motivation}
+\begin{itemize}
+	\item In its simplest form, networks can be modeled by graphs with nodes as vertices and links between them as edges.
+	\item In modeling interconnection networks by graphs one often considers these restrictions:
+	\begin{itemize}
+		\item limitation on the number of physical links leaving a node
+		\item limitation on accessibility, that is, any two nodes should be accessible using at most a certain number of physical links.
+		\item limitation on length of smallest cycle in graph.
+	\end{itemize}
+\end{itemize}
+
+In graph theory this leads to two important problems: the {\em degree/diameter problem} to construct the largest possible graphs of a given maximum degree and a given diameter, and the {\em degree/girth problem} to construct the smallest possible regular graphs of a given degree and a given girth; in both cases the adjectives `large' and `small' refer to the order (i.e., the number of vertices) of a graph.
+\paragraph{Degree/diameter problem}
+~\\
+There is a theoretical upper bound on the largest order of a graph of maximum degree $d\ge 2$ and diameter $k\ge 1$.
+\begin{equation}\label{eq:Moore}
+	\begin{split}
+		n_{d,k} \leq M_{d,k}    & = 1 + d + d(d - 1) + \dots + d(d - 1)^{k-1}  \\
+								& = 1 + d(1 + (d - 1) + \dots + (d - 1)^{k-1}) \\
+								& = \begin{cases}
+								1+d\frac{(d-1)^{k}-1}{d-2}, & \text{if}\ d > 2 \\
+								2k+1, & \text{if}\ d=2
+									\end{cases}
+	\end{split}
+\end{equation} ~\\~\\
+Graphs of maximum degree $d$ and diameter $k$ with $M_{d,k}$ vertices are called {\em Moore graphs}. Moore graphs are rare; they exist only for the following degrees and diameters: 
+~\\
+\begin{itemize}
+	\item If $d = 2$ for any $k \geq 1$
+	\item If $k = 1$ for any $d \geq 2$
+	\item If $k = 2$ and $d \in \{3, 7 \}$, and possibly $57$
+\end{itemize} ~\\
+In the remaining cases one tries to construct graphs of maximum degree $d$ and diameter $k$ of order as close to the Moore bound $M_{d,k}$ as possible.
+
+\begin{figure}
+	\centering
+	\includegraphics[scale=0.7]{Hoffman-Singleton_graph.png}
+
+	\textbf{Hoffman-Singleton graph with $k=2$ and $d=7$}
+\end{figure}
+
+~\\
+\paragraph{Construction of large graphs}
+~\\
+Finding $(d,k)$-graph of large order is approached by many techniques, mostly using combinatorics on words or various algebraic structures. \\~\\
+We present two examples of bounds arising from such constructions: ~\\
+Using combinatorics on words, Baskoro and Miller(1993) \cite{Bas-Mil} proved that 
+\begin{equation*}
+	n_{d,k} \geq \left( \frac{d}{2} \right)^{k} +  \left( \frac{d}{2} \right)^{k-1}     
+\end{equation*}
+With the help of finite fields Bevan, Erskine and Lewis(2017) \cite{Bev-Ers} observed that modified Brown graphs give the bound
+\begin{equation*}
+	n_{d,2} \geq d^{2} - 2d^{1+\varepsilon}     
+\end{equation*}
+where $\varepsilon$ depends on results about graphs between consecutive primes. 
+
+\paragraph{Cayley graphs}  
+~\\
+Let $\Gamma$ be a group and let $S\subset \Gamma$ be a symmetric unit-free generating set for $\Gamma$; that is, we require that $S=S^{-1}$ and $1\notin S$. 
+The $\textit{Cayley graph}$ $C(\Gamma,S)$ is the graph with vertex set $\Gamma$ in which vertices $a,b$ are adjacent if $a^{-1}b\in S$. ~\\
+
+By $C_{d,k}$ we denote the largest order of Cayley graph of degree $d$ and diameter $k$. ~\\
+The best currently known lower bound on diameter $2$ for an infinite family of degrees is due to \v{S}iagiov\'a and \v{S}ir\'a\v{n}(2012): ~\\
+Let $D = \{ 2^{2m+\mu}+    (2+\delta)2^{m+1}-6,m \geq 1, \mu \in \{0,1\} \}$. Then, for every $d\in D$ one has $C_{d,2} > d^{2} - 6\sqrt{2}d^{3/2}$.
+
+\paragraph{Special linear group}  
+~\\
+%\begin{definition}[General and special linear group] 
+Let $q$ be a power of a prime and let $GF(q)$ be the Galois field of order $q$. The {\em general linear group} $GL(m,q)$ consists of all non-singular $m\times m$ matrices over $GF(q)$ under multiplication. \\~\\
+The special linear group is the subgroup of $GL(m,q)$ consiting of matrices with determinant $1$.
+~\\
+$|GL(m,q)| = (q^m - 1)(q^m - q) \cdots (q^m - q^{m-1})$
+~\\
+$|SL(m,q)| = |GL(m,q)|/(q-1)$
+~\\
+%\end{theorem}
+\paragraph{Computer search}
+~\\
+We created a program generating Cayley graphs of given degree and diameter based on $SL(2,q)$. \\~\\
+As an example, consider the problem of generating a Cayley graph for the group $SL(2,5)$ of diameter $2$ and minimum possible degree.
+~\\
+In order to find graphs with given $d$ and $k$ we generted Cayley graphs from random symmetric unit-free sets $S$ of $SL(2,5)$.
+The order of $SL(2,5)$ is $120$, so that by the Moore bound the first feasible degree (equal to sthe size of a generating set) would be $12$.
+
+The group $SL(2,5)$ has only one involution; all the remaining $118$ elements form $59$ pairs of the form $\{x,x^{-1}\}$. \\~\\
+To check all Cayley graphs $C(G,S)$ for $G=SL(2,5)$ and $|S|=12$ we would have to generate all the ${59 \choose 6} = 45057474$ possibilities for $S$ and then check for the diameter of the resulting Cayley graphs. \\~\\
+For the group $G=SL(2,5)$ and generating sets $S$ such that $|S|=d$ by our randomized algorithm we found the following number of generating sets giving Cayley graphs $C(G,S)$ of diameter $2$: \\~\\
+
+\begin{tabular}[htbp]{l*{10}{c}r}
+		$d$ & $13$ & $14$ & $15$ & $16$ & $17$ & $18$ & $19$ & $20$ & $21$ \\ 
+		\hline
+		Found graphs & $0$ & $0$ & $1$ & $107$ & $345$ & $2451$ & $4120$ & $11669$ & $14926$ \\
+\end{tabular}
+
+\begin{figure}
+	\centering
+	\includegraphics[scale=0.40]{example.png} 
+
+	\textbf{Example of graph generated on $SL(2,3)$}
+\end{figure}
+~\\~\\~\\~\\
+\paragraph{Genearation of Cayley graph}
+\lstinputlisting[language=Perl]{cayley_graph_generation.pl}
+
+\paragraph{Check of diameter of Cayley graph}
+\lstinputlisting[language=Perl]{check_diameter.pl}
+
+
+\paragraph{Degree/girth problem}
+~\\
+Finding regular graphs with smallest possible order denoted $n_{d,g}$ with given degree $d$ and girth $g\geq3$ is known as {\em degree/girth problem}. Motivation for finding such graphs could arise from constructing graphs with no cycles of length less than $g$ and its similarity to {\em degree/diameter problem}.
+\begin{equation*}
+	n_{d,g} \geq M(d,g) = 1 + d + d(d - 1) + d(d - 1)^{2} + \dots + d(d - 1)^{\frac{g-3}{2}}
+\end{equation*}
+and for even $g$
+\begin{equation*}
+	n_{d,g} \geq M(d,g) = 2(1 + (d - 1) + (d - 1)^{2} + \dots + (d - 1)^{\frac{g-2}{2}})
+\end{equation*}
+
+For odd $g$ the Moore bound is obtained in the same way as the Moore bound for the degree/diameter problem for the diameter $k=(g-1)/2$. For even $g$ we start with an edge and from its incident vertices we continue growing two spanning trees until we reach depth $(g-2)/2$.
+
+Graphs of degree $d$ and girth $g$ with order equal to $M(d,g)$ are called Moore graphs or cages. We list all cases with $n_{d,g} = M_{d,g}$ below:
+
+\begin{itemize}
+	\item{\makebox[5cm]{For $d=2$,\hfill}$g \geq 2$ - circles}
+    \item{\makebox[5cm]{For $g=3$,\hfill}$d \geq 2$ - complete graphs}
+    \item{\makebox[5cm]{For $g=4$,\hfill}$d \geq 2$ - complete bipartite graphs}
+    \item{\makebox[5cm]{For $g=5$,\hfill}$d=2$ - circle of length $5$}
+    \item[]{\makebox[5cm]{\hfill}$d=3$ - Peterssen graph}
+    \item[]{\makebox[5cm]{\hfill}$d=7$ - Hoffman-Singleton graph}
+    \item[]{\makebox[5cm]{\hfill}$d=57$ - this value has not been excluded but no such graph has been found yet }
+    \item{\makebox[7cm]{For $g \in {6,8,12}$,\hfill}if $d-1$ is a prime power}
+\end{itemize}
+\begin{figure}
+	\centering
+	\includegraphics[scale=0.4]{Heawood_graph.png} 
+
+	\textbf{Heawood graph with $d=3$ and $g=6$}
+\end{figure}
+\end{multicols}
+
+\vfill
+\begin{center}
+\makebox[\textwidth]{\includegraphics[width=\paperwidth]{footer/footer.pdf}}
+\end{center}
+\end{document}

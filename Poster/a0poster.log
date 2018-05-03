@@ -1,0 +1,14 @@
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (MiKTeX 2.9) (preloaded format=pdftex 2012.5.8)  19 MAY 2014 22:12
+entering extended mode
+**E:/DIPLOMOVKA/poster/a0poster.sty
+(E:/DIPLOMOVKA/poster/a0poster.sty
+! Undefined control sequence.
+l.3 \usepackage
+               {color}
+? 
+! Emergency stop.
+l.3 \usepackage
+               {color}
+End of file on the terminal!
+
+!  ==> Fatal error occurred, no output PDF file produced!
