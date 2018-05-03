@@ -775,8 +775,9 @@ sub get_random_index_girth
 
 	while(1) {
 		my $chosen_index = int(rand($#{ $group_ref->[0] } + 1 ));
-		if($chosen_index != $neutral_element) {
+		if($group_ref->[3]->[0]->[$chosen_index] >= 5 && $chosen_index != $neutral_element) {
 			return $chosen_index;
+		
 		}
 	}
 }
@@ -1208,7 +1209,13 @@ sub search_graphs_with_girth
 	my ($field_bound, $diameter, $property) = @_;
 
 	srand time;
+<<<<<<< HEAD
 	my $number_of_forks = 4;
+||||||| merged common ancestors
+	my $number_of_forks = 12;
+=======
+	my $number_of_forks = 0;
+>>>>>>> 2daf026e8a84357db8f518d3bfc055c0b051287c
 	my $hash_table_size = 154485863;
 	my $number_of_generated_graphs = 50000;
 	my $time_limit = 60; # seconds
@@ -1219,11 +1226,22 @@ sub search_graphs_with_girth
 	my $pm = new Parallel::ForkManager( $number_of_forks );
 
 
-	foreach my $degree ( $moore_degree..(2 * $moore_degree) ) {
+	foreach my $degree ( 2..$moore_degree ) {
 		print "Starting with degree $degree\n";
 		foreach (1..1000) {
 			my $generating_set_ref = get_random_generating_set(\@group, $zp, $degree);
 
+			my @orders;	
+			foreach my $m ( @{ $generating_set_ref } ) { 
+				foreach my $i ( 0..$#{ $group[0] } ) {
+					if(all $m == $group[0]->[$i]) {
+						push @orders, $group[3]->[0]->[$i];	
+					}	
+				}		
+			}
+			print "#############################\n";
+			@orders = sort @orders;
+			print join(", ", @orders) . "\n";
 			$pm->start and next;
 			my $girth = find_girth($generating_set_ref, $zp);
 			if(find_girth($generating_set_ref, $zp) == 5) {
@@ -1233,9 +1251,9 @@ sub search_graphs_with_girth
 				make_graphical_output(@graph, "new");
 				<STDIN>;
 			} else {
-				print "$girth\n";
+				print "$girth: \n";
 			}
-
+			print "################################\n";
 			$pm->finish;
 		}
 	}
