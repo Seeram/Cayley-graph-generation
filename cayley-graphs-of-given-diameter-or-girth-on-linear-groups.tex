@@ -37,12 +37,14 @@
      \centerline {\large \bf{Slovak University of Technology in Bratislava}}
      \vskip 0.2cm
      \centerline{\large \bf{Faculty of Civil Engineering}}
-     \vskip 5cm
+     \vskip 0.2cm
+	 Evidential number: SvF-5342-54946
+     \vskip 5.0cm
      \centerline{\Large \bf{Cayley graphs of given degree and diameter on linear groups}}
      \vskip 0.2cm
      \vskip 0.5cm
      \centerline{\large \bf{Bachelor Thesis}}
-     \vskip 5cm          %\vskip 2cm             %zmena kvoli zobrazovaniu dnesneho datumu
+     \vskip 7cm          %\vskip 2cm             %zmena kvoli zobrazovaniu dnesneho datumu
      \normalsize
          \begin{tabular}[l]{p{0.27\textwidth}p{0.73\textwidth}}
 			 Study program: & Mathematical and Computational Modelling  \\
@@ -64,9 +66,25 @@
 
 \section{Abstract}
 
-This bachelor thesis discuss two problems concerning construction of graphs with given restriction, namely {\em degree/diameter} and {\em degree/girth} problem. In our work we describe both problems, the associated theoretical bounds and some research results with focus on Cayley graphs on $2$-dimensional special linear groups over finite fields. We present algorithm for generating such Cayley graphs of diameter 2, looking for smallest possible degree. We used randomized search over generating sets of predetermined sizes in small special linear groups of dimension 2 over finite fields. ~ \\
+This bachelor thesis discuss two problems concerning construction of graphs with given restriction, namely {\em degree/diameter} and {\em degree/girth} problem. In our work we describe both problems, the associated theoretical bounds and some research results with focus on Cayley graphs on $2$-dimensional special linear groups over finite fields. We present algorithm for generating such Cayley graphs of diameter 2, looking for smallest possible degree. We used randomized search over generating sets of predetermined sizes in small special linear groups of dimension 2 over finite fields. 
+~\\
+{\bf{Keywords:}} degree/diameter, degree/girth, special linear group, Cayley graph
+~\\~\\
+Pr\'aca pojedn\'ava o dvoch probl\'emoch pri kon\v{s}trukci\'i grafov s predur\v{c}en\'ymi obmedzeniami, konkr\'etne probl\'em stup\v{n}a a priemeru a stup\v{n}a a obvodu. V pr\'aci popisujeme oba probl\'emy, ich teoretick\'e ohrani\v{c}enia a v\'ysledky vedeck\'eho v\'yskumu so zameran\'im na Cayleyho grafy on $2$-rozmern\'ych \v{s}peci\'alnych line\'arnych grup\'ach nad kone\v{c}n\'ymi po\v{l}ami. V pr\'aci uv\'adzame algoritmus pre generovanie Cayleyho grafu priemeru 2, pri ktor\'ych h\v{l}ad\'ame tak\'y s \v{c}o najmen\v{s}\'im mo\v{z}n\'ym stup\v{n}om. Na h\v{l}adanie sme pou\v{z}ili n\'ahodn\'e vyh\v{l}ad\'avanie v mno\v{z}in\'ach s predur\v{c}enou ve\v{l}os\v{t}ou v mal\'ych \v{s}peci\'alnych line\'arnych grup\'ach dimenzie 2 nad kone\v{c}n\'ymi po\v{l}ami. ~\\
+{\bf{K\v{l}\'u\v{c}ov\'e slov\'a:}} degree/diameter, degree/girth, special linear group, Cayleyho graf
 
-Pr\'aca pojedn\'ava o dvoch probl\'emoch pri kon\v{s}trukci\'i grafov s predur\v{c}en\'ymi obmedzeniami, konkr\'etne probl\'em stup\v{n}a a priemeru a stup\v{n}a a obvodu. V pr\'aci popisujeme oba probl\'emy, ich teoretick\'e ohrani\v{c}enia a v\'ysledky vedeck\'eho v\'yskumu so zameran\'im na Cayleyho grafy on $2$-rozmern\'ych \v{s}peci\'alnych line\'arnych grup\'ach nad kone\v{c}n\'ymi po\v{l}ami. V pr\'aci uv\'adzame algoritmus pre generovanie Cayleyho grafu priemeru 2, pri ktor\'ych h\v{l}ad\'ame tak\'y s \v{c}o najmen\v{s}\'im mo\v{z}n\'ym stup\v{n}om. Na h\v{l}adanie sme pou\v{z}ili n\'ahodn\'e vyh\v{l}ad\'avanie v mno\v{z}in\'ach s predur\v{c}enou ve\v{l}os\v{t}ou v mal\'ych \v{s}peci\'alnych line\'arnych grup\'ach dimenzie 2 nad kone\v{c}n\'ymi po\v{l}ami.
+\newpage
+	\vskip 5cm          %\vskip 2cm             %zmena kvoli zobrazovaniu dnesneho datumu
+	{\bf{\v{C}estn\'e prehl\'asenie}} ~\\
+	Vyhlasujem, \v{z}e som bakal\'arsku pr\'acu vypracoval samostatne s pou\v{z}it\'im uvedenej odbornej literat\'ury a s odbornou pomocou ved\'uceho pr\'ace.
+	\vskip 2cm          %\vskip 2cm             %zmena kvoli zobrazovaniu dnesneho datumu
+	V Bratislave d\v{n}a  
+	\vskip 2cm          %\vskip 2cm             %zmena kvoli zobrazovaniu dnesneho datumu
+	\hskip 10cm .................... ~\\ 
+
+\newpage
+
+\tableofcontents
 
 \newpage
 
@@ -429,7 +447,7 @@ For comparison we present latest known results for Cayley graphs with $k=2$, tak
 		\end{tabular}
 	}
 \end{center}
-
+\newpage
 \section{The degree/girth problem}
 Finding regular graphs with smallest possible order denoted $n_{d,g}$ with given degree $d$ and girth $g\geq3$ is known as {\em degree/girth problem}. Motivation for finding such graphs could arise from constructing graphs with no cycles of length less than $g$ and its similarity to {\em degree/diameter problem}. The problem was studied first by Biggs ~\cite{Biggs}.
 \subsection{Moore bound}
@@ -473,6 +491,7 @@ At the beginning we call the {\em find\_cycle} procedure with {\em girth} we are
 
 The procedure {\em find\_cycle} taking the same arguments as  iterating over all variations with repetition with order equal to {\em girth} and assigning indices into {\em var} array. We multiply elements of the {\em generating set} in same order as in {\em var}. Immediately after obtaining our result we check whether they contain the neutral element. If this condition is true we have found a cycle of length of {\em girth}. False values for  all cases mean a negative result for such a cycle.
 
+\newpage
 \lstinputlisting[language=Perl, frame=sinlge]{check_girth.pl}
 
 \newpage
@@ -481,8 +500,9 @@ The procedure {\em find\_cycle} taking the same arguments as  iterating over all
 
 In our work we discussed problems of construction of graphs with restriction on {\em degree/diameter} and {\em degree/girth}. We discussed theoretical bounds on both problems called after Moore and special cases of graphs reaching the Moore bound. We introduced Cayley graphs as a special case of graphs with a `high level of symmetry'. Cayley graphs of a given degree and diameter (or girth) have been considered before, but to the best of our knowledge not on special two-dimensional linear groups. This was the reason why we tried to extend the search to such groups of comparatively small order, and to diameter 2 and small girth. We described implementation and our approach in search for such graphs with our results.
 
-\section{Resume}
-V tejto pr\'aci sme rozoberali probl\'em kon\v{s}trukcie grafov s obmedzeniami pre probl\'emy stup\v{n}a a priemeru a stup\v{n}a a obvodu. Rozoberali sme teoretick\'e ohrani\v{c}enia pre oba probl\'emy pomenovanon\'e pod\v{l}a Moora a \v{s}peci\'alny pr\'ipad grafov ktor\'e t\'uto hranicu dosahuj\'u. Uviedli sme Cayleho grafy ako grafy s vysokou hranicou symetrie. Cayleho grafy s dan\'ym stup\v{n}om a priemmerom (alebo obvodom) boli predt\'ym vzan\'e do \'uvahy, pod\v{l}a na\v{s}ich vedomost\'i nie ale na $2$-dimenzion\'alnych \v{s}peici\'alnych line\'arnych grup\'ach. Bolo to dovodom pre\v{c}o sme sa pok\'usili roz\v{s}\'iri\v{t} h\v{l}adanie v grup\'ah s mal\'ym r\'adom, a na priemer 2 a mal\'e obvody. Pop\'isali sme implement\'aciu a n\'a\v{s} pr\'istup in h\v{l}adan\'i tak\'ychto grafov s na\v{s}\'imi v\'ysledkami.
+\newpage
+\section{Resum\'e}
+V tejto pr\'aci sme rozoberali probl\'em kon\v{s}trukcie grafov s obmedzeniami pre probl\'emy stup\v{n}a a priemeru a stup\v{n}a a obvodu. Rozoberali sme teoretick\'e ohrani\v{c}enia pre oba probl\'emy pomenovanon\'e pod\v{l}a Edwarda F. Moora a \v{s}peci\'alny pr\'ipad grafov ktor\'e t\'uto hranicu dosahuj\'u. Uviedli sme Cayleho grafy ako grafy s vysokou mierou symetrie. Cayleho grafy s dan\'ym stup\v{n}om a priemerom (alebo obvodom) boli predt\'ym vzan\'e do \'uvahy, pod\v{l}a na\v{s}ich vedomost\'i nie ale na $2$-dimenzion\'alnych \v{s}peici\'alnych line\'arnych grup\'ach. To bolo dovodom pre\v{c}o sme sa pok\'usili roz\v{s}\'iri\v{t} h\v{l}adanie v grup\'ah s mal\'ym r\'adom, a na priemer 2 a mal\'e obvody. Pop\'isali sme implement\'aciu a n\'a\v{s} pr\'istup in h\v{l}adan\'i tak\'ychto grafov s na\v{s}\'imi v\'ysledkami.
 
 \begin{thebibliography}{xx}
 
