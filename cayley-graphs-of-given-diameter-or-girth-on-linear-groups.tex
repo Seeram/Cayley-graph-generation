@@ -12,6 +12,7 @@
 \usepackage{algorithmic}
 \usepackage{algorithm}
 \usepackage{listings}
+\usepackage{pdfpages}
 %\usepackage{cite}
 
 \graphicspath{ {pictures/} }
@@ -27,6 +28,7 @@
 \setlength{\belowdisplayskip}{7pt} \setlength{\belowdisplayshortskip}{5pt}
 \setlength{\abovedisplayskip}{7pt} \setlength{\abovedisplayshortskip}{5pt}
 
+\includepdf[pages={1}]{file.pdf}
 %====================================================================================================================================================
 % FIRST PAGE
 %====================================================================================================================================================
@@ -50,7 +52,7 @@
 			 Study program: & Mathematical and Computational Modelling  \\
 			 Major: & 9.1.9 Applied Mathematics  \\
          	 Department: & Department of Mathematics and Constructive Geometry\\
-			 Supervisor: & Jana \v{S}iagiov\'a \\
+			 Supervisor: & doc. RNDr. Jana \v{S}iagiov\'a, PhD. \\
          \end{tabular}
      \vskip 3cm
      \centerline{\large \bf{Bratislava 2018}}
@@ -60,18 +62,8 @@
 
  \newpage
 
-%====================================================================================================================================================
-% END OF FIRST PAGE
-%====================================================================================================================================================
+\includepdf[pages={1}]{screen.pdf}
 
-\section{Abstract}
-
-This bachelor thesis discuss two problems concerning construction of graphs with given restriction, namely {\em degree/diameter} and {\em degree/girth} problem. In our work we describe both problems, the associated theoretical bounds and some research results with focus on Cayley graphs on $2$-dimensional special linear groups over finite fields. We present algorithm for generating such Cayley graphs of diameter 2, looking for smallest possible degree. We used randomized search over generating sets of predetermined sizes in small special linear groups of dimension 2 over finite fields. 
-~\\
-{\bf{Keywords:}} degree/diameter, degree/girth, special linear group, Cayley graph
-~\\~\\
-Pr\'aca pojedn\'ava o dvoch probl\'emoch pri kon\v{s}trukci\'i grafov s predur\v{c}en\'ymi obmedzeniami, konkr\'etne probl\'em stup\v{n}a a priemeru a stup\v{n}a a obvodu. V pr\'aci popisujeme oba probl\'emy, ich teoretick\'e ohrani\v{c}enia a v\'ysledky vedeck\'eho v\'yskumu so zameran\'im na Cayleyho grafy on $2$-rozmern\'ych \v{s}peci\'alnych line\'arnych grup\'ach nad kone\v{c}n\'ymi po\v{l}ami. V pr\'aci uv\'adzame algoritmus pre generovanie Cayleyho grafu priemeru 2, pri ktor\'ych h\v{l}ad\'ame tak\'y s \v{c}o najmen\v{s}\'im mo\v{z}n\'ym stup\v{n}om. Na h\v{l}adanie sme pou\v{z}ili n\'ahodn\'e vyh\v{l}ad\'avanie v mno\v{z}in\'ach s predur\v{c}enou ve\v{l}os\v{t}ou v mal\'ych \v{s}peci\'alnych line\'arnych grup\'ach dimenzie 2 nad kone\v{c}n\'ymi po\v{l}ami. ~\\
-{\bf{K\v{l}\'u\v{c}ov\'e slov\'a:}} degree/diameter, degree/girth, special linear group, Cayleyho graf
 
 \newpage
 	\vskip 5cm          %\vskip 2cm             %zmena kvoli zobrazovaniu dnesneho datumu
@@ -81,6 +73,26 @@ Pr\'aca pojedn\'ava o dvoch probl\'emoch pri kon\v{s}trukci\'i grafov s predur\v
 	V Bratislave d\v{n}a  
 	\vskip 2cm          %\vskip 2cm             %zmena kvoli zobrazovaniu dnesneho datumu
 	\hskip 10cm .................... ~\\ 
+\newpage
+{\bf{Po\v{d}akovanie}} ~\\
+\vskip 0.5cm
+Pri vypracovan\'i pr\'ace mi ve\v{l}kou mierou pomohla ved\'uca pr\'ace doc. RNDr. Jana \v{S}iagiov\'a, PhD. ktorej ochota a trpezlivos\v{t} pre m\v{n}a ostan\'u in\v{s}pir\'aciou v \v{z}ivote.
+\newpage
+
+
+
+%====================================================================================================================================================
+% END OF FIRST PAGE
+%====================================================================================================================================================
+
+\section{Abstract}
+This bachelor thesis discuss two problems concerning construction of graphs with given restriction, namely {\em degree/diameter} and {\em degree/girth} problem. In our work we describe both problems, the associated theoretical bounds and some research results with focus on Cayley graphs on $2$-dimensional special linear groups over finite fields. We present algorithm for generating such Cayley graphs of diameter 2, looking for smallest possible degree. We used randomized search over generating sets of predetermined sizes in small special linear groups of dimension 2 over finite fields. 
+~\\
+{\bf{Keywords:}} degree/diameter, degree/girth, special linear group, Cayley graph
+~\\~\\
+Pr\'aca pojedn\'ava o dvoch probl\'emoch pri kon\v{s}trukci\'i grafov s predur\v{c}en\'ymi obmedzeniami, konkr\'etne probl\'em stup\v{n}a a priemeru a stup\v{n}a a obvodu. V pr\'aci popisujeme oba probl\'emy, ich teoretick\'e ohrani\v{c}enia a v\'ysledky vedeck\'eho v\'yskumu so zameran\'im na Cayleyho grafy on $2$-rozmern\'ych \v{s}peci\'alnych line\'arnych grup\'ach nad kone\v{c}n\'ymi po\v{l}ami. V pr\'aci uv\'adzame algoritmus pre generovanie Cayleyho grafu priemeru 2, pri ktor\'ych h\v{l}ad\'ame tak\'y s \v{c}o najmen\v{s}\'im mo\v{z}n\'ym stup\v{n}om. Na h\v{l}adanie sme pou\v{z}ili n\'ahodn\'e vyh\v{l}ad\'avanie v mno\v{z}in\'ach s predur\v{c}enou ve\v{l}os\v{t}ou v mal\'ych \v{s}peci\'alnych line\'arnych grup\'ach dimenzie 2 nad kone\v{c}n\'ymi po\v{l}ami. ~\\
+{\bf{K\v{l}\'u\v{c}ov\'e slov\'a:}} degree/diameter, degree/girth, special linear group, Cayleyho graf
+
 
 \newpage
 
